@@ -46,6 +46,7 @@ export const setLogoState = ({state}) => {
 
             // Calculate category factor weights by level of explicitness (0 thru 4)
             let i;
+            var explicitness = 0;
             var factorweighted_categories = [],
 
                 level0_exclusions = [],
@@ -74,7 +75,7 @@ export const setLogoState = ({state}) => {
 
             for (i=0; i < categories.length; i++) {
                 const x = categories[i]
-                var explicitness = 0;
+                explicitness = 0;
                 if (x.acf.explicitness) explicitness = x.acf.explicitness
                 explicitness = parseInt(explicitness, 10);
                 switch (explicitness) {
@@ -131,7 +132,7 @@ export const setLogoState = ({state}) => {
                 
                 var x = categories[i];
 
-                var explicitness = 0;
+                explicitness = 0;
                 if (x.acf.explicitness) explicitness = x.acf.explicitness
                 explicitness = parseInt(explicitness, 10);
 
