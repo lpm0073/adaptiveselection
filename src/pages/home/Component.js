@@ -102,9 +102,24 @@ class Home extends Component {
           image_queue: images,
           page_number: this.state.page_number + 1
         });
+        console.log(images);
       })
       .catch(error => {
-        console.log("frowny face.");
+        /*
+            {
+              "code": "rest_post_invalid_page_number",
+              "message": "The page number requested is larger than the number of pages available.",
+              "data": {
+                "status": 400
+                }
+            }
+
+        */
+       console.log("frowny face.");
+       this.setState({
+         page_number: 0
+       });
+
       });
   
     }
@@ -121,13 +136,14 @@ class Home extends Component {
           <div className="home-page mt-5 pt-5">
             <div className="row m-2 p-2 text-center">
               {this.state.image_queue != null ? this.state.image_queue.map((obj, indx) => {
+                  var imgDict = wpGetImage(obj, "medium");
                   return (
                     <ImageBox 
                     key={indx}
                     imageKey={indx}
-                    url={wpGetImage(obj)}
-                    height = "125px"
-                    width = "125px"
+                    url={imgDict.source_url}
+                    height = {imgDict.height}
+                    width = {imgDict.width}
                     />
                   );
                 })
