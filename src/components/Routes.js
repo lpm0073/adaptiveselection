@@ -4,7 +4,7 @@ import { withRouter } from 'react-router-dom';
 
 // Redux
 import { connect } from 'react-redux';
-import { fetchSpecialties } from '../redux/ActionCreators';
+import { fetchSpecialties, fetchCategories } from '../redux/ActionCreators';
 
 // Pages
 import Home from '../pages/home/Component';
@@ -16,6 +16,7 @@ const mapStateToProps = state => ({
 
 const mapDispatchToProps = (dispatch) => ({
   fetchSpecialties: () => {dispatch(fetchSpecialties())},
+  fetchCategories: () => {dispatch(fetchCategories())}
 });
 
 
@@ -23,6 +24,7 @@ class Routes extends Component {
   
   componentDidMount() {
     this.props.fetchSpecialties();
+    this.props.fetchCategories();
   }
 
   shouldComponentUpdate(nextProps, nextState) {

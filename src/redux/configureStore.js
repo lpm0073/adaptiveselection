@@ -1,5 +1,6 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { Specialties } from './specialties';
+import { Categories } from './categories';
 import { HomePageRedux } from './homePage.js';
 
 import thunk from 'redux-thunk';
@@ -12,6 +13,7 @@ export const ConfigureStore = () => {
         
         combineReducers({
             specialties: Specialties,
+            categories: Categories,
             homePage: HomePageRedux
         }),
         applyMiddleware(thunk, logger)
