@@ -27,22 +27,12 @@ class Home extends Component {
     }
   }
 
-  categoryWeights() {
-    const categories = this.props.categories.items;
-    for (var i=0; i++; i < categories.length) {
-        const x = {
-
-        }
-    }
-  }
-
   render() {
       if (!this.props.categories.isLoading) {
         const cats = this.props.categories.items;
         const exclusions = wpGetExclusions(0, cats);
         console.log("exclusions will be: ", exclusions);
         console.log("url will be: ", mediaUrl + "&" + exclusions);
-        console.log(cats);
       }
       return(
           <div className="home-page mt-5 pt-5">

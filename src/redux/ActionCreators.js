@@ -128,7 +128,9 @@ export const setLogoState = ({state}) => {
 
             // add percentage weights by level
             for (i=0; i < categories.length; i++) {
-                const x = categories[i]
+                
+                var x = categories[i];
+
                 var explicitness = 0;
                 if (x.acf.explicitness) explicitness = x.acf.explicitness
                 explicitness = parseInt(explicitness, 10);
@@ -147,6 +149,7 @@ export const setLogoState = ({state}) => {
                 x.level3_weight = (1 + (level3_pct / x.level3_item_pct));
                 x.level4_weight = (1 + (level4_pct / x.level4_item_pct));
 
+                delete x.acf;
                 factorweighted_categories.push(x);
             }
             const retval = {
@@ -155,7 +158,7 @@ export const setLogoState = ({state}) => {
                 level2_exclusions: level2_exclusions,
                 level3_exclusions: level3_exclusions,
                 level4_exclusions: level4_exclusions,
-                items: factorweighted_categories
+                categories: factorweighted_categories
             }
             dispatch(addCategories(retval));
         })
