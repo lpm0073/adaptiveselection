@@ -26,14 +26,17 @@ class Home extends Component {
     this.state = {
       isCategoryInitialized: false,
       fetcherTimeout: null,
-      level: 0,
+      level: 1,
       category_exclusions: [],
       media_query: '',
       image_working_set: null,
-      image_queue: null
+      image_queue: null,
+      page_number: 1
     }
 
     this.fetcher = this.fetcher.bind(this);
+    this.handle_level = this.handle_level.bind(this);
+
 
   }
 
@@ -48,6 +51,7 @@ class Home extends Component {
 
         const self = this;
         const fetcherTimeout = setTimeout(function() {
+            self.handle_level();
             self.fetcher();
         }, 250);    
         this.setState({
@@ -56,19 +60,28 @@ class Home extends Component {
 
   }
 
-  fetcher() {
+  handle_level() {
 
-    // initialize the state media_query URL
-    if (!this.state.isCategoryInitialized && !this.props.categories.isLoading) {
+    if (!this.props.categories.isLoading) {
       const cats = this.props.categories.items;
-      const exclusions = wpGetExclusions(0, cats);
+      const exclusions = wpGetExclusions(this.state.level, cats);
       this.setState({
         category_exclusions: exclusions,
         media_query: mediaUrl + "&" + exclusions,
         isCategoryInitialized: true
       });
+  
+    }
+  
+  }
 
-      fetch(this.state.media_query)
+  fetcher() {
+
+    // initialize the state media_query URL
+    if (this.state.isCategoryInitialized && !this.props.categories.isLoading) {
+      const url = this.state.media_query + "&page=" + this.state.page_number;
+      console.log(url);
+      fetch(url)
       .then(
           response => {
               if (response.ok) {
@@ -86,7 +99,8 @@ class Home extends Component {
       .then(response => response.json())
       .then(images => {
         this.setState({
-          image_queue: images
+          image_queue: images,
+          page_number: this.state.page_number + 1
         });
       })
       .catch(error => {
@@ -95,80 +109,32 @@ class Home extends Component {
   
     }
 
-
-    /*
     const self = this;
     setTimeout(function() {
         self.fetcher();
-    }, 3000 * Math.random());   
-     */
+    }, 30000 * Math.random());   
 
   }
 
   render() {
-      console.log("image queue:", this.state.image_queue);
-      if (!this.state.image_queue) {
-        return(
-          <div>still waiting...</div>
-        );
-      }
-
       return(
           <div className="home-page mt-5 pt-5">
-
             <div className="row m-2 p-2 text-center">
-
-              {this.state.image_queue.map((obj, indx) => {
-                  console.log("in the zone", obj);
+              {this.state.image_queue != null ? this.state.image_queue.map((obj, indx) => {
                   return (
                     <ImageBox 
                     key={indx}
-                    imageKey="1" 
+                    imageKey={indx}
                     url={wpGetImage(obj)}
                     height = "125px"
                     width = "125px"
                     />
                   );
-                })}
-
-
-              
-              <ImageBox 
-                imageKey="2" 
-                url="https://cdn.fotomashup.com/2020/06/10214304/xf366110106c3d40f98d8dbbe7decab0a-700.jpg" 
-                height = "125px"
-                width = "125px"
-              />
-              
-              <ImageBox 
-                imageKey="3" 
-                url="https://cdn.fotomashup.com/2020/06/10214241/Wonderland-004.jpg" 
-                height = "125px"
-                width = "125px"
-              />
-
-              <ImageBox 
-                imageKey="4" 
-                url="https://cdn.fotomashup.com/2020/06/10214226/women-looking-at-viewer-stockings-black-hair-kitchen-boobs-lingerie-clothing-French-Maid-Leah-Francis-lady-leg-costume-undergarment-fetish-model-soubrette-339304.jpg" 
-                height = "125px"
-                width = "125px"
-              />
-
-              <ImageBox 
-                imageKey="5" 
-                url="https://cdn.fotomashup.com/2020/06/10214231/women-model-black-hair-leather-latex-catsuit-323011-wallhere.com_.jpg" 
-                height = "125px"
-                width = "125px"
-              />
-
-              <ImageBox 
-                imageKey="6" 
-                url="https://cdn.fotomashup.com/2020/06/10214206/women-1591617702767-5078.jpg" 
-                height = "125px"
-                width = "125px"
-              />
+                })
+                :
+                <div>i am waiting</div>
+              }
             </div>
-
         </div>
       );
   
