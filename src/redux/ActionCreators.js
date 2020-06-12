@@ -1,5 +1,5 @@
 import * as ActionTypes from './ActionTypes';
-import { backendUrl } from '../shared/urls';
+import { backendUrl, categoriesUrl } from '../shared/urls';
 import { imagePreFetcher } from '../shared/imagePrefetcher';
 
 /*  ----------------------------------- 
@@ -26,7 +26,7 @@ export const setLogoState = ({state}) => {
     export const fetchCategories = () => (dispatch) => {
         dispatch(CategoriesLoading(true));
     
-        return fetch(backendUrl + "categories?per_page=100")
+        return fetch(categoriesUrl)
         .then(
             response => {
                 if (response.ok) {
@@ -46,7 +46,15 @@ export const setLogoState = ({state}) => {
 
             // Calculate category factor weights by level of explicitness (0 thru 4)
             let i;
-            var level0_cnt = 0,
+            var factorweighted_categories = [],
+
+                level0_exclusions = [],
+                level1_exclusions = [],
+                level2_exclusions = [],
+                level3_exclusions = [],
+                level4_exclusions = [],
+
+                level0_cnt = 0,
                 level1_cnt = 0,
                 level2_cnt = 0,
                 level3_cnt = 0,
@@ -77,23 +85,31 @@ export const setLogoState = ({state}) => {
                     case 1:
                         level1_cnt += x.count;
                         level1_i += 1;
+                        level0_exclusions.push(x.id);
                         break;
                     case 2:
                         level2_cnt += x.count;
                         level2_i += 1;
+                        level1_exclusions.push(x.id);
                         break;
                     case 3:
                         level3_cnt += x.count;
                         level3_i += 1;
+                        level2_exclusions.push(x.id);
                         break;
                     case 4:
                         level4_cnt += x.count;
                         level4_i += 1;
+                        level3_exclusions.push(x.id);
                         break;
                     default:
                         break;
                 }
             }
+            level2_exclusions = level2_exclusions.concat(level3_exclusions);
+            level1_exclusions = level1_exclusions.concat(level2_exclusions);
+            level0_exclusions = level0_exclusions.concat(level1_exclusions);
+
             level4_cnt += level3_cnt + level2_cnt + level1_cnt + level0_cnt;
             level3_cnt += level2_cnt + level1_cnt + level0_cnt;
             level2_cnt += level1_cnt + level0_cnt;
@@ -113,7 +129,11 @@ export const setLogoState = ({state}) => {
             // add percentage weights by level
             for (i=0; i < categories.length; i++) {
                 const x = categories[i]
+                var explicitness = 0;
+                if (x.acf.explicitness) explicitness = x.acf.explicitness
+                explicitness = parseInt(explicitness, 10);
 
+                x.level = explicitness;
                 x.level0_item_pct = x.count / level0_cnt;
                 x.level1_item_pct = x.count / level1_cnt;
                 x.level2_item_pct = x.count / level2_cnt;
@@ -126,9 +146,18 @@ export const setLogoState = ({state}) => {
                 x.level2_weight = (1 + (level2_pct / x.level2_item_pct));
                 x.level3_weight = (1 + (level3_pct / x.level3_item_pct));
                 x.level4_weight = (1 + (level4_pct / x.level4_item_pct));
-            }
 
-            dispatch(addCategories(categories));
+                factorweighted_categories.push(x);
+            }
+            const retval = {
+                level0_exclusions: level0_exclusions,
+                level1_exclusions: level1_exclusions,
+                level2_exclusions: level2_exclusions,
+                level3_exclusions: level3_exclusions,
+                level4_exclusions: level4_exclusions,
+                items: factorweighted_categories
+            }
+            dispatch(addCategories(retval));
         })
         .catch(error => dispatch(CategoriesFailed(error.message)));
     

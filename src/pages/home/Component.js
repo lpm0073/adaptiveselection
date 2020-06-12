@@ -6,6 +6,8 @@ import * as Actions from '../../redux/ActionCreators';
 
 import './styles.css';
 import {ImageBox} from '../../components/ImageBox';
+import { wpGetExclusions } from '../../shared/categories';
+import { mediaUrl } from '../../shared/urls';
 
 const mapStateToProps = state => ({
     ...state
@@ -21,7 +23,7 @@ class Home extends Component {
     super(props);
 
     this.state = {
-      
+
     }
   }
 
@@ -36,7 +38,11 @@ class Home extends Component {
 
   render() {
       if (!this.props.categories.isLoading) {
-        console.log(this.props.categories.items);
+        const cats = this.props.categories.items;
+        const exclusions = wpGetExclusions(0, cats);
+        console.log("exclusions will be: ", exclusions);
+        console.log("url will be: ", mediaUrl + "&" + exclusions);
+        console.log(cats);
       }
       return(
           <div className="home-page mt-5 pt-5">
