@@ -8,7 +8,7 @@ import './styles.css';
 import {ImageBox} from './ImageBox';
 import { wpGetExclusions } from '../../shared/categories';
 import { mediaUrl } from '../../shared/urls';
-import { wpGetImage } from './wpGetImage';
+import { wpGetImage } from './wpImageLib';
 
 const mapStateToProps = state => ({
     ...state
@@ -48,6 +48,7 @@ class Home extends Component {
     this.getRandomImage = this.getRandomImage.bind(this);
     this.setBackgroundUrl = this.setBackgroundUrl.bind(this);
     this.getElapsedTime = this.getElapsedTime.bind(this);
+    this.imagePositioning = this.imagePositioning.bind(this);
   }
 
 
@@ -190,27 +191,60 @@ class Home extends Component {
 
   }
 
+  imagePositioning(image_width, image_height) {
+    // build random trajectory that passes through the
+    // interior 2/3 of curr viewpane.
+    const X = window.innerWidth;
+    const Y = window.innerHeight;
+    const x_begin = ((1/6) * X);
+    const x_end = X - ((1/6) * X);
+    const y_begin = ((1/6) * Y);
+    const y_end = Y - ((1/6) * Y);
+
+    const slope = (Math.random() * (2 * Math.PI));
+    const duration = Math.floor(Math.random() * 30000);
+
+    const image_center_x = x_begin + Math.floor(Math.random() * x_end);
+    const image_center_y = y_begin + Math.floor(Math.random() * y_end);
+
+    const css_absolute_position_x = Math.floor(image_center_x - (image_width / 2));
+    const css_absolute_position_y = Math.floor(image_center_y - (image_height / 2));
+
+    const position = {
+      x: css_absolute_position_x,
+      y: css_absolute_position_y,
+      slope: slope,
+      duration: duration
+    }
+    console.log("imagePositioning()", position);
+    return position;
+  }
+
   setBackgroundUrl(imageKey, newImage) {
     const images_per_row = this.state.number_of_images < 3 ? this.state.number_of_images : 3;
-    const max_height = this.state.number_of_images > 3 ? window.screen.height / 2 : window.screen.height;
+    const max_height = this.state.number_of_images > 3 ? window.screen.height / 2 : Math.floor((2/3) * window.screen.height);
     newImage = wpGetImage(newImage, images_per_row, max_height);
 
     if (!newImage) return;
 
     let newImageSet;
     const obj = {
-      key: parseInt(imageKey, 10),
-      id: parseInt(newImage.id, 10),
+      key: imageKey,
+      id: newImage.id,
       source_url: newImage.source_url,
-      height: parseInt(newImage.height, 10),
-      width: parseInt(newImage.width, 10),
+      height: newImage.height,
+      width: newImage.width,
       timestamp: new Date(),
-      image_data: newImage
+      image_data: newImage,
+      positioning: this.imagePositioning(newImage.width, newImage.height)
     }
 
+    // build an array of all previous keys except for our new imageKey.
+    // then push our newly generated image set onto the end of the array.
     newImageSet = this.state.image_carousel.filter(image => image.key !== imageKey);
     newImageSet.push(obj);
 
+    // sort the array by key
     var finalImageSet = [];
     for (var i=0; i < newImageSet.length; i++) {
       for (var j=0; j < newImageSet.length; j++) {
@@ -280,7 +314,7 @@ class Home extends Component {
       })
       .catch(error => {
         /* most common error is when we query for non-existent page (we don't know how many pages there are) */
-        var num_pages = this.state.num_pages > this.state.page_number ? this.state.page_number : this.state.num_pages;
+        var num_pages = this.state.num_pages > this.state.page_number ? this.state.num_pages - (this.state.num_pages - this.state.page_number)/2  : this.state.num_pages;
         num_pages = num_pages > this.state.highest_confirmed_page ? num_pages : this.state.highest_confirmed_page;
         const page_number = Math.floor(Math.random() * num_pages);
 
