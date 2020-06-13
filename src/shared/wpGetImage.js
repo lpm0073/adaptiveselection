@@ -43,7 +43,7 @@ export const wpGetImage = (item, imageSize) => {
         }
       }
       catch(err) {
-        console.log("could not check size");
+        
       }
 
       return dict;

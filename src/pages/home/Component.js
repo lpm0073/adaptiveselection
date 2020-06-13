@@ -25,7 +25,8 @@ class Home extends Component {
 
     this.state = {
       isCategoryInitialized: false,
-      fetcherTimeout: null,
+      fetcherDelay: null,
+      repaintDelay: null,
       level: 4,
       page_number: Math.floor(Math.random() * 25),
       category_exclusions: [],
@@ -60,9 +61,12 @@ class Home extends Component {
   getElapsedTime(imageKey) {
     const d = new Date();
 
-    this.state.image_carousel.map((image) => {
-        if (image.key === imageKey) return d - image.timestamp;
+    this.state.image_carousel
+    .filter(image => image.key === imageKey)
+    .map(image => {
+      return d - image.timestamp;
     });
+
     return 999999;
   }
 
@@ -70,22 +74,25 @@ class Home extends Component {
   repaint() {
     /* place a random image on a random imageKey at a random point in time. */
     if (this.state.image_working_set.length > 0) {
-
-        const imageKey = this.getRandomImageFrame();
-        const images = this.state.image_working_set;
-        const image = this.getRandomImage(images);
-        const elapsed = this.getElapsedTime(imageKey);
-
-        if (imageKey != null && elapsed > 2000) {
-            this.setBackgroundUrl(imageKey, image);
-        }
-
-    }
+          const imageKey = this.getRandomImageFrame();
+          const images = this.state.image_working_set;
+          const image = this.getRandomImage(images);
+          const elapsed = this.getElapsedTime(imageKey);
+          if (imageKey != null && elapsed > 20000) {
+              this.setBackgroundUrl(imageKey, image);
+          }
+      }
 
     const self = this;
-    setTimeout(function() {
+    const repaintDelay = setTimeout(function() {
         self.repaint();
     }, 5000 * Math.random());   
+
+    this.setState({
+      repaintDelay: repaintDelay
+    });
+    return;
+
   
   }
 
@@ -99,18 +106,19 @@ class Home extends Component {
   componentDidMount() {
 
         const self = this;
-        const fetcherTimeout = setTimeout(function() {
+        const fetcherDelay = setTimeout(function() {
             self.handleChangeLevel();
             self.imageFetcher();
             self.repaint();
         }, 250);    
         this.setState({
-          fetcherTimeout: fetcherTimeout
+          fetcherDelay: fetcherDelay
         });
   }
 
   componentWillUnmount() {
-    clearTimeout(this.state.fetcherTimeout);
+    clearTimeout(this.state.fetcherDelay);
+    clearTimeout(this.state.repaintDelay);
   }
 
   render() {
@@ -144,11 +152,10 @@ class Home extends Component {
 
   isImageCollision(imageCandidate) {
 
-    this.state.image_carousel.map((image) => {
-        if (imageCandidate.id === image.id) {
-          return true;
-        }
-    });
+    this.state.image_carousel
+    .filter(image => imageCandidate.id === image.id)
+    .map(image => {return true});
+
     return false;
 
   }
@@ -156,9 +163,7 @@ class Home extends Component {
   setBackgroundUrl(imageKey, newImage) {
     newImage = wpGetImage(newImage, "medium");
 
-    if (this.isImageCollision(newImage)) console.log("Collision!!!!!");
-    var newImageSet = [];
-    var finalImageSet = [];
+    let newImageSet;
     const obj = {
       key: parseInt(imageKey, 10),
       id: parseInt(newImage.id, 10),
@@ -168,29 +173,8 @@ class Home extends Component {
       timestamp: new Date()
     }
 
-    this.state.image_carousel.map((image) => {
-        if (image.key !== imageKey) {
-          newImageSet.push(image);
-        }
-    });
+    newImageSet = this.state.image_carousel.filter(image => image.key !== imageKey);
     newImageSet.push(obj);
-
-
-    // order the list by key
-    /*
-    let i, j;
-    const length = newImageSet.length;
-
-    for (i=0; i < length; i++) {
-      for (j=0; j < length; j++) {
-        if (newImageSet[j].key === i) {
-          finalImageSet.push(newImageSet[j]);
-          break;
-        }
-      }
-    }
-    console.log("setBackgroundUrl() - final set", finalImageSet);
-     */
 
     this.setState({
       image_carousel: newImageSet
@@ -225,19 +209,18 @@ class Home extends Component {
       const url = this.state.media_query + "&page=" + this.state.page_number;
       fetch(url)
       .then(response => {
-          console.log("fetch - response:", response);
-              if (response.ok) {
-                  return response;
-              } else {
-                  var error = new Error('Error ' + response.status + ': ' + response.statusText);
-                  error.response = response;
-                  throw error;
-              }
-          },
-          error => {
-              var errmess = new Error(error.message);
-              throw errmess;
-          })
+            if (response.ok) {
+                return response;
+            } else {
+                var error = new Error('Error ' + response.status + ': ' + response.statusText);
+                error.response = response;
+                throw error;
+            }
+        },
+        error => {
+            var errmess = new Error(error.message);
+            throw errmess;
+      })
       .then(response => response.json())
       .then(images => {
         const image_working_set = this.state.image_working_set.concat(images);
