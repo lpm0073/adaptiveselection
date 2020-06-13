@@ -28,7 +28,7 @@ class Home extends Component {
       isCategoryInitialized: false,
       fetcherDelay: null,
       repaintDelay: null,
-      level: 4,
+      level: 0,
       page_number: Math.floor(Math.random() * 25),
       category_exclusions: [],
       media_query: '',
@@ -104,13 +104,24 @@ class Home extends Component {
           <div className="home-page mt-5 pt-5">
             <div className="row m-2 p-2 text-center">
               {this.state.image_carousel.length > 0 ? this.state.image_carousel.map((image) => {
+                  const images_per_row = this.state.number_of_images <= 3 ? this.state.number_of_images : 3;
+                  const maxWidth = (window.innerWidth / images_per_row) * .90;
+                  const width = image.width < maxWidth ? image.width : maxWidth;
+                  const height = width === image.width ? image.height : width * image.image_data.aspect_ratio;
+                  /*
+                  console.log("image", image);
+                  console.log("images_per_row", images_per_row);
+                  console.log("maxWidth", maxWidth);
+                  console.log("width", width);
+                  console.log("height", height);
+                   */
                   return (
                     <ImageBox 
                     key={image.key}
                     imageKey={image.key}
                     url={image.source_url}
-                    height = {image.height}
-                    width = {image.width}
+                    height = {height}
+                    width = {width}
                     />
                   );
                 })
@@ -194,7 +205,8 @@ class Home extends Component {
       source_url: newImage.source_url,
       height: parseInt(newImage.height, 10),
       width: parseInt(newImage.width, 10),
-      timestamp: new Date()
+      timestamp: new Date(),
+      image_data: newImage
     }
 
     newImageSet = this.state.image_carousel.filter(image => image.key !== imageKey);

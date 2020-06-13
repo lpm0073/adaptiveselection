@@ -12,7 +12,7 @@ export const ImageBox = (props) => {
   
     return(
         <React.Fragment >
-            <div key={key} className="col-lg-4 col-md-6 col-sm-12">
+            <div key={key} className="col-lg-4 col-md-6 col-sm-12 m-2 p-2">
               <div className="box m-1 p-1" style={divStyle}>{label}</div>
             </div>
         </React.Fragment>

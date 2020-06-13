@@ -7,7 +7,6 @@
 .box {
   height: 125px;
   width: 100%;
-  border: 1px solid gray;
   color: green;
   background-size: contain;
   background-repeat: no-repeat;

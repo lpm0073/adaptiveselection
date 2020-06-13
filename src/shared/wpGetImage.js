@@ -145,7 +145,7 @@ export const wpGetImage = (item, images_per_row = 3, max_height = 500) => {
     return a dict of image meta data based on available
     images, screen size, and aspect_ratio.
    */
-    console.log("max height", max_height);
+
     let dict, imgDict;
     const aspect_ratio = getAspectRatio(item);
     var size = "DEFAULT",
