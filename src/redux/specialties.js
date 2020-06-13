@@ -1,6 +1,5 @@
 import * as ActionTypes from './ActionTypes';
 
-import { wpGetImage } from '../shared/wpGetImage';
 import { shuffleArray } from '../shared/shuffle';
 
 
@@ -16,7 +15,7 @@ export const Specialties = (state = {
 
             const posts = action.payload;
             const logos = shuffleArray(posts.map((post, indx) => {
-                return wpGetImage(post, "medium");
+                return "wpGetImage(post)";
             }));
     
             const featured_logos =  shuffleArray(posts.filter((post, indx) => {
@@ -27,7 +26,7 @@ export const Specialties = (state = {
                 }
                 return false;
             }).map((featuredPost, indx) => {
-                return wpGetImage(featuredPost, "medium");
+                return "wpGetImage(featuredPost)";
             }));
     
             return {

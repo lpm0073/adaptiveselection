@@ -181,7 +181,9 @@ class Home extends Component {
   }
 
   setBackgroundUrl(imageKey, newImage) {
-    newImage = wpGetImage(newImage, "large");
+    newImage = wpGetImage(newImage);
+
+    if (!newImage) return;
 
     let newImageSet;
     const obj = {
