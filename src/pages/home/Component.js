@@ -27,7 +27,7 @@ class Home extends Component {
       isCategoryInitialized: false,
       fetcherDelay: null,
       repaintDelay: null,
-      level: 4,
+      level: 0,
       page_number: Math.floor(Math.random() * 25),
       category_exclusions: [],
       media_query: '',
@@ -54,12 +54,12 @@ class Home extends Component {
           const images = this.state.image_working_set;
           const image = this.getRandomImage(images);
           const elapsed = this.getElapsedTime(imageKey);
-          console.log("repaint()", imageKey, elapsed);
-          if (imageKey != null && elapsed > 30000) {
+
+          if (imageKey !== null && elapsed > 15000) {
               this.setBackgroundUrl(imageKey, image);
           }
       }
-    const delay = this.state.image_carousel.length < this.state.number_of_images ? 500 : 15000;
+    const delay = this.state.image_carousel.length < this.state.number_of_images ? 500 : 5000;
     const self = this;
     const repaintDelay = setTimeout(function() {
         self.repaint();
@@ -124,7 +124,7 @@ class Home extends Component {
 
   getRandomImage(images) {
 
-    if (images === null) return null;
+    if (images === null || images.length === 0) return null;
     var image, i = 0;
     do {
         image = images[Math.floor(Math.random() * images.length)];
@@ -239,7 +239,12 @@ class Home extends Component {
       })
       .then(response => response.json())
       .then(images => {
-        const image_working_set = this.state.image_working_set.concat(images);
+        var image_working_set = images.filter(image => !(image.id in this.state.image_working_set.map(worker => {
+          return worker.id;
+        })))
+        console.log("unique elements:", image_working_set.length, this.state.image_working_set.length);
+        image_working_set = this.state.image_working_set.concat(image_working_set);
+
         this.setState({
           image_working_set: image_working_set,
           page_number: this.state.page_number + Math.floor(Math.random() * 10)
