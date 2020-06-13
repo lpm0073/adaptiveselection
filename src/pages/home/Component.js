@@ -46,31 +46,6 @@ class Home extends Component {
     this.getElapsedTime = this.getElapsedTime.bind(this);
   }
 
-  getRandomImage(images) {
-
-    if (images === null) return null;
-    var image, i = 0;
-    do {
-        image = images[Math.floor(Math.random() * images.length)];
-        if (!this.isImageCollision(image)) return image;
-        i++;
-    } while (i <= 2 * images.length)
-
-    return null;
-  }
-
-  getElapsedTime(imageKey) {
-    const d = new Date();
-
-    this.state.image_carousel
-    .filter(image => image.key === imageKey)
-    .map(image => {
-      return d - image.timestamp;
-    });
-
-    return 999999;
-  }
-
 
   repaint() {
     /* place a random image on a random imageKey at a random point in time. */
@@ -79,7 +54,8 @@ class Home extends Component {
           const images = this.state.image_working_set;
           const image = this.getRandomImage(images);
           const elapsed = this.getElapsedTime(imageKey);
-          if (imageKey != null && elapsed > 20000) {
+          console.log("repaint()", imageKey, elapsed);
+          if (imageKey != null && elapsed > 30000) {
               this.setBackgroundUrl(imageKey, image);
           }
       }
@@ -145,6 +121,35 @@ class Home extends Component {
       );
   
   }
+
+  getRandomImage(images) {
+
+    if (images === null) return null;
+    var image, i = 0;
+    do {
+        image = images[Math.floor(Math.random() * images.length)];
+        if (!this.isImageCollision(image)) return image;
+        i++;
+    } while (i <= 2 * images.length)
+
+    return null;
+  }
+
+  getElapsedTime(imageKey) {
+    const d = new Date();
+    let elapsed;
+
+    this.state.image_carousel
+    .filter(image => {
+      return image.key === imageKey;
+    })
+    .map(image => {
+      elapsed = d - image.timestamp;
+    });
+    if (elapsed > 0) return elapsed;
+    return 999999;
+  }
+
 
   getRandomImageFrame() {
     if (this.state.image_carousel.length < this.state.number_of_images - 1) return this.state.image_carousel.length;
@@ -250,11 +255,15 @@ class Home extends Component {
       });
   
     }
-
+    const delay = this.state.image_working_set.length < 4 * this.state.number_of_images ? 500: 30000;
     const self = this;
-    setTimeout(function() {
+
+    const fetcherDelay = setTimeout(function() {
         self.imageFetcher();
-    }, 30000 * Math.random());   
+    }, delay * Math.random());
+    this.setState({
+      fetcherDelay: fetcherDelay
+    });
 
   }
 
