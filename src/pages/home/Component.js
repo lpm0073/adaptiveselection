@@ -34,7 +34,7 @@ class Home extends Component {
       media_query: '',
       image_working_set: [],
       image_carousel: [],
-      number_of_images: 6,
+      number_of_images: 2,
       image_last_position: 0
     }
 
@@ -181,7 +181,9 @@ class Home extends Component {
   }
 
   setBackgroundUrl(imageKey, newImage) {
-    newImage = wpGetImage(newImage);
+    const images_per_row = this.state.number_of_images < 3 ? this.state.number_of_images : 3;
+    const max_height = this.state.number_of_images > 3 ? window.screen.height / 2 : window.screen.height;
+    newImage = wpGetImage(newImage, images_per_row, max_height);
 
     if (!newImage) return;
 

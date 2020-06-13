@@ -130,24 +130,23 @@ function sizeChooser(item, images_per_row = 3) {
 
 }
 
-function getMaxRenderingHeight() {
-  return  window.screen.height < 300 ? window.screen.height : 300;
+function getMaxRenderingHeight(max_height = 500) {
+  return  window.screen.height < max_height ? window.screen.height : max_height;
 
 }
 function getMaxRenderingWidth(images_per_row) {
 
-  const width = window.screen.width / images_per_row
-  return width < 500 ? width : 500;
+  return window.screen.width / images_per_row
 
 }
 
-export const wpGetImage = (item, images_per_row = 3) => {
+export const wpGetImage = (item, images_per_row = 3, max_height = 500) => {
   /*
     return a dict of image meta data based on available
     images, screen size, and aspect_ratio.
    */
+    console.log("max height", max_height);
     let dict, imgDict;
-    const max_width = window.screen.width;
     const aspect_ratio = getAspectRatio(item);
     var size = "DEFAULT",
         sizes = null,
@@ -161,8 +160,8 @@ export const wpGetImage = (item, images_per_row = 3) => {
         height = getHeight(imgDict.height, imgDict.width, aspect_ratio);
         width = getWidth(imgDict.height, imgDict.width, aspect_ratio);
 
-        if (height > getMaxRenderingHeight()) {
-            height = getMaxRenderingHeight();
+        if (height > getMaxRenderingHeight(max_height)) {
+            height = getMaxRenderingHeight(max_height);
             width = height / aspect_ratio;
         }
         if (width > getMaxRenderingWidth()) {
@@ -183,7 +182,7 @@ export const wpGetImage = (item, images_per_row = 3) => {
           sizes: sizes
         };
 
-      console.log("wpGetImage() results", dict);
+      //console.log("wpGetImage() results", dict);
 
       return dict;
 }
