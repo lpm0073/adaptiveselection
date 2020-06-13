@@ -5,10 +5,10 @@ import * as Actions from '../../redux/ActionCreators';
 
 
 import './styles.css';
-import {ImageBox} from '../../components/ImageBox';
+import {ImageBox} from './ImageBox';
 import { wpGetExclusions } from '../../shared/categories';
 import { mediaUrl } from '../../shared/urls';
-import { wpGetImage } from '../../shared/wpGetImage';
+import { wpGetImage } from './wpGetImage';
 
 const mapStateToProps = state => ({
     ...state
@@ -29,13 +29,15 @@ class Home extends Component {
       fetcherDelay: null,
       repaintDelay: null,
       level: 0,
-      page_number: Math.floor(Math.random() * 25),
+      page_number: Math.floor(Math.random() * 100),
+      num_pages: 1000,   // <---- start high and interpolate downwards based on success/failure
+      highest_confirmed_page: 0,
       category_exclusions: [],
       media_query: '',
       image_working_set: [],
       image_carousel: [],
-      number_of_images: 2,
-      image_last_position: 0
+      number_of_images: 1,
+      image_last_position: 0,
     }
 
     this.imageFetcher = this.imageFetcher.bind(this);
@@ -48,32 +50,6 @@ class Home extends Component {
     this.getElapsedTime = this.getElapsedTime.bind(this);
   }
 
-
-  repaint() {
-    /* place a random image on a random imageKey at a random point in time. */
-    if (this.state.image_working_set.length > 0) {
-          const imageKey = this.getRandomImageFrame();
-          const images = this.state.image_working_set;
-          const image = this.getRandomImage(images);
-          const elapsed = this.getElapsedTime(imageKey);
-
-          if (imageKey !== null && image !== null && elapsed > 15000) {
-              this.setBackgroundUrl(imageKey, image);
-          }
-      }
-    const delay = this.state.image_carousel.length < this.state.number_of_images ? 500 : 5000;
-    const self = this;
-    const repaintDelay = setTimeout(function() {
-        self.repaint();
-    }, delay * Math.random());   
-
-    this.setState({
-      repaintDelay: repaintDelay
-    });
-    return;
-
-  
-  }
 
   shouldComponentUpdate(nextProps, nextState) {
     if (this.state.level !== nextState.level) {
@@ -102,36 +78,58 @@ class Home extends Component {
   render() {
       return(
           <div className="home-page mt-5 pt-5">
-            <div className="row m-2 p-2 text-center">
-              {this.state.image_carousel.length > 0 ? this.state.image_carousel.map((image) => {
-                  const images_per_row = this.state.number_of_images <= 3 ? this.state.number_of_images : 3;
-                  const maxWidth = (window.innerWidth / images_per_row) * .90;
-                  const width = image.width < maxWidth ? image.width : maxWidth;
-                  const height = width === image.width ? image.height : width * image.image_data.aspect_ratio;
-                  /*
-                  console.log("image", image);
-                  console.log("images_per_row", images_per_row);
-                  console.log("maxWidth", maxWidth);
-                  console.log("width", width);
-                  console.log("height", height);
-                   */
-                  return (
-                    <ImageBox 
-                    key={image.key}
-                    imageKey={image.key}
-                    url={image.source_url}
-                    height = {height}
-                    width = {width}
-                    />
-                  );
-                })
-                :
-                <div>i am waiting</div>
-              }
-            </div>
+            {this.state.image_carousel.length > 0 ? this.state.image_carousel.map((image) => {
+                const images_per_row = this.state.number_of_images <= 3 ? this.state.number_of_images : 3;
+                const maxWidth = (window.innerWidth / images_per_row) * .90;
+                const width = image.width < maxWidth ? image.width : maxWidth;
+                const height = width === image.width ? image.height : width * image.image_data.aspect_ratio;
+                /*
+                console.log("image", image);
+                console.log("images_per_row", images_per_row);
+                console.log("maxWidth", maxWidth);
+                console.log("width", width);
+                console.log("height", height);
+                  */
+                return (
+                  <ImageBox 
+                  key={image.key}
+                  imageKey={image.key}
+                  url={image.source_url}
+                  height = {height}
+                  width = {width}
+                  />
+                );
+              })
+              :
+              <div>i am waiting</div>
+            }
         </div>
       );
   
+  }
+
+  repaint() {
+    /* place a random image on a random imageKey at a random point in time. */
+    if (this.state.image_working_set.length > 0) {
+          const imageKey = this.getRandomImageFrame();
+          const images = this.state.image_working_set;
+          const image = this.getRandomImage(images);
+          const elapsed = this.getElapsedTime(imageKey);
+
+          if (imageKey !== null && image !== null && elapsed > 15000) {
+              this.setBackgroundUrl(imageKey, image);
+          }
+      }
+    const delay = this.state.image_carousel.length < this.state.number_of_images ? 500 : 5000;
+    const self = this;
+    const repaintDelay = setTimeout(function() {
+        self.repaint();
+    }, delay * Math.random());   
+
+    this.setState({
+      repaintDelay: repaintDelay
+    });
+    return;
   }
 
   getRandomImage(images) {
@@ -166,6 +164,7 @@ class Home extends Component {
     })
     .map(image => {
       elapsed = d - image.timestamp;
+      return elapsed;
     });
     if (elapsed > 0) return elapsed;
     return 999999;
@@ -273,14 +272,21 @@ class Home extends Component {
 
         this.setState({
           isInitialized: true,
+          highest_confirmed_page: this.state.page_number,
           image_working_set: image_working_set,
-          page_number: this.state.page_number + Math.floor(Math.random() * 10)
+          page_number:  Math.floor(Math.random() * this.state.num_pages)
         });
 
       })
       .catch(error => {
+        /* most common error is when we query for non-existent page (we don't know how many pages there are) */
+        var num_pages = this.state.num_pages > this.state.page_number ? this.state.page_number : this.state.num_pages;
+        num_pages = num_pages > this.state.highest_confirmed_page ? num_pages : this.state.highest_confirmed_page;
+        const page_number = Math.floor(Math.random() * num_pages);
+
         this.setState({
-          page_number: Math.floor(Math.random() * 25)
+          page_number: page_number,
+          num_pages: num_pages
         });
          /*
             {
