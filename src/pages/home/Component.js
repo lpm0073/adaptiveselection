@@ -52,10 +52,11 @@ class Home extends Component {
     var image, i = 0;
     do {
         image = images[Math.floor(Math.random() * images.length)];
+        if (!this.isImageCollision(image)) return image;
         i++;
-    } while (this.isImageCollision(image) && (i <= images.length))
+    } while (i <= 2 * images.length)
 
-    return image;
+    return null;
   }
 
   getElapsedTime(imageKey) {
@@ -82,11 +83,11 @@ class Home extends Component {
               this.setBackgroundUrl(imageKey, image);
           }
       }
-
+    const delay = this.state.image_carousel.length < this.state.number_of_images ? 500 : 15000;
     const self = this;
     const repaintDelay = setTimeout(function() {
         self.repaint();
-    }, 5000 * Math.random());   
+    }, delay * Math.random());   
 
     this.setState({
       repaintDelay: repaintDelay
@@ -154,7 +155,10 @@ class Home extends Component {
 
     this.state.image_carousel
     .filter(image => imageCandidate.id === image.id)
-    .map(image => {return true});
+    .map(image => {
+      console.log("collision!!!");
+      return true;
+    });
 
     return false;
 
