@@ -1,8 +1,8 @@
 export const wpGetImage = (item, imageSize) => {
 
     let dict;
-    const max_width = 500;
-    const max_height = 500;
+    const max_width = 400;
+    const max_height = 400;
 
     try {
         // try to retrieve an optimized version of the image, if it exists
@@ -30,7 +30,6 @@ export const wpGetImage = (item, imageSize) => {
 
       try {
         if (dict.height > max_height || dict.width > max_width) {
-          console.log("size issues");
           const proportion = dict.height / dict.width;
 
           if (dict.height > max_height) {
