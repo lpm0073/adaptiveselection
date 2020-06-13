@@ -7,6 +7,7 @@ export const wpGetImage = (item, imageSize) => {
     try {
         // try to retrieve an optimized version of the image, if it exists
         dict = {
+          id: item.id,
           source_url: item.media_details.sizes[imageSize].source_url,
           height: item.media_details.sizes[imageSize].height,
           width: item.media_details.sizes[imageSize].width
@@ -16,6 +17,7 @@ export const wpGetImage = (item, imageSize) => {
         // otherwise return the original image
         try {
           dict =  {
+            id: item.id,
             source_url: item.media_details.sizes["full"].source_url,
             height: item.media_details.sizes["full"].height,
             width: item.media_details.sizes["full"].width

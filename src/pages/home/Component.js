@@ -26,13 +26,13 @@ class Home extends Component {
     this.state = {
       isCategoryInitialized: false,
       fetcherTimeout: null,
-      level: 1,
-      page_number: 1,
+      level: 4,
+      page_number: Math.floor(Math.random() * 25),
       category_exclusions: [],
       media_query: '',
       image_working_set: [],
       image_carousel: [],
-      number_of_images: 10
+      number_of_images: 8
     }
 
     this.imageFetcher = this.imageFetcher.bind(this);
@@ -45,30 +45,15 @@ class Home extends Component {
     this.getElapsedTime = this.getElapsedTime.bind(this);
   }
 
-  getRandomImageFrame() {
-    console.log("getRandomImageFrame");
-    return Math.floor(Math.random() * this.state.number_of_images);
-  }
-
-  isImageCollision(url) {
-    console.log("isImageCollision");
-    this.state.image_carousel.map((image) => {
-        if (url === image.source_url) return true;
-    });
-    return false;
-
-  }
-
   getRandomImage(images) {
-    console.log("getRandomImage()");
 
     if (images === null) return null;
-
     var image, i = 0;
     do {
         image = images[Math.floor(Math.random() * images.length)];
         i++;
     } while (this.isImageCollision(image) && (i <= images.length))
+
     return image;
   }
 
@@ -81,37 +66,6 @@ class Home extends Component {
     return 999999;
   }
 
-  setBackgroundUrl(imageKey, newImage) {
-    console.log("setBackgroundUrl() - imageKey", imageKey);
-    console.log("setBackgroundUrl() - newImage", newImage);
-
-    newImage = wpGetImage(newImage, "medium");
-    console.log("setBackgroundUrl() - newImage (processed)", newImage);
-
-    var newImageSet = [];
-    const obj = {
-      key: imageKey,
-      source_url: newImage.source_url,
-      height: newImage.height,
-      width: newImage.width,
-      timestamp: new Date()
-    }
-    newImageSet.push(obj);
-
-    this.state.image_carousel.map((image) => {
-        if (image.key !== imageKey.key) {
-          newImageSet.push(image);
-        }
-    });
-
-    console.log("setBackgroundUrl() - newImageSet", newImageSet);
-
-    this.setState({
-      image_carousel: newImageSet
-    });
-
-
-  }
 
   repaint() {
     /* place a random image on a random imageKey at a random point in time. */
@@ -119,14 +73,8 @@ class Home extends Component {
 
         const imageKey = this.getRandomImageFrame();
         const images = this.state.image_working_set;
-
         const image = this.getRandomImage(images);
         const elapsed = this.getElapsedTime(imageKey);
-
-        console.log("repaint() imageKey", imageKey);
-        console.log("repaint() images", images);
-        console.log("repaint() image", image);
-        console.log("repaint() elapsed", elapsed);
 
         if (imageKey != null && elapsed > 2000) {
             this.setBackgroundUrl(imageKey, image);
@@ -165,6 +113,90 @@ class Home extends Component {
     clearTimeout(this.state.fetcherTimeout);
   }
 
+  render() {
+      return(
+          <div className="home-page mt-5 pt-5">
+            <div className="row m-2 p-2 text-center">
+              {this.state.image_carousel.length > 0 ? this.state.image_carousel.map((image) => {
+                  return (
+                    <ImageBox 
+                    key={image.key}
+                    imageKey={image.key}
+                    url={image.source_url}
+                    height = {image.height}
+                    width = {image.width}
+                    />
+                  );
+                })
+                :
+                <div>i am waiting</div>
+              }
+            </div>
+        </div>
+      );
+  
+  }
+
+  getRandomImageFrame() {
+    if (this.state.image_carousel.length < this.state.number_of_images - 1) return this.state.image_carousel.length;
+    return Math.floor(Math.random() * this.state.number_of_images);
+  }
+
+  isImageCollision(imageCandidate) {
+
+    this.state.image_carousel.map((image) => {
+        if (imageCandidate.id === image.id) {
+          return true;
+        }
+    });
+    return false;
+
+  }
+
+  setBackgroundUrl(imageKey, newImage) {
+    newImage = wpGetImage(newImage, "medium");
+
+    if (this.isImageCollision(newImage)) console.log("Collision!!!!!");
+    var newImageSet = [];
+    var finalImageSet = [];
+    const obj = {
+      key: parseInt(imageKey, 10),
+      id: parseInt(newImage.id, 10),
+      source_url: newImage.source_url,
+      height: parseInt(newImage.height, 10),
+      width: parseInt(newImage.width, 10),
+      timestamp: new Date()
+    }
+
+    this.state.image_carousel.map((image) => {
+        if (image.key !== imageKey) {
+          newImageSet.push(image);
+        }
+    });
+    newImageSet.push(obj);
+
+
+    // order the list by key
+    /*
+    let i, j;
+    const length = newImageSet.length;
+
+    for (i=0; i < length; i++) {
+      for (j=0; j < length; j++) {
+        if (newImageSet[j].key === i) {
+          finalImageSet.push(newImageSet[j]);
+          break;
+        }
+      }
+    }
+    console.log("setBackgroundUrl() - final set", finalImageSet);
+     */
+
+    this.setState({
+      image_carousel: newImageSet
+    });
+  }
+
   handleChangeLevel() {
 
     if (this.props.categories.isLoading && !this.state.isCategoryInitialized) {
@@ -191,10 +223,9 @@ class Home extends Component {
     // initialize the state media_query URL
     if (this.state.isCategoryInitialized && !this.props.categories.isLoading) {
       const url = this.state.media_query + "&page=" + this.state.page_number;
-      console.log(url);
       fetch(url)
-      .then(
-          response => {
+      .then(response => {
+          console.log("fetch - response:", response);
               if (response.ok) {
                   return response;
               } else {
@@ -210,16 +241,15 @@ class Home extends Component {
       .then(response => response.json())
       .then(images => {
         const image_working_set = this.state.image_working_set.concat(images);
-        console.log("loaded: image_working_set", image_working_set);
         this.setState({
           image_working_set: image_working_set,
-          page_number: this.state.page_number + 1
+          page_number: this.state.page_number + Math.floor(Math.random() * 10)
         });
       })
       .catch(error => {
         console.log("frowny face.");
         this.setState({
-          page_number: 1
+          page_number: Math.floor(Math.random() * 25)
         });
          /*
             {
@@ -240,32 +270,6 @@ class Home extends Component {
     }, 30000 * Math.random());   
 
   }
-
-  render() {
-      return(
-          <div className="home-page mt-5 pt-5">
-            <div className="row m-2 p-2 text-center">
-              {this.state.image_carousel.length > 0 ? this.state.image_carousel.map((image, indx) => {
-                  console.log("render()", image);
-                  return (
-                    <ImageBox 
-                    key={indx}
-                    imageKey={indx}
-                    url={image.source_url}
-                    height = {image.height}
-                    width = {image.width}
-                    />
-                  );
-                })
-                :
-                <div>i am waiting</div>
-              }
-            </div>
-        </div>
-      );
-  
-  }
-
 
 
 }
