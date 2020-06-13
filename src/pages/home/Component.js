@@ -185,8 +185,15 @@ class Home extends Component {
     newImageSet = this.state.image_carousel.filter(image => image.key !== imageKey);
     newImageSet.push(obj);
 
+    var finalImageSet = [];
+    for (var i=0; i < newImageSet.length; i++) {
+      for (var j=0; j < newImageSet.length; j++) {
+        if (newImageSet[j].key === i) finalImageSet.push(newImageSet[j]);
+      }
+    }
+
     this.setState({
-      image_carousel: newImageSet
+      image_carousel: finalImageSet
     });
   }
 
