@@ -1,5 +1,4 @@
 import React, {Component} from 'react';
-import ReactDOM from 'react-dom';
 import Draggable from 'react-draggable';
 
 class ImageBox extends Component {
@@ -40,12 +39,11 @@ class ImageBox extends Component {
     }
     zIndex += 1;
 
-    console.log("getNextZOrder()", zIndex);
     return zIndex;
   }
   
   handleMouseDown() {
-    console.log("handleMouseDown()");
+
     clearTimeout(this._timeoutID);
     this.setState({
       clickTimeStamp: new Date(),
@@ -65,6 +63,11 @@ class ImageBox extends Component {
   handleStop() {
     console.log("handleStop()");
   }
+
+  eventLogger = (e: MouseEvent, data: Object) => {
+    console.log('Event: ', e);
+    console.log('Data: ', data);
+  };
 
   render() {
     // React key
@@ -91,7 +94,7 @@ class ImageBox extends Component {
 
               <div
                 key={key}
-                className="image-container m-2 p-2" 
+                className="image-container m-2 p-2 handle" 
                 style={this.state.imageContainerStyle}
                 >
                 <div className="image-frame m-0 p-0" 

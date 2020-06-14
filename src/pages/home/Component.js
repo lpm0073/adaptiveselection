@@ -36,7 +36,7 @@ class Home extends Component {
       media_query: '',
       image_working_set: [],
       image_carousel: [],
-      number_of_images: 20,
+      number_of_images: 10,
       image_last_position: 0, // the ordinal position of the most recently used image in the working set.
       last_image_queued: d.setDate(d.getDate()-5) // make sure initial date is stale
     }
