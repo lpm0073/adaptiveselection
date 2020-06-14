@@ -1,4 +1,4 @@
-export const wpGetImage = (item, images_per_row = 3, max_height = 500) => {
+export const wpGetImage = (item, images_per_row = 3, max_height = 500, max_width = 750) => {
   /*
     return a dict of image meta data based on available
     images, screen size, and aspect_ratio.
@@ -22,8 +22,8 @@ export const wpGetImage = (item, images_per_row = 3, max_height = 500) => {
             height = getMaxRenderingHeight(max_height);
             width = height / aspect_ratio;
         }
-        if (width > getMaxRenderingWidth()) {
-          width = getMaxRenderingWidth();
+        if (width > getMaxRenderingWidth(images_per_row, max_width)) {
+          width = getMaxRenderingWidth(images_per_row, max_width);
           height = width * aspect_ratio;
         }
 
@@ -187,8 +187,8 @@ function getMaxRenderingHeight(max_height = 500) {
   return  window.screen.height < max_height ? window.screen.height : max_height;
 
 }
-function getMaxRenderingWidth(images_per_row) {
-  return window.screen.width / images_per_row
+function getMaxRenderingWidth(images_per_row, max_width = 750) {
+  return window.screen.width / images_per_row < max_width ? window.screen.width / images_per_row : max_width;
 }
 function getMaxImageHeight() {
   return window.screen.height > 500 ? window.screen.height : 500; 

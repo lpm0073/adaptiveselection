@@ -29,7 +29,7 @@ class Home extends Component {
       fetcherDelay: null,
       repaintDelay: null,
       level: 0,
-      page_number: Math.floor(Math.random() * 100),
+      page_number: Math.floor(Math.random() * 40),
       num_pages: 1000,   // <---- start high and interpolate downwards based on success/failure
       highest_confirmed_page: 0,
       category_exclusions: [],
@@ -42,13 +42,15 @@ class Home extends Component {
 
     this.imageFetcher = this.imageFetcher.bind(this);
     this.handleChangeLevel = this.handleChangeLevel.bind(this);
-    this.repaint = this.repaint.bind(this);
+    this.shuffleImages = this.shuffleImages.bind(this);
     this.getRandomImageFrame = this.getRandomImageFrame.bind(this);
     this.isImageCollision = this.isImageCollision.bind(this);
     this.getRandomImage = this.getRandomImage.bind(this);
     this.setBackgroundUrl = this.setBackgroundUrl.bind(this);
     this.getElapsedTime = this.getElapsedTime.bind(this);
     this.imagePositioning = this.imagePositioning.bind(this);
+    this.repositionImage = this.repositionImage.bind(this);
+
   }
 
 
@@ -84,20 +86,18 @@ class Home extends Component {
                 const maxWidth = (window.innerWidth / images_per_row) * .90;
                 const width = image.width < maxWidth ? image.width : maxWidth;
                 const height = width === image.width ? image.height : width * image.image_data.aspect_ratio;
-                /*
-                console.log("image", image);
-                console.log("images_per_row", images_per_row);
-                console.log("maxWidth", maxWidth);
-                console.log("width", width);
-                console.log("height", height);
-                  */
+
                 return (
                   <ImageBox 
-                  key={image.key}
-                  imageKey={image.key}
-                  url={image.source_url}
-                  height = {height}
-                  width = {width}
+                    key={image.key}
+                    imageKey={image.key}
+                    url={image.source_url}
+                    height = {height}
+                    width = {width}
+                    position_left = {image.position.left}
+                    position_top = {image.position.top}
+                    slope = {image.position.slope}
+                    duration = {image.position.duration}
                   />
                 );
               })
@@ -109,7 +109,7 @@ class Home extends Component {
   
   }
 
-  repaint() {
+  shuffleImages() {
     /* place a random image on a random imageKey at a random point in time. */
     if (this.state.image_working_set.length > 0) {
           const imageKey = this.getRandomImageFrame();
@@ -124,7 +124,7 @@ class Home extends Component {
     const delay = this.state.image_carousel.length < this.state.number_of_images ? 500 : 5000;
     const self = this;
     const repaintDelay = setTimeout(function() {
-        self.repaint();
+        self.shuffleImages();
     }, delay * Math.random());   
 
     this.setState({
@@ -211,19 +211,42 @@ class Home extends Component {
     const css_absolute_position_y = Math.floor(image_center_y - (image_height / 2));
 
     const position = {
-      x: css_absolute_position_x,
-      y: css_absolute_position_y,
+      left: css_absolute_position_x,
+      top: css_absolute_position_y,
       slope: slope,
       duration: duration
     }
-    console.log("imagePositioning()", position);
+
     return position;
+  }
+
+  repositionImage(image) {
+    console.log("repositionImage()", image);
+
+    if (image.position.left <= 0) return;
+
+    image.position.left -= 1;
+    image.position.top -= 1;
+
+    const new_carousel = this.state.image_carousel
+                           .filter((curr_image) => curr_image.id !== image.id );
+    this.setState({
+      image_carousel: new_carousel
+    });
+
+    const self = this;
+    setTimeout(function() {
+        self.repositionImage(image);
+    }, 1000);
+
+
   }
 
   setBackgroundUrl(imageKey, newImage) {
     const images_per_row = this.state.number_of_images < 3 ? this.state.number_of_images : 3;
     const max_height = this.state.number_of_images > 3 ? window.screen.height / 2 : Math.floor((2/3) * window.screen.height);
-    newImage = wpGetImage(newImage, images_per_row, max_height);
+    const max_width = Math.floor((2/3) * window.screen.width);
+    newImage = wpGetImage(newImage, images_per_row, max_height, max_width);
 
     if (!newImage) return;
 
@@ -236,7 +259,7 @@ class Home extends Component {
       width: newImage.width,
       timestamp: new Date(),
       image_data: newImage,
-      positioning: this.imagePositioning(newImage.width, newImage.height)
+      position: this.imagePositioning(newImage.width, newImage.height)
     }
 
     // build an array of all previous keys except for our new imageKey.
@@ -255,6 +278,7 @@ class Home extends Component {
     this.setState({
       image_carousel: finalImageSet
     });
+
   }
 
   handleChangeLevel() {
@@ -302,7 +326,7 @@ class Home extends Component {
         })))
         image_working_set = this.state.image_working_set.concat(image_working_set);
 
-        if (!this.state.isInitialized) this.repaint();
+        if (!this.state.isInitialized) this.shuffleImages();
 
         this.setState({
           isInitialized: true,
@@ -314,14 +338,6 @@ class Home extends Component {
       })
       .catch(error => {
         /* most common error is when we query for non-existent page (we don't know how many pages there are) */
-        var num_pages = this.state.num_pages > this.state.page_number ? this.state.num_pages - (this.state.num_pages - this.state.page_number)/2  : this.state.num_pages;
-        num_pages = num_pages > this.state.highest_confirmed_page ? num_pages : this.state.highest_confirmed_page;
-        const page_number = Math.floor(Math.random() * num_pages);
-
-        this.setState({
-          page_number: page_number,
-          num_pages: num_pages
-        });
          /*
             {
               "code": "rest_post_invalid_page_number",
@@ -331,11 +347,19 @@ class Home extends Component {
                 }
             }
         */
+       var num_pages = this.state.num_pages > this.state.page_number ? this.state.num_pages - (this.state.num_pages - this.state.page_number)/2  : this.state.num_pages;
+        num_pages = num_pages > this.state.highest_confirmed_page ? num_pages : this.state.highest_confirmed_page;
+        const page_number = Math.floor(Math.random() * num_pages);
+
+        this.setState({
+          page_number: page_number,
+          num_pages: num_pages
+        });
       });
   
     const delay = this.state.image_working_set.length < (10 * this.state.number_of_images) ? 3000: 15000;
-    const self = this;
 
+    const self = this;
     const fetcherDelay = setTimeout(function() {
         self.imageFetcher();
     }, delay * Math.random());

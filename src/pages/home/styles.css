@@ -4,8 +4,16 @@
   background-color: black;
 }
 
-.box {
+.image-container {
+  position: absolute;
+  animation: image_mover;
+  animation-duration: 15s;
+
+}
+
+.image-frame {
   color: green;
   background-size: contain;
   background-repeat: no-repeat;
 }
+
