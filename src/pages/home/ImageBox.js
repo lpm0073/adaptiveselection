@@ -1,4 +1,5 @@
 import React from 'react';
+import { TransitionGroup, CSSTransition } from 'react-transition-group';
 
 export const ImageBox = (props) => {
 
@@ -21,14 +22,18 @@ export const ImageBox = (props) => {
 
   return(
       <React.Fragment >
-          <div key={key} 
-                className="image-container col-lg-4 col-md-6 col-sm-12 m-2 p-2" 
-                style={imageContainerStyle}>
+          <TransitionGroup>
+              <CSSTransition key={key} classNames="image" timeout={300}>
+                <div key={key}
+                  className="image-container col-lg-4 col-md-6 col-sm-12 m-2 p-2" 
+                  style={imageContainerStyle}>
 
-            <div className="image-frame m-0 p-0" 
-                  style={imageFrameStyle}>{label}</div>
-
-          </div>
+                  <div className="image-frame m-0 p-0" 
+                        style={imageFrameStyle}>{label}
+                  </div>
+                </div>
+              </CSSTransition>
+          </TransitionGroup>              
           
       </React.Fragment>
   );
