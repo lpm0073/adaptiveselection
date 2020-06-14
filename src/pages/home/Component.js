@@ -5,7 +5,7 @@ import * as Actions from '../../redux/ActionCreators';
 
 
 import './styles.css';
-import {ImageBox} from './ImageBox';
+import ImageBox from './ImageBox';
 import { wpGetExclusions } from '../../shared/categories';
 import { mediaUrl } from '../../shared/urls';
 import { wpGetImage } from './wpImageLib';

@@ -8,38 +8,24 @@
   position: absolute;
   animation: image_mover;
   animation-duration: 15s;
-
 }
 
 .image-frame {
   color: green;
   background-size: contain;
   background-repeat: no-repeat;
-  z-index: 0;
 }
 
 /*
   Animations
 */
 
-.image-enter {
-  opacity: 0.01;
-  transform: translateX(-100%);
+.react-draggable {
+  
 }
+.react-draggable-dragging {
 
-.image-enter-active {
-  opacity: 1;
-  transform: translateX(0%);
-  transition: all 300ms ease-in;
 }
-
-.image-exit {
-  opacity: 1;
-  transform: translateX(0%);
-}
-
-.image-exit-active {
-  opacity: 0.01;
-  transform: translateX(100%);
-  transition: all 300ms ease-in-out;
+.react-draggable-dragged {
+  
 }
