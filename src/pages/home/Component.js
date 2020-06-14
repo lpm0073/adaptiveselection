@@ -27,7 +27,7 @@ class Home extends Component {
       isCategoryInitialized: false,
       fetcherDelay: null,
       queueDelay: null,
-      level: 0,
+      level: 4,
       page_number: Math.floor(Math.random() * 40),
       num_pages: 1000,   // <---- start high and interpolate downwards based on success/failure
       highest_confirmed_page: 0,
@@ -35,7 +35,7 @@ class Home extends Component {
       media_query: '',
       image_working_set: [],
       image_carousel: [],
-      number_of_images: 10,
+      number_of_images: 20,
       image_last_position: 0, // the ordinal position of the most recently used image in the working set.
     }
 
@@ -77,10 +77,11 @@ class Home extends Component {
 
   render() {
       return(
-          <div className="home-page mt-5 pt-5">
+          <div id="home-page" className="home-page mt-5 pt-5">
             {this.state.image_carousel.length > 0 ? this.state.image_carousel.map((image) => {
-                const images_per_row = this.state.number_of_images <= 3 ? this.state.number_of_images : 3;
-                const maxWidth = (window.innerWidth / images_per_row) * .90;
+
+                var homePage = document.getElementById("home-page");
+                const maxWidth = (homePage.offsetWidth * .75);
                 const width = image.width < maxWidth ? image.width : maxWidth;
                 const height = width === image.width ? image.height : width * image.image_data.aspect_ratio;
 
@@ -116,7 +117,7 @@ class Home extends Component {
         const images_per_row = this.state.number_of_images < 3 ? this.state.number_of_images : 3;
         const max_height = this.state.number_of_images > 3 ? window.screen.height / 2 : Math.floor((2/3) * window.screen.height);
         const max_width = Math.floor((2/3) * window.screen.width);
-        const newImage = wpGetImage(image, images_per_row, max_height, max_width);
+        const newImage = wpGetImage(image, max_height, max_width);
     
         if (!newImage) {
           console.log("queueImage() internal error: wpGetImage() did not return a value");
@@ -138,13 +139,13 @@ class Home extends Component {
       }
 
       /* setup the dequeue event */
-      const dequeueDelay = Math.floor(Math.random() * 30000);;
+      const dequeueDelay = 15000 + Math.floor(Math.random() * 45000);;
       const self = this;
       setTimeout(function() {self.removeFromImageCarousel(imageKey);}, dequeueDelay);   
     }
     
     /* queue the next iteration */
-    const delay = this.state.image_carousel.length === 0 ? 500 : 10000;
+    const delay = this.state.image_carousel.length === 0 ? 500 : 5000;
     const self = this;
     const queueDelay = setTimeout(function() {self.queueImage();}, delay * Math.random());   
     this.setState({queueDelay: queueDelay});
@@ -211,13 +212,13 @@ class Home extends Component {
 
   imagePositioning(image_width, image_height) {
     // build random trajectory that passes through the
-    // interior 2/3 of curr viewpane.
+    // interior 2/3 of curr view pane.
     const X = window.innerWidth;
     const Y = window.innerHeight;
-    const x_begin = ((1/6) * X);
-    const x_end = X - ((1/6) * X);
-    const y_begin = ((1/6) * Y);
-    const y_end = Y - ((1/6) * Y);
+    const x_begin = image_width / 2;
+    const x_end = X - (image_width / 2);
+    const y_begin = image_height / 2;
+    const y_end = Y - (image_height / 2);
 
     const slope = (Math.random() * (2 * Math.PI));
     const duration = Math.floor(Math.random() * 30000);

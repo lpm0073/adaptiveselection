@@ -1,4 +1,4 @@
-export const wpGetImage = (item, images_per_row = 3, max_height = 500, max_width = 750) => {
+export const wpGetImage = (item, max_height = 1024, max_width = 2048) => {
   /*
     return a dict of image meta data based on available
     images, screen size, and aspect_ratio.
@@ -12,7 +12,7 @@ export const wpGetImage = (item, images_per_row = 3, max_height = 500, max_width
         width =0;
 
         // try to retrieve an optimized version of the image, if it exists
-        size = sizeChooser(item, images_per_row);
+        size = sizeChooser(item);
         imgDict = size === "DEFAULT" ? item.media_details : item.media_details.sizes[size];
         sizes = item.media_details.hasOwnProperty("sizes") ? item.media_details.sizes : item.media_details;
         height = getHeight(imgDict.height, imgDict.width, aspect_ratio);
@@ -22,8 +22,8 @@ export const wpGetImage = (item, images_per_row = 3, max_height = 500, max_width
             height = getMaxRenderingHeight(max_height);
             width = height / aspect_ratio;
         }
-        if (width > getMaxRenderingWidth(images_per_row, max_width)) {
-          width = getMaxRenderingWidth(images_per_row, max_width);
+        if (width > getMaxRenderingWidth(max_width)) {
+          width = getMaxRenderingWidth(max_width);
           height = width * aspect_ratio;
         }
 
@@ -32,12 +32,12 @@ export const wpGetImage = (item, images_per_row = 3, max_height = 500, max_width
           source_url: imgDict.source_url,
           raw_height: imgDict.height,
           raw_width: imgDict.width,
-          max_image_width: getMaxImageWidth(images_per_row),
+          max_image_width: getMaxImageWidth(),
           max_image_height: getMaxImageHeight(),      
           height: height,
           width: width,
           aspect_ratio: aspect_ratio,
-          valid_sizes: getValidSizes(item, images_per_row),
+          valid_sizes: getValidSizes(item),
           size: size,
           sizes: sizes
         };
@@ -49,7 +49,7 @@ export const wpGetImage = (item, images_per_row = 3, max_height = 500, max_width
       return dict;
 }
 
-function sizeChooser(item, images_per_row = 3) {
+function sizeChooser(item) {
   /*
     Analyze available options for image size.
     Choose the largest available size based on device screen
@@ -57,7 +57,7 @@ function sizeChooser(item, images_per_row = 3) {
   var validSizes = [],
       selected_size = "DEFAULT";
 
-  validSizes = getValidSizes(item, images_per_row);
+  validSizes = getValidSizes(item);
   if (validSizes.length > 0) selected_size = getSmallest(item, validSizes);
   else selected_size = getLargest(item);
   
@@ -103,9 +103,9 @@ function getWidth(height, width, aspect_ratio) {
   then analyze these and choose all that are at least
   as large as our expected viewing area.
 */
-function getValidSizes(item, images_per_row = 3) {
+function getValidSizes(item) {
   const aspect_ratio = getAspectRatio(item);
-  const max_width = getMaxImageWidth(images_per_row) 
+  const max_width = getMaxImageWidth() 
   const max_height = getMaxImageHeight()
   var x = null,
       height = 0,
@@ -183,16 +183,19 @@ function getSmallest(item, validSizes) {
 }
 
 
-function getMaxRenderingHeight(max_height = 500) {
-  return  window.screen.height < max_height ? window.screen.height : max_height;
-
+function getMaxRenderingHeight(max_height = 1024) {
+  var homePage = document.getElementById("home-page");
+  return  homePage.offsetHeight < max_height ? homePage.offsetHeight : max_height;
 }
-function getMaxRenderingWidth(images_per_row, max_width = 750) {
-  return window.screen.width / images_per_row < max_width ? window.screen.width / images_per_row : max_width;
+function getMaxRenderingWidth(max_width = 2048) {
+  var homePage = document.getElementById("home-page");
+  return homePage.offsetWidth < max_width ? homePage.offsetWidth : max_width;
 }
-function getMaxImageHeight() {
-  return window.screen.height > 500 ? window.screen.height : 500; 
+function getMaxImageHeight(max_height = 1024) {
+  var homePage = document.getElementById("home-page");
+  return  homePage.offsetHeight < max_height ? homePage.offsetHeight : max_height;
 }
-function getMaxImageWidth(images_per_row = 3) {
-  return window.screen.width / images_per_row > 500 ? window.screen.width / images_per_row : 500;
+function getMaxImageWidth(max_width = 2048) {
+  var homePage = document.getElementById("home-page");
+  return homePage.offsetWidth < max_width ? homePage.offsetWidth : max_width;
 }
