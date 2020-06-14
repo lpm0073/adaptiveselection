@@ -20,25 +20,28 @@ const mapDispatchToProps = (dispatch) => ({
 
 class Home extends Component {
 
+  isCategoryInitialized = false;
+  fetcherDelay = null;
+  queueDelay = null;
+  highest_confirmed_page = 0;
+  image_working_set = [];
+  image_last_position = 0; // the ordinal position of the most recently used image in the working set.
+  last_image_queued = null;  // make sure initial date is stale
+  page_number = Math.floor(Math.random() * 40);
+  num_pages = 1000;   // <---- start high and interpolate downwards based on success/failure
+  category_exclusions = [];
+  media_query = '';
+
   constructor(props) {
     super(props);
     var d = new Date();
+    
+    this.last_image_queued = d.setDate(d.getDate()-5);
 
     this.state = {
-      isCategoryInitialized: false,
-      fetcherDelay: null,
-      queueDelay: null,
       level: 4,
-      page_number: Math.floor(Math.random() * 40),
-      num_pages: 1000,   // <---- start high and interpolate downwards based on success/failure
-      highest_confirmed_page: 0,
-      category_exclusions: [],
-      media_query: '',
-      image_working_set: [],
       image_carousel: [],
       number_of_images: 10,
-      image_last_position: 0, // the ordinal position of the most recently used image in the working set.
-      last_image_queued: d.setDate(d.getDate()-5) // make sure initial date is stale
     }
 
     this.imageFetcher = this.imageFetcher.bind(this);
@@ -65,18 +68,15 @@ class Home extends Component {
   componentDidMount() {
 
     const self = this;
-    const fetcherDelay = setTimeout(function() {
+    this.fetcherDelay = setTimeout(function() {
         self.handleChangeLevel();
         self.imageFetcher();
     }, 250);    
-    this.setState({
-      fetcherDelay: fetcherDelay
-    });
   }
 
   componentWillUnmount() {
-    clearTimeout(this.state.fetcherDelay);
-    clearTimeout(this.state.queueDelay);
+    clearTimeout(this.fetcherDelay);
+    clearTimeout(this.queueDelay);
   }
 
   render() {
@@ -139,9 +139,9 @@ class Home extends Component {
   /* add a random image at a random location on the device screen. */
   queueImage() {
     // if we have images in our working set, and we need more images on screen
-    if (this.state.image_working_set.length > 0 && 
+    if (this.image_working_set.length > 0 && 
         this.state.image_carousel.length < this.state.number_of_images &&
-        this.getElapsedTime(this.state.last_image_queued) > 2500) {
+        this.getElapsedTime(this.last_image_queued) > 2500) {
 
       const newImage = this.generateNewImageObject();   
       this.addToImageCarousel(newImage);
@@ -151,9 +151,7 @@ class Home extends Component {
       const self = this;
       setTimeout(function() {self.removeFromImageCarousel(newImage.key);}, dequeueDelay);   
 
-      this.setState({
-        last_image_queued: new Date()
-      });
+      this.last_image_queued = new Date();
 
     }
     
@@ -163,8 +161,7 @@ class Home extends Component {
     if (this.state.image_carousel.length < this.state.number_of_images) delay = 2000;
 
     const self = this;
-    const queueDelay = setTimeout(function() {self.queueImage();}, delay);   
-    this.setState({queueDelay: queueDelay});
+    this.queueDelay = setTimeout(function() {self.queueImage();}, delay);   
   }
 
   removeFromImageCarousel(key) {
@@ -191,19 +188,17 @@ class Home extends Component {
   }
 
   getNextImage() {
-    const images = this.state.image_working_set;
+    const images = this.image_working_set;
     if (images === null || images.length === 0) return null;
     var image, 
-        i = this.state.image_last_position + 1,
+        i = this.image_last_position + 1,
         attempts = 0;
     do {
         if (i >= (images.length - 1)) i = 0;
         image = images[i];
         i++;
         if (!this.isImageCollision(image)) {
-          this.setState({
-            image_last_position: i
-          });
+          this.image_last_position = i;
           return image;
         }
         attempts++;
@@ -258,7 +253,7 @@ class Home extends Component {
 
   handleChangeLevel() {
 
-    if (this.props.categories.isLoading && !this.state.isCategoryInitialized) {
+    if (this.props.categories.isLoading && !this.isCategoryInitialized) {
       // we're not ready, so wait 500ms and then try again.
       const self = this;
       setTimeout(function() {
@@ -268,18 +263,15 @@ class Home extends Component {
     }
 
     const cats = this.props.categories.items;
-    const exclusions = wpGetExclusions(this.state.level, cats);
-    this.setState({
-      category_exclusions: exclusions,
-      media_query: mediaUrl + "&" + exclusions,
-      isCategoryInitialized: true
-    });
+    this.isCategoryInitialized = true;
+    this.category_exclusions = wpGetExclusions(this.state.level, cats);
+    this.media_query = mediaUrl + "&" + this.category_exclusions;
   
   }
 
   imageFetcher() {
 
-      const url = this.state.media_query + "&page=" + this.state.page_number;
+      const url = this.media_query + "&page=" + this.page_number;
       fetch(url)
       .then(response => {
             if (response.ok) {
@@ -296,18 +288,15 @@ class Home extends Component {
       })
       .then(response => response.json())
       .then(images => {
-        var image_working_set = images.filter(image => !(image.id in this.state.image_working_set.map(worker => {
+        var new_images = images.filter(image => !(image.id in this.image_working_set.map(worker => {
           return worker.id;
         })))
-        image_working_set = this.state.image_working_set.concat(image_working_set);
+        this.image_working_set = this.image_working_set.concat(new_images);
 
         if (this.state.image_carousel.length === 0) this.queueImage();
 
-        this.setState({
-          highest_confirmed_page: this.state.page_number,
-          image_working_set: image_working_set,
-          page_number:  Math.floor(Math.random() * this.state.num_pages)
-        });
+        this.highest_confirmed_page = this.page_number;
+        this.page_number = Math.floor(Math.random() * this.num_pages)
       })
       .catch(error => {
         /* most common error is when we query for non-existent page (we don't know how many pages there are) */
@@ -320,25 +309,19 @@ class Home extends Component {
                 }
             }
         */
-       var num_pages = this.state.num_pages > this.state.page_number ? this.state.num_pages - (this.state.num_pages - this.state.page_number)/2  : this.state.num_pages;
-        num_pages = num_pages > this.state.highest_confirmed_page ? num_pages : this.state.highest_confirmed_page;
-        const page_number = Math.floor(Math.random() * num_pages);
+       var num_pages = this.num_pages > this.state.page_number ? this.num_pages - (this.num_pages - this.state.page_number)/2  : this.num_pages;
+        num_pages = num_pages > this.highest_confirmed_page ? num_pages : this.highest_confirmed_page;
+        this.num_pages = num_pages;
+        this.page_number = Math.floor(Math.random() * num_pages);
 
-        this.setState({
-          page_number: page_number,
-          num_pages: num_pages
-        });
       });
   
-    const delay = this.state.image_working_set.length < (10 * this.state.number_of_images) ? 3000: 15000;
+    const delay = this.image_working_set.length < (10 * this.state.number_of_images) ? 3000: 15000;
 
     const self = this;
-    const fetcherDelay = setTimeout(function() {
+    this.fetcherDelay = setTimeout(function() {
         self.imageFetcher();
     }, delay * Math.random());
-    this.setState({
-      fetcherDelay: fetcherDelay
-    });
 
   }
 
