@@ -50,6 +50,7 @@ class Home extends Component {
     this.imagePositioning = this.imagePositioning.bind(this);
     this.removeFromImageCarousel = this.removeFromImageCarousel.bind(this);
     this.getElapsedTime = this.getElapsedTime.bind(this);
+    this.generateNewImageObject = this.generateNewImageObject.bind(this);
 
   }
 
@@ -110,48 +111,50 @@ class Home extends Component {
   
   }
 
-    /* add a random image at a random location on the device screen. */
+  generateNewImageObject() {
+    const max_height = this.state.number_of_images > 3 ? window.screen.height / 2 : Math.floor((2/3) * window.screen.height);
+    const max_width = Math.floor((2/3) * window.screen.width);
+    const image = this.getNextImage();
+    const newImage = wpGetImage(image, max_height, max_width);
+    const imageKey = Math.floor(Math.random() * 1000000);
+
+    if (!newImage) {
+      console.log("queueImage() internal error: wpGetImage() did not return a value");
+      return;
+    }
+
+    return {
+      key: imageKey,
+      id: newImage.id,
+      source_url: newImage.source_url,
+      height: newImage.height,
+      width: newImage.width,
+      timestamp: new Date(),
+      image_data: newImage,
+      position: this.imagePositioning(newImage.width, newImage.height)
+    }        
+
+  }
+  
+  /* add a random image at a random location on the device screen. */
   queueImage() {
     // if we have images in our working set, and we need more images on screen
     if (this.state.image_working_set.length > 0 && 
         this.state.image_carousel.length < this.state.number_of_images &&
         this.getElapsedTime(this.state.last_image_queued) > 2500) {
-      const imageKey = Math.floor(Math.random() * 1000000);
-      const image = this.getNextImage();
 
-      if (imageKey !== null && image !== null) {
-        const max_height = this.state.number_of_images > 3 ? window.screen.height / 2 : Math.floor((2/3) * window.screen.height);
-        const max_width = Math.floor((2/3) * window.screen.width);
-        const newImage = wpGetImage(image, max_height, max_width);
-    
-        if (!newImage) {
-          console.log("queueImage() internal error: wpGetImage() did not return a value");
-          return;
-        }
-    
-        const obj = {
-          key: imageKey,
-          id: newImage.id,
-          source_url: newImage.source_url,
-          height: newImage.height,
-          width: newImage.width,
-          timestamp: new Date(),
-          image_data: newImage,
-          position: this.imagePositioning(newImage.width, newImage.height)
-        }        
+      const newImage = this.generateNewImageObject();   
+      this.addToImageCarousel(newImage);
 
-        /* setup the dequeue event */
-        const dequeueDelay = 15000 + Math.floor(Math.random() * 45000);
-        const self = this;
-        setTimeout(function() {self.removeFromImageCarousel(imageKey);}, dequeueDelay);   
+      /* setup the dequeue event */
+      const dequeueDelay = 15000 + Math.floor(Math.random() * 45000);
+      const self = this;
+      setTimeout(function() {self.removeFromImageCarousel(newImage.key);}, dequeueDelay);   
 
-        this.addToImageCarousel(obj);
+      this.setState({
+        last_image_queued: new Date()
+      });
 
-        this.setState({
-          last_image_queued: new Date()
-        });
-
-      }
     }
     
     /* queue the next iteration */
