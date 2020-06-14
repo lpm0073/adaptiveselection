@@ -17,7 +17,6 @@ const mapDispatchToProps = (dispatch) => ({
   actions: bindActionCreators(Actions, dispatch)
 });
 
-
 class Home extends Component {
 
   isCategoryInitialized = false;
