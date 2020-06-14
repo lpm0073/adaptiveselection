@@ -30,7 +30,7 @@ class Home extends Component {
   page_number = Math.floor(Math.random() * 40);
   num_pages = 1000;   // <---- start high and interpolate downwards based on success/failure
   category_exclusions = [];
-  media_query = '';
+  media_query;
 
   constructor(props) {
     super(props);
@@ -71,7 +71,7 @@ class Home extends Component {
     this.fetcherDelay = setTimeout(function() {
         self.handleChangeLevel();
         self.imageFetcher();
-    }, 250);    
+    }, 50);    
   }
 
   componentWillUnmount() {
