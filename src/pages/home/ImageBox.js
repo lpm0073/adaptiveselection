@@ -4,6 +4,7 @@ import Draggable from 'react-draggable';
 class ImageBox extends Component {
 
   _timeoutID;
+  clickTimeStamp;
 
   constructor(props) {
     super(props);
@@ -14,9 +15,9 @@ class ImageBox extends Component {
     this.getNextZOrder = this.getNextZOrder.bind(this);
     
     var d = new Date();
+    this.clickTimeStamp = d.setDate(d.getDate()-5); // make sure initial date is stale,
 
     this.state = {
-      clickTimeStamp: d.setDate(d.getDate()-5), // make sure initial date is stale,
       imageContainerStyle: {
         zIndex: this.getNextZOrder()
       },
@@ -45,8 +46,8 @@ class ImageBox extends Component {
   handleMouseDown() {
 
     clearTimeout(this._timeoutID);
+    this.clickTimeStamp = new Date();
     this.setState({
-      clickTimeStamp: new Date(),
       imageContainerStyle: {
         zIndex: this.getNextZOrder() 
       }      
