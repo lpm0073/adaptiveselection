@@ -22,6 +22,7 @@ class Home extends Component {
 
   constructor(props) {
     super(props);
+    var d = new Date();
 
     this.state = {
       isCategoryInitialized: false,
@@ -37,6 +38,7 @@ class Home extends Component {
       image_carousel: [],
       number_of_images: 20,
       image_last_position: 0, // the ordinal position of the most recently used image in the working set.
+      last_image_queued: d.setDate(d.getDate()-5) // make sure initial date is stale
     }
 
     this.imageFetcher = this.imageFetcher.bind(this);
@@ -47,6 +49,7 @@ class Home extends Component {
     this.addToImageCarousel = this.addToImageCarousel.bind(this);
     this.imagePositioning = this.imagePositioning.bind(this);
     this.removeFromImageCarousel = this.removeFromImageCarousel.bind(this);
+    this.getElapsedTime = this.getElapsedTime.bind(this);
 
   }
 
@@ -107,14 +110,16 @@ class Home extends Component {
   
   }
 
+    /* add a random image at a random location on the device screen. */
   queueImage() {
-    /* place a random image on a random imageKey at a random point in time. */
-    if (this.state.image_working_set.length > 0 && this.state.image_carousel.length < this.state.number_of_images) {
+    // if we have images in our working set, and we need more images on screen
+    if (this.state.image_working_set.length > 0 && 
+        this.state.image_carousel.length < this.state.number_of_images &&
+        this.getElapsedTime(this.state.last_image_queued) > 2500) {
       const imageKey = Math.floor(Math.random() * 1000000);
       const image = this.getNextImage();
 
       if (imageKey !== null && image !== null) {
-        const images_per_row = this.state.number_of_images < 3 ? this.state.number_of_images : 3;
         const max_height = this.state.number_of_images > 3 ? window.screen.height / 2 : Math.floor((2/3) * window.screen.height);
         const max_width = Math.floor((2/3) * window.screen.width);
         const newImage = wpGetImage(image, max_height, max_width);
@@ -134,20 +139,28 @@ class Home extends Component {
           image_data: newImage,
           position: this.imagePositioning(newImage.width, newImage.height)
         }        
-        
-        this.addToImageCarousel(obj);
-      }
 
-      /* setup the dequeue event */
-      const dequeueDelay = 15000 + Math.floor(Math.random() * 45000);;
-      const self = this;
-      setTimeout(function() {self.removeFromImageCarousel(imageKey);}, dequeueDelay);   
+        /* setup the dequeue event */
+        const dequeueDelay = 15000 + Math.floor(Math.random() * 45000);
+        const self = this;
+        setTimeout(function() {self.removeFromImageCarousel(imageKey);}, dequeueDelay);   
+
+        this.addToImageCarousel(obj);
+
+        this.setState({
+          last_image_queued: new Date()
+        });
+
+      }
     }
     
     /* queue the next iteration */
-    const delay = this.state.image_carousel.length === 0 ? 500 : 5000;
+    var delay = 5000;
+    if (this.state.image_carousel.length === 0) delay = 500;
+    if (this.state.image_carousel.length < this.state.number_of_images) delay = 2000;
+
     const self = this;
-    const queueDelay = setTimeout(function() {self.queueImage();}, delay * Math.random());   
+    const queueDelay = setTimeout(function() {self.queueImage();}, delay);   
     this.setState({queueDelay: queueDelay});
   }
 
@@ -326,6 +339,10 @@ class Home extends Component {
 
   }
 
+  getElapsedTime(timestamp) {
+    const d = new Date();
+        return d - timestamp;
+  }
 
 }
 
