@@ -30,18 +30,22 @@ class ImageBox extends Component {
   }
 
   getNextZOrder() {
-    var x = document.getElementsByClassName("image-container");
-    var zIndex = 0;
-    var i;
-    for (i = 0; i < x.length; i++) {
-      if (x[i].style.zIndex > zIndex) zIndex = x[i].style.zIndex;
+    var imageContainers = document.getElementsByClassName("image-container"),
+        zIndex = 1,
+        thisZIndex = 0;
+
+    for (var i = 0; i < imageContainers.length; i++) {
+      thisZIndex = Number(imageContainers[i].style.zIndex);
+      if (thisZIndex > zIndex) zIndex = thisZIndex;
     }
     zIndex += 1;
+
+    console.log("getNextZOrder()", zIndex);
     return zIndex;
   }
   
   handleMouseDown() {
-
+    console.log("handleMouseDown()");
     clearTimeout(this._timeoutID);
     this.setState({
       clickTimeStamp: new Date(),
