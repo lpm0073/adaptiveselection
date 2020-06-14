@@ -24,10 +24,9 @@ class Home extends Component {
     super(props);
 
     this.state = {
-      isInitialized: false,
       isCategoryInitialized: false,
       fetcherDelay: null,
-      repaintDelay: null,
+      queueDelay: null,
       level: 0,
       page_number: Math.floor(Math.random() * 40),
       num_pages: 1000,   // <---- start high and interpolate downwards based on success/failure
@@ -36,20 +35,18 @@ class Home extends Component {
       media_query: '',
       image_working_set: [],
       image_carousel: [],
-      number_of_images: 1,
-      image_last_position: 0,
+      number_of_images: 10,
+      image_last_position: 0, // the ordinal position of the most recently used image in the working set.
     }
 
     this.imageFetcher = this.imageFetcher.bind(this);
     this.handleChangeLevel = this.handleChangeLevel.bind(this);
-    this.shuffleImages = this.shuffleImages.bind(this);
-    this.getRandomImageFrame = this.getRandomImageFrame.bind(this);
+    this.queueImage = this.queueImage.bind(this);
     this.isImageCollision = this.isImageCollision.bind(this);
-    this.getRandomImage = this.getRandomImage.bind(this);
-    this.setBackgroundUrl = this.setBackgroundUrl.bind(this);
-    this.getElapsedTime = this.getElapsedTime.bind(this);
+    this.getNextImage = this.getNextImage.bind(this);
+    this.addToImageCarousel = this.addToImageCarousel.bind(this);
     this.imagePositioning = this.imagePositioning.bind(this);
-    this.repositionImage = this.repositionImage.bind(this);
+    this.removeFromImageCarousel = this.removeFromImageCarousel.bind(this);
 
   }
 
@@ -75,7 +72,7 @@ class Home extends Component {
 
   componentWillUnmount() {
     clearTimeout(this.state.fetcherDelay);
-    clearTimeout(this.state.repaintDelay);
+    clearTimeout(this.state.queueDelay);
   }
 
   render() {
@@ -109,37 +106,80 @@ class Home extends Component {
   
   }
 
-  shuffleImages() {
+  queueImage() {
     /* place a random image on a random imageKey at a random point in time. */
-    if (this.state.image_working_set.length > 0) {
-          const imageKey = this.getRandomImageFrame();
-          const images = this.state.image_working_set;
-          const image = this.getRandomImage(images);
-          const elapsed = this.getElapsedTime(imageKey);
+    if (this.state.image_working_set.length > 0 && this.state.image_carousel.length < this.state.number_of_images) {
+      const imageKey = Math.floor(Math.random() * 1000000);
+      const image = this.getNextImage();
 
-          if (imageKey !== null && image !== null && elapsed > 15000) {
-              this.setBackgroundUrl(imageKey, image);
-          }
+      if (imageKey !== null && image !== null) {
+        const images_per_row = this.state.number_of_images < 3 ? this.state.number_of_images : 3;
+        const max_height = this.state.number_of_images > 3 ? window.screen.height / 2 : Math.floor((2/3) * window.screen.height);
+        const max_width = Math.floor((2/3) * window.screen.width);
+        const newImage = wpGetImage(image, images_per_row, max_height, max_width);
+    
+        if (!newImage) {
+          console.log("queueImage() internal error: wpGetImage() did not return a value");
+          return;
+        }
+    
+        const obj = {
+          key: imageKey,
+          id: newImage.id,
+          source_url: newImage.source_url,
+          height: newImage.height,
+          width: newImage.width,
+          timestamp: new Date(),
+          image_data: newImage,
+          position: this.imagePositioning(newImage.width, newImage.height)
+        }        
+        
+        this.addToImageCarousel(obj);
       }
-    const delay = this.state.image_carousel.length < this.state.number_of_images ? 500 : 5000;
-    const self = this;
-    const repaintDelay = setTimeout(function() {
-        self.shuffleImages();
-    }, delay * Math.random());   
 
-    this.setState({
-      repaintDelay: repaintDelay
-    });
-    return;
+      /* setup the dequeue event */
+      const dequeueDelay = Math.floor(Math.random() * 30000);;
+      const self = this;
+      setTimeout(function() {self.removeFromImageCarousel(imageKey);}, dequeueDelay);   
+    }
+    
+    /* queue the next iteration */
+    const delay = this.state.image_carousel.length === 0 ? 500 : 10000;
+    const self = this;
+    const queueDelay = setTimeout(function() {self.queueImage();}, delay * Math.random());   
+    this.setState({queueDelay: queueDelay});
   }
 
-  getRandomImage(images) {
+  removeFromImageCarousel(key) {
+    // build an array of all previous keys except for our new imageKey.
+    // then push our newly generated image set onto the end of the array.
+    var newImageSet = this.state.image_carousel.filter(carousel_image => carousel_image.key !== key);
+
+    this.setState({
+      image_carousel: newImageSet
+    });
+
+  }
+
+  addToImageCarousel(newImage) {
+    // build an array of all previous keys except for our new imageKey.
+    // then push our newly generated image set onto the end of the array.
+    var newImageSet = this.state.image_carousel;
+    newImageSet.push(newImage);
+
+    this.setState({
+      image_carousel: newImageSet
+    });
+
+  }
+
+  getNextImage() {
+    const images = this.state.image_working_set;
     if (images === null || images.length === 0) return null;
     var image, 
         i = this.state.image_last_position + 1,
         attempts = 0;
     do {
-        //image = images[Math.floor(Math.random() * images.length)];
         if (i >= (images.length - 1)) i = 0;
         image = images[i];
         i++;
@@ -153,28 +193,6 @@ class Home extends Component {
     } while (attempts <= 2 * images.length)
 
     return null;
-  }
-
-  getElapsedTime(imageKey) {
-    const d = new Date();
-    let elapsed;
-
-    this.state.image_carousel
-    .filter(image => {
-      return image.key === imageKey;
-    })
-    .map(image => {
-      elapsed = d - image.timestamp;
-      return elapsed;
-    });
-    if (elapsed > 0) return elapsed;
-    return 999999;
-  }
-
-
-  getRandomImageFrame() {
-    if (this.state.image_carousel.length < this.state.number_of_images - 1) return this.state.image_carousel.length;
-    return Math.floor(Math.random() * this.state.number_of_images);
   }
 
   isImageCollision(imageCandidate) {
@@ -220,66 +238,6 @@ class Home extends Component {
     return position;
   }
 
-  repositionImage(image) {
-    console.log("repositionImage()", image);
-
-    if (image.position.left <= 0) return;
-
-    image.position.left -= 1;
-    image.position.top -= 1;
-
-    const new_carousel = this.state.image_carousel
-                           .filter((curr_image) => curr_image.id !== image.id );
-    this.setState({
-      image_carousel: new_carousel
-    });
-
-    const self = this;
-    setTimeout(function() {
-        self.repositionImage(image);
-    }, 1000);
-
-
-  }
-
-  setBackgroundUrl(imageKey, newImage) {
-    const images_per_row = this.state.number_of_images < 3 ? this.state.number_of_images : 3;
-    const max_height = this.state.number_of_images > 3 ? window.screen.height / 2 : Math.floor((2/3) * window.screen.height);
-    const max_width = Math.floor((2/3) * window.screen.width);
-    newImage = wpGetImage(newImage, images_per_row, max_height, max_width);
-
-    if (!newImage) return;
-
-    let newImageSet;
-    const obj = {
-      key: imageKey,
-      id: newImage.id,
-      source_url: newImage.source_url,
-      height: newImage.height,
-      width: newImage.width,
-      timestamp: new Date(),
-      image_data: newImage,
-      position: this.imagePositioning(newImage.width, newImage.height)
-    }
-
-    // build an array of all previous keys except for our new imageKey.
-    // then push our newly generated image set onto the end of the array.
-    newImageSet = this.state.image_carousel.filter(image => image.key !== imageKey);
-    newImageSet.push(obj);
-
-    // sort the array by key
-    var finalImageSet = [];
-    for (var i=0; i < newImageSet.length; i++) {
-      for (var j=0; j < newImageSet.length; j++) {
-        if (newImageSet[j].key === i) finalImageSet.push(newImageSet[j]);
-      }
-    }
-
-    this.setState({
-      image_carousel: finalImageSet
-    });
-
-  }
 
   handleChangeLevel() {
 
@@ -326,15 +284,13 @@ class Home extends Component {
         })))
         image_working_set = this.state.image_working_set.concat(image_working_set);
 
-        if (!this.state.isInitialized) this.shuffleImages();
+        if (this.state.image_carousel.length === 0) this.queueImage();
 
         this.setState({
-          isInitialized: true,
           highest_confirmed_page: this.state.page_number,
           image_working_set: image_working_set,
           page_number:  Math.floor(Math.random() * this.state.num_pages)
         });
-
       })
       .catch(error => {
         /* most common error is when we query for non-existent page (we don't know how many pages there are) */
