@@ -112,17 +112,19 @@ function getValidSizes(item) {
       width = 0,
       validSizes = []
 
-  if (item.media_details.hasOwnProperty("sizes")) {
-    for (var size in item.media_details.sizes) {
-      x = item.media_details.sizes[size];
-      if (x.hasOwnProperty("width") && x.hasOwnProperty("height")) {
-        height = getHeight(x.height, x.width, aspect_ratio);
-        width = getWidth(x.height, x.width, aspect_ratio);
-        if ((aspect_ratio < 1 && width > max_width) || (aspect_ratio >= 1 && height > max_height)) {
-         validSizes.push(size);
+  if (item.hasOwnProperty("media_details")) {
+    if (item.media_details.hasOwnProperty("sizes")) {
+      for (var size in item.media_details.sizes) {
+        x = item.media_details.sizes[size];
+        if (x.hasOwnProperty("width") && x.hasOwnProperty("height")) {
+          height = getHeight(x.height, x.width, aspect_ratio);
+          width = getWidth(x.height, x.width, aspect_ratio);
+          if ((aspect_ratio < 1 && width > max_width) || (aspect_ratio >= 1 && height > max_height)) {
+           validSizes.push(size);
+          }
         }
       }
-    }
+    }  
   }
   return validSizes;
 }
