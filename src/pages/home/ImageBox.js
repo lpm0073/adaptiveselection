@@ -15,6 +15,7 @@ class ImageBox extends Component {
     this.getNextZOrder = this.getNextZOrder.bind(this);
     this.isOnTop = this.isOnTop.bind(this);
     this.handleWindowClose = this.handleWindowClose.bind(this);
+    this.toggleHover = this.toggleHover.bind(this);
     
     var d = new Date();
     this.clickTimeStamp = d.setDate(d.getDate()-5); // make sure initial date is stale,
@@ -32,7 +33,8 @@ class ImageBox extends Component {
         height: this.props.height,
         width: this.props.width
       },
-      isClosed: false
+      isClosed: false,
+      isHovering: false
     }
   }
 
@@ -68,6 +70,12 @@ class ImageBox extends Component {
     });
   }
 
+  toggleHover() {
+    this.setState({
+      isHovering: !this.state.isHovering
+    });
+  }
+
   handleMouseDown() {
 
     clearTimeout(this._timeoutID);
@@ -99,9 +107,10 @@ class ImageBox extends Component {
     // React key
     const key = "image-box-" + this.props.imageKey;
     const label = "Box " + this.props.imageKey;
-    var containerClasses = "image-container m-0 p-0 handle"
-    if (this.isOnTop()) containerClasses += " hoverable"
-    if (this.state.isClosed) containerClasses += " window-closer"
+    var containerClasses = "image-container m-0 p-0 handle";
+    if (this.isOnTop()) containerClasses += " hoverable";
+    if (this.state.isClosed) containerClasses += " window-closer";
+    if (this.state.isHovering) containerClasses += " hovering";
 
     // See: https://github.com/STRML/react-draggable
     return(
@@ -126,6 +135,8 @@ class ImageBox extends Component {
                 id={this.props.imageKey}
                 className={containerClasses}
                 style={this.state.imageContainerStyle}
+                onMouseEnter={this.toggleHover} 
+                onMouseLeave={this.toggleHover}                
                 >
                 <div className="image-frame m-0 p-0" 
                       style={this.state.imageFrameStyle}>

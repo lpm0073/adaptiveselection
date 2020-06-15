@@ -11,6 +11,11 @@
   transition-delay: 0ms;
 }
 
+.hovering {
+  /* do not delete! */
+  transition-delay: 0ms;
+}
+
 .window-closer {
   display: none !important;
   width: 0 !important;

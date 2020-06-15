@@ -53,6 +53,7 @@ class Home extends Component {
     this.removeFromImageCarousel = this.removeFromImageCarousel.bind(this);
     this.getElapsedTime = this.getElapsedTime.bind(this);
     this.generateNewImageObject = this.generateNewImageObject.bind(this);
+    this.existsClass = this.existsClass.bind(this);
 
   }
 
@@ -82,6 +83,12 @@ class Home extends Component {
       this.removeFromImageCarousel(key);
     }
 
+  }
+
+  // returns true if there is an element in the DOM containing this class
+  existsClass(className) {
+    const elements = document.getElementsByClassName(className);
+    return elements.length > 0;
   }
 
   render() {
@@ -146,6 +153,7 @@ class Home extends Component {
     // if we have images in our working set, and we need more images on screen
     if (this.image_working_set.length > 0 && 
         this.state.image_carousel.length < this.state.number_of_images &&
+        !this.existsClass("hovering") &&
         this.getElapsedTime(this.last_image_queued) > 2500) {
 
       const newImage = this.generateNewImageObject();   
