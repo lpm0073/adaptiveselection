@@ -6,7 +6,7 @@ import * as Actions from '../../redux/ActionCreators';
 
 import './styles.css';
 import ImageBox from './ImageBox';
-import { wpGetExclusions } from '../../shared/categories';
+import { wpGetExclusions, wpGetExclusionArray } from '../../shared/categories';
 import { mediaUrl } from '../../shared/urls';
 import { wpGetImage } from './wpImageLib';
 
@@ -26,7 +26,7 @@ class Home extends Component {
   image_working_set = [];
   image_last_position = 0; // the ordinal position of the most recently used image in the working set.
   last_image_queued = null;  // make sure initial date is stale
-  page_number = Math.floor(Math.random() * 40);
+  page_number = 1 + Math.floor(Math.random() * 40);
   num_pages = 1000;   // <---- start high and interpolate downwards based on success/failure
   category_exclusions = [];
   media_query;
@@ -38,7 +38,7 @@ class Home extends Component {
     this.last_image_queued = d.setDate(d.getDate()-5);
 
     this.state = {
-      level: 4,
+      level: 0,
       image_carousel: [],
       number_of_images: 10,
     }
@@ -54,6 +54,7 @@ class Home extends Component {
     this.getElapsedTime = this.getElapsedTime.bind(this);
     this.generateNewImageObject = this.generateNewImageObject.bind(this);
     this.existsClass = this.existsClass.bind(this);
+    this.removeExclusions = this.removeExclusions.bind(this);
 
   }
 
@@ -83,6 +84,9 @@ class Home extends Component {
       this.removeFromImageCarousel(key);
     }
 
+    // re-validate the working set and the carousel against our current
+    // list of category exclusions.
+    this.removeExclusions();
   }
 
   // returns true if there is an element in the DOM containing this class
@@ -175,6 +179,23 @@ class Home extends Component {
 
     const self = this;
     this.queueDelay = setTimeout(function() {self.queueImage();}, delay);   
+  }
+
+  // if level has changed downwards then the working set probably contains
+  // content that is no longer conforms and needs to be purged.
+  removeExclusions() {
+    var category_exclusions = wpGetExclusionArray(this.state.level, this.props.categories.items),
+        this_categories = [];
+
+    for (var i=0; i < this.image_working_set.length; i++) {
+        this_categories = this.image_working_set[i].categories;
+        const intersection = this_categories.filter(element => category_exclusions.includes(element))
+        if (intersection.length > 0 ) {
+          const this_image = this.image_working_set[i]
+          this.removeFromImageCarousel(this_image.id);
+          this.image_working_set = this.image_working_set.filter(image => image.id !== this_image.id);
+        }
+    }
   }
 
   removeFromImageCarousel(key) {
@@ -279,6 +300,7 @@ class Home extends Component {
     this.isCategoryInitialized = true;
     this.category_exclusions = wpGetExclusions(this.state.level, cats);
     this.media_query = mediaUrl + "&" + this.category_exclusions;
+    this.removeExclusions();
   
   }
 
@@ -310,7 +332,7 @@ class Home extends Component {
         if (this.state.image_carousel.length === 0) this.queueImage();
 
         this.highest_confirmed_page = this.page_number;
-        this.page_number = Math.floor(Math.random() * this.num_pages)
+        this.page_number = 1 + Math.floor(Math.random() * this.num_pages)
       })
       .catch(error => {
         /* most common error is when we query for non-existent page (we don't know how many pages there are) */
@@ -328,7 +350,7 @@ class Home extends Component {
         var num_pages = this.num_pages > this.page_number ? this.num_pages - (this.num_pages - this.page_number)/2  : this.num_pages;
         num_pages = num_pages > this.highest_confirmed_page ? num_pages : this.highest_confirmed_page;
         this.num_pages = num_pages;
-        this.page_number = Math.floor(Math.random() * num_pages);
+        this.page_number = 1 + Math.floor(Math.random() * num_pages);
 
       });
   
