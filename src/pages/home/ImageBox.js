@@ -13,6 +13,7 @@ class ImageBox extends Component {
     this.handleDrag = this.handleDrag.bind(this);
     this.handleStop = this.handleStop.bind(this);
     this.getNextZOrder = this.getNextZOrder.bind(this);
+    this.isOnTop = this.isOnTop.bind(this);
     
     var d = new Date();
     this.clickTimeStamp = d.setDate(d.getDate()-5); // make sure initial date is stale,
@@ -25,7 +26,7 @@ class ImageBox extends Component {
         backgroundImage: "url('" + this.props.url + "')",
         height: this.props.height,
         width: this.props.width
-      }      
+      }
     }
   }
 
@@ -43,14 +44,26 @@ class ImageBox extends Component {
     return zIndex;
   }
   
+  isOnTop() {
+
+    var imageContainers = document.getElementsByClassName("image-container"),
+        thisZIndex = 0;
+
+    for (var i = 0; i < imageContainers.length; i++) {
+      thisZIndex = Number(imageContainers[i].style.zIndex);
+      if (thisZIndex > this.state.imageContainerStyle.zIndex) return false;
+    }
+    return true;
+  }
+
   handleMouseDown() {
 
     clearTimeout(this._timeoutID);
     this.clickTimeStamp = new Date();
     this.setState({
       imageContainerStyle: {
-        zIndex: this.getNextZOrder() 
-      }      
+        zIndex: this.getNextZOrder()
+      }
     });
   }
 
@@ -74,6 +87,8 @@ class ImageBox extends Component {
     // React key
     const key = "image-box-" + this.props.imageKey;
     const label = "Box " + this.props.imageKey;
+    var containerClasses = "image-container m-0 p-0 handle"
+    if (this.isOnTop()) containerClasses += " hoverable"
 
     // See: https://github.com/STRML/react-draggable
     return(
@@ -95,11 +110,17 @@ class ImageBox extends Component {
 
               <div
                 key={key}
-                className="image-container m-2 p-2 handle" 
+                className={containerClasses}
                 style={this.state.imageContainerStyle}
                 >
                 <div className="image-frame m-0 p-0" 
                       style={this.state.imageFrameStyle}>{label}
+                      <div id="grabbers">
+                        <div className="top-left"></div>
+                        <div className="top-right"></div>
+                        <div className="bottom-left"></div>
+                        <div className="bottom-right"></div>
+                      </div>
                 </div>
               </div>
 
