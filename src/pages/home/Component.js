@@ -151,16 +151,16 @@ class Home extends Component {
   /* add a random image at a random location on the device screen. */
   queueImage() {
     // if we have images in our working set, and we need more images on screen
-    if (this.image_working_set.length > 0 && 
-        this.state.image_carousel.length < this.state.number_of_images &&
-        !this.existsClass("hovering") &&
-        this.getElapsedTime(this.last_image_queued) > 2500) {
+    if (this.image_working_set.length > 0 &&                                // we have images
+        this.state.image_carousel.length < this.state.number_of_images &&   // the desktop wants images
+        !this.existsClass("hovering") &&                                    // we're not hovering over an image at the moment
+        this.getElapsedTime(this.last_image_queued) > 4500) {               // its been at least 4.5s since the last image was added
 
       const newImage = this.generateNewImageObject();   
       this.addToImageCarousel(newImage);
 
       /* setup the dequeue event */
-      const dequeueDelay = 15000 + Math.floor(Math.random() * 45000);
+      const dequeueDelay = 15000 + Math.floor(Math.random() * 45000);       // image lifespan of 15 to 60 seconds
       const self = this;
       setTimeout(function() {self.removeFromImageCarousel(newImage.key);}, dequeueDelay);   
 
@@ -301,6 +301,7 @@ class Home extends Component {
       })
       .then(response => response.json())
       .then(images => {
+        // only add unique return values, so that we don't accumulated duplicates in the working set
         var new_images = images.filter(image => !(image.id in this.image_working_set.map(worker => {
           return worker.id;
         })))
@@ -322,14 +323,16 @@ class Home extends Component {
                 }
             }
         */
-       var num_pages = this.num_pages > this.state.page_number ? this.num_pages - (this.num_pages - this.state.page_number)/2  : this.num_pages;
+
+      // try to reverse engineer the total number of pages avaiable.
+        var num_pages = this.num_pages > this.page_number ? this.num_pages - (this.num_pages - this.page_number)/2  : this.num_pages;
         num_pages = num_pages > this.highest_confirmed_page ? num_pages : this.highest_confirmed_page;
         this.num_pages = num_pages;
         this.page_number = Math.floor(Math.random() * num_pages);
 
       });
   
-    const delay = this.image_working_set.length < (10 * this.state.number_of_images) ? 3000: 15000;
+    const delay = this.image_working_set.length < (10 * this.state.number_of_images) ? 1000: 15000;
 
     const self = this;
     this.fetcherDelay = setTimeout(function() {
