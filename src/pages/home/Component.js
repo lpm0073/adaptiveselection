@@ -97,21 +97,23 @@ class Home extends Component {
 
   render() {
       return(
-          <div id="home-page" className="home-page mt-5 pt-5">
+          <div id="home-page" className="home-page">
             {this.state.image_carousel.length > 0 ? this.state.image_carousel.map((image) => {
 
+                /*
                 var homePage = document.getElementById("home-page");
                 const maxWidth = (homePage.offsetWidth * .75);
                 const width = image.width < maxWidth ? image.width : maxWidth;
                 const height = width === image.width ? image.height : width * image.image_data.aspect_ratio;
+                */
 
                 return (
                   <ImageBox 
                     key={image.key}
                     imageKey={image.key}
                     url={image.source_url}
-                    height = {height}
-                    width = {width}
+                    height = {image.height}
+                    width = {image.width}
                     position_left = {image.position.left}
                     position_top = {image.position.top}
                     slope = {image.position.slope}
@@ -259,25 +261,20 @@ class Home extends Component {
   imagePositioning(image_width, image_height) {
     // build random trajectory that passes through the
     // interior 2/3 of curr view pane.
-    const X = window.innerWidth;
-    const Y = window.innerHeight;
-    const x_begin = image_width / 2;
-    const x_end = X - (image_width / 2);
-    const y_begin = image_height / 2;
-    const y_end = Y - (image_height / 2);
+    const canvas_area = .90;
+
+    const X = window.innerWidth * canvas_area;
+    const Y = window.innerHeight * canvas_area;
+
+    const position_x = Math.floor(Math.random() * (X - image_width));
+    const position_y = Math.floor(Math.random() * (Y - image_height));
 
     const slope = (Math.random() * (2 * Math.PI));
     const duration = Math.floor(Math.random() * 30000);
 
-    const image_center_x = x_begin + Math.floor(Math.random() * x_end);
-    const image_center_y = y_begin + Math.floor(Math.random() * y_end);
-
-    const css_absolute_position_x = Math.floor(image_center_x - (image_width / 2));
-    const css_absolute_position_y = Math.floor(image_center_y - (image_height / 2));
-
     const position = {
-      left: css_absolute_position_x,
-      top: css_absolute_position_y,
+      left: (window.innerWidth * (1 - canvas_area))/2 + position_x,
+      top: (window.innerHeight * (1 - canvas_area))/2 + position_y,
       slope: slope,
       duration: duration
     }
