@@ -39,7 +39,8 @@ export const wpGetImage = (item, max_height = 1024, max_width = 2048) => {
           aspect_ratio: aspect_ratio,
           valid_sizes: getValidSizes(item),
           size: size,
-          sizes: sizes
+          sizes: sizes,
+          data: item
         };
 
       if(dict.size === "DEFAULT") {

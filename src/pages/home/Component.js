@@ -116,6 +116,7 @@ class Home extends Component {
                     position_top = {image.position.top}
                     slope = {image.position.slope}
                     duration = {image.position.duration}
+                    image = {image}
                   />
                 );
               })
@@ -174,7 +175,7 @@ class Home extends Component {
     
     /* queue the next iteration */
     var delay = 5000;
-    if (this.state.image_carousel.length === 0) delay = 500;
+    if (this.state.image_carousel.length <= 1) delay = 500;
     if (this.state.image_carousel.length < this.state.number_of_images) delay = 2000;
 
     const self = this;

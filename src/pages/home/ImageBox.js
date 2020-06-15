@@ -85,6 +85,7 @@ class ImageBox extends Component {
         zIndex: this.getNextZOrder()
       }
     });
+    console.log("handleMouseDown()", this.props.image);
   }
 
 
