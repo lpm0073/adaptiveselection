@@ -39,7 +39,8 @@
 .react-draggable-dragging {
   border: 1px solid gray;
   border-radius: 5px;
-  }
+  cursor: move;
+}
 
 .react-draggable-dragged {
   
@@ -65,16 +66,21 @@
 .top-left {
   top: 0;
   left: 0;
+  font-size: .5em;
+  color: red;
 }
 .top-right {
   top: 0;
   right: 0;
+  cursor: ne-resize;
 }
 .bottom-left {
   bottom: 0;
   left: 0;
+  cursor: sw-resize;
 }
 .bottom-right {
   bottom: 0;
   right: 0;
+  cursor: se-resize;
 }

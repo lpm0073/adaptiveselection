@@ -130,7 +130,7 @@ class ImageBox extends Component {
                 <div className="image-frame m-0 p-0" 
                       style={this.state.imageFrameStyle}>
                       <div id="grabbers" style={this.state.grabberStyle}>
-                        <div className="top-left" onMouseDown={this.handleWindowClose}></div>
+                        <div className="top-left text-center" onMouseDown={this.handleWindowClose}>X</div>
                         <div className="top-right"></div>
                         <div className="bottom-left"></div>
                         <div className="bottom-right"></div>
