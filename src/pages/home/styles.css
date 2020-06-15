@@ -8,7 +8,13 @@
   border: 3px solid goldenrod;
   box-shadow: 0 1px 5px 1px #cccccc;
   border-radius: 5px;
-  transition-delay: 250ms;
+  transition-delay: 0ms;
+}
+
+.window-closer {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
 }
 
 .image-container {
@@ -48,11 +54,14 @@
 }
 #grabbers > div {
   position:absolute;
-  background-color: goldenrod;
   border: 1px dotted green;
-  width: 25px;
-  height: 25px;
+  width: 15px;
+  height: 15px;
 }
+#grabbers > div:hover {
+  background-color: goldenrod;
+}
+
 .top-left {
   top: 0;
   left: 0;

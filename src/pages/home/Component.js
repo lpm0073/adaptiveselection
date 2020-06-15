@@ -56,14 +56,6 @@ class Home extends Component {
 
   }
 
-
-  shouldComponentUpdate(nextProps, nextState) {
-    if (this.state.level !== nextState.level) {
-      console.log("the level changed.");
-    }
-    return true;
-  }
-
   componentDidMount() {
 
     const self = this;
@@ -76,6 +68,20 @@ class Home extends Component {
   componentWillUnmount() {
     clearTimeout(this.fetcherDelay);
     clearTimeout(this.queueDelay);
+  }
+
+  /* find any closed windows and remove these from the carousel */
+  componentWillUpdate() {
+
+    // window-closer class is added by a mousedown event handler in ImageBox
+    var closedWindows = document.getElementsByClassName("window-closer"),
+        key = 0;
+
+    for (var i = 0; i < closedWindows.length; i++) {
+      key = Number(closedWindows[i].id);
+      this.removeFromImageCarousel(key);
+    }
+
   }
 
   render() {
@@ -115,7 +121,7 @@ class Home extends Component {
     const max_width = Math.floor((2/3) * window.screen.width);
     const image = this.getNextImage();
     const newImage = wpGetImage(image, max_height, max_width);
-    const imageKey = Math.floor(Math.random() * 1000000);
+    const imageKey = newImage.id;
 
     if (!newImage) {
       console.log("queueImage() internal error: wpGetImage() did not return a value");

@@ -14,6 +14,7 @@ class ImageBox extends Component {
     this.handleStop = this.handleStop.bind(this);
     this.getNextZOrder = this.getNextZOrder.bind(this);
     this.isOnTop = this.isOnTop.bind(this);
+    this.handleWindowClose = this.handleWindowClose.bind(this);
     
     var d = new Date();
     this.clickTimeStamp = d.setDate(d.getDate()-5); // make sure initial date is stale,
@@ -26,7 +27,12 @@ class ImageBox extends Component {
         backgroundImage: "url('" + this.props.url + "')",
         height: this.props.height,
         width: this.props.width
-      }
+      },
+      grabberStyle: {
+        height: this.props.height,
+        width: this.props.width
+      },
+      isClosed: false
     }
   }
 
@@ -54,6 +60,12 @@ class ImageBox extends Component {
       if (thisZIndex > this.state.imageContainerStyle.zIndex) return false;
     }
     return true;
+  }
+
+  handleWindowClose() {
+    this.setState({
+      isClosed: true
+    });
   }
 
   handleMouseDown() {
@@ -89,6 +101,7 @@ class ImageBox extends Component {
     const label = "Box " + this.props.imageKey;
     var containerClasses = "image-container m-0 p-0 handle"
     if (this.isOnTop()) containerClasses += " hoverable"
+    if (this.state.isClosed) containerClasses += " window-closer"
 
     // See: https://github.com/STRML/react-draggable
     return(
@@ -110,13 +123,14 @@ class ImageBox extends Component {
 
               <div
                 key={key}
+                id={this.props.imageKey}
                 className={containerClasses}
                 style={this.state.imageContainerStyle}
                 >
                 <div className="image-frame m-0 p-0" 
-                      style={this.state.imageFrameStyle}>{label}
-                      <div id="grabbers">
-                        <div className="top-left"></div>
+                      style={this.state.imageFrameStyle}>
+                      <div id="grabbers" style={this.state.grabberStyle}>
+                        <div className="top-left" onMouseDown={this.handleWindowClose}></div>
                         <div className="top-right"></div>
                         <div className="bottom-left"></div>
                         <div className="bottom-right"></div>
