@@ -36,23 +36,28 @@
 }
 
 /* --------------------- Interactions --------------------- */
-.hovering {
+.analytics_hovering {
   /* do not delete! */
   transition-delay: 0ms;
 }
-.like {
+.analytics_like {
   /* do not delete! */
   transition-delay: 0ms;
 }
-.dislike {
+.analytics_dislike {
   /* do not delete! */
   transition-delay: 0ms;
 }
-.click {
+.analytics_click {
   /* do not delete! */
   transition-delay: 0ms;
 }
-
+.analytics_move {
+  transition-delay: 0ms;
+}
+.analytics_resize {
+  transition-delay: 0ms;
+}
 
 /* --------------------- Animations --------------------- */
 

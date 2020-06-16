@@ -70,6 +70,13 @@ class ImageBox extends Component {
     if (this.state.isHovering) containerClasses += " hovering";
     if (this._like) likeStyles = {fontSize: 'larger'};
     if (this._dislike) dislikeStyles = {fontSize: 'larger'};
+
+    /* behavior tracking */
+    if (this._click) containerClasses += " analytics_click";
+    if (this._move) containerClasses += " analytics_move";
+    if (this._resizing) containerClasses += " analytics_resize";
+    if (this._like) containerClasses += " analytics_like";
+    if (this._dislike) containerClasses += " analytics_dislike";
     
     // See: https://github.com/STRML/react-draggable
 
@@ -122,7 +129,7 @@ class ImageBox extends Component {
     clearTimeout(this.windowCloseDelay);
     const delay = 15000 + Math.floor(Math.random() * 45000);       // image lifespan of 15 to 60 seconds
     const self = this;
-    this.windowCloseDelay = setTimeout(function() {self.handleWindowClose(self.props.image.id);}, delay);   
+    this.windowCloseDelay = setTimeout(function() {self.handleWindowClose();}, delay);   
   }
   
   handleResizing() {

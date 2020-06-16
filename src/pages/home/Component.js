@@ -33,15 +33,6 @@ class Home extends Component {
 
   constructor(props) {
     super(props);
-    var d = new Date();
-    
-    this.last_image_queued = d.setDate(d.getDate()-5);
-
-    this.state = {
-      level: 0,
-      image_carousel: [],
-      number_of_images: 5,
-    }
 
     this.imageFetcher = this.imageFetcher.bind(this);
     this.handleChangeLevel = this.handleChangeLevel.bind(this);
@@ -54,7 +45,19 @@ class Home extends Component {
     this.getElapsedTime = this.getElapsedTime.bind(this);
     this.existsClass = this.existsClass.bind(this);
     this.removeExclusions = this.removeExclusions.bind(this);
+    this.processClosedWindows = this.processClosedWindows.bind(this);
+    this.processAnalytics = this.processAnalytics.bind(this);
+    this.setAnalyticsTag = this.setAnalyticsTag.bind(this);
 
+    var d = new Date();
+    
+    this.last_image_queued = d.setDate(d.getDate()-5);
+
+    this.state = {
+      level: 0,
+      image_carousel: [],
+      number_of_images: 5,
+    }
   }
 
   componentDidMount() {
@@ -71,21 +74,34 @@ class Home extends Component {
     clearTimeout(this.queueDelay);
   }
 
-  /* find any closed windows and remove these from the carousel */
-  componentWillUpdate() {
 
-    // window-closer class is added by a mousedown event handler in ImageBox
-    var closedWindows = document.getElementsByClassName("window-closer"),
-        id = 0;
+  setAnalyticsTag(tag, elements) {
 
-    for (var i = 0; i < closedWindows.length; i++) {
-      id = Number(closedWindows[i].id);
-      this.removeFromImageCarousel(id);
+    for (var i = 0; i < elements.length; i++) {
+      const id = Number(elements[i].id);
+      
+      for (var j = 0; j < this.image_working_set.length; j++) {
+        if (this.image_working_set[j].id === id) {
+          switch (tag) {
+            case "click": this.image_working_set[j].analytics.click = true; break;
+            case "move": this.image_working_set[j].analytics.move = true; break;
+            case "resize": this.image_working_set[j].analytics.resize = true; break;
+            case "like": this.image_working_set[j].analytics.like = true; break;
+            case "dislike": this.image_working_set[j].analytics.dislike = true; break;
+            default: break;
+          }          
+          return;
+        }        
+      }
     }
+  }
 
-    // re-validate the working set and the carousel against our current
-    // list of category exclusions.
-    this.removeExclusions();
+  processAnalytics() {
+    this.setAnalyticsTag("click", document.getElementsByClassName("analytics_click"));
+    this.setAnalyticsTag("move", document.getElementsByClassName("analytics_move"));
+    this.setAnalyticsTag("resize", document.getElementsByClassName("analytics_resize"));
+    this.setAnalyticsTag("like", document.getElementsByClassName("analytics_like"));
+    this.setAnalyticsTag("dislike", document.getElementsByClassName("analytics_dislike"));
   }
 
   // returns true if there is an element in the DOM containing this class
@@ -125,6 +141,17 @@ class Home extends Component {
 
   /* add a random image at a random location on the device screen. */
   queueImage() {
+    // do this first.
+    // gather user analytics signals from class data embedded in the items in image_carousel
+    this.processAnalytics();
+
+    // dequeue any windows that were closed by the user
+    this.processClosedWindows();
+
+    // re-validate the working set and the carousel against our current
+    // list of category exclusions.
+    this.removeExclusions();
+
     // if we have images in our working set, and we need more images on screen
     if (this.image_working_set.length > 0 &&                                // we have images
         this.state.image_carousel.length < this.state.number_of_images &&   // the desktop wants images
@@ -151,6 +178,17 @@ class Home extends Component {
     this.queueDelay = setTimeout(function() {self.queueImage();}, delay);   
   }
 
+  processClosedWindows() {
+    // window-closer class is added by a mousedown event handler in ImageBox
+    var closedWindows = document.getElementsByClassName("window-closer"),
+        id = 0;
+
+    for (var i = 0; i < closedWindows.length; i++) {
+      id = Number(closedWindows[i].id);
+      this.removeFromImageCarousel(id);
+    }
+
+  }
   // if level has changed downwards then the working set probably contains
   // content that is no longer conforms and needs to be purged.
   removeExclusions() {
@@ -289,7 +327,20 @@ class Home extends Component {
         // only add unique return values, so that we don't accumulated duplicates in the working set
         var new_images = images.filter(image => !(image.id in this.image_working_set.map(worker => {
           return worker.id;
-        })))
+        })));
+
+        // initialize analytics data
+        new_images = new_images.map((image) => {
+          image.analytics = {
+            click: false,
+            move: false,
+            resize: false,
+            like: false,
+            dislike: false
+          };
+          return image;
+        })
+        
         this.image_working_set = this.image_working_set.concat(new_images);
 
         if (this.state.image_carousel.length === 0) this.queueImage();
