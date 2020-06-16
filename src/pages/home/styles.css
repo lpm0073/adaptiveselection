@@ -155,6 +155,11 @@
 .like {
   left: 40%;
 }
+
 .dislike {
   left: 60%;
+}
+
+.info {
+  left: 50%;
 }

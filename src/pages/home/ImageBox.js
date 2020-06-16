@@ -27,6 +27,7 @@ class ImageBox extends Component {
     this.toggleHover = this.toggleHover.bind(this);
     this.handleLike = this.handleLike.bind(this);
     this.handleDislike = this.handleDislike.bind(this);
+    this.handleInfoButton = this.handleInfoButton.bind(this);
     this.handleResizing = this.handleResizing.bind(this);
     this.resetWindowCloseDelay = this.resetWindowCloseDelay.bind(this);
     
@@ -117,6 +118,7 @@ class ImageBox extends Component {
                       </div>
                       <div id="button-bar" className="text-center">
                         <div className="like" style={likeStyles} onMouseDown={this.handleLike}><i class="fa fa-thumbs-up"></i></div>
+                        <div className="info" onMouseDown={this.handleInfoButton}><i class="fa fa-info-circle"></i></div>
                         <div className="dislike" style={dislikeStyles} onMouseDown={this.handleDislike}><i class="fa fa-thumbs-down"></i></div>
                       </div>
                 </div>
@@ -150,6 +152,9 @@ class ImageBox extends Component {
     this._dislike = (!this._dislike);
     if (this._like) this._like = false;
     if (this._dislike) this.resetWindowCloseDelay(1500);
+  }
+  handleInfoButton () {
+    console.log("handleInfoButton()");
   }
 
   getNextZOrder() {
