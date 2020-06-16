@@ -67,7 +67,6 @@ class ImageBox extends Component {
         <React.Fragment >
           <Draggable
             axis="both"
-            bounds="parent"
             cancel=".body"
             defaultPosition={{x: this.props.image.position_props.left, y: this.props.image.position_props.top}}
             defaultClassName="react-draggable"
@@ -82,7 +81,7 @@ class ImageBox extends Component {
 
               <div
                 key={key}
-                id={this.props.imageKey}
+                id={this.props.image.id}
                 className={containerClasses}
                 style={this.state.imageContainerStyle}
                 onMouseEnter={this.toggleHover}

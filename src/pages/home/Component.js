@@ -111,10 +111,7 @@ class Home extends Component {
               }
 
               return (
-                <ImageBox 
-                  key={image.key}
-                  image = {image}
-                />
+                <ImageBox key={image.key} image = {image} />
               );
             })
             :
