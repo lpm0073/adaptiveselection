@@ -11,10 +11,12 @@ class ImageBox extends Component {
   _like = false;
   _dislike = false;
   _move = false;
+  _resizing = false;
 
   constructor(props) {
     super(props);
     this.handleMouseDown = this.handleMouseDown.bind(this);
+    this.handleMouseUp = this.handleMouseUp.bind(this);
     this.handleStart = this.handleStart.bind(this);
     this.handleDrag = this.handleDrag.bind(this);
     this.handleStop = this.handleStop.bind(this);
@@ -24,6 +26,7 @@ class ImageBox extends Component {
     this.toggleHover = this.toggleHover.bind(this);
     this.handleLike = this.handleLike.bind(this);
     this.handleDislike = this.handleDislike.bind(this);
+    this.handleResizing = this.handleResizing.bind(this);
     
     var d = new Date();
     this.clickTimeStamp = d.setDate(d.getDate()-5); // make sure initial date is stale,
@@ -58,7 +61,7 @@ class ImageBox extends Component {
     if (this.state.isHovering) containerClasses += " hovering";
     if (this._like) likeStyles = {fontSize: 'larger'};
     if (this._dislike) dislikeStyles = {fontSize: 'larger'};
-
+    
     // See: https://github.com/STRML/react-draggable
     return(
         <React.Fragment >
@@ -82,16 +85,17 @@ class ImageBox extends Component {
                 id={this.props.imageKey}
                 className={containerClasses}
                 style={this.state.imageContainerStyle}
-                onMouseEnter={this.toggleHover} 
-                onMouseLeave={this.toggleHover}                
+                onMouseEnter={this.toggleHover}
+                onMouseLeave={this.toggleHover}
+                onMouseUp={this.handleMouseUp}
                 >
                 <div className="image-frame m-0 p-0" 
                       style={this.state.imageFrameStyle}>
                       <div id="grabbers" style={this.state.grabberStyle}>
                         <div className="top-left text-center" onMouseDown={this.handleWindowClose}><i class="fa fa-window-close m-0 p-0"></i></div>
-                        <div className="top-right"></div>
-                        <div className="bottom-left"></div>
-                        <div className="bottom-right"></div>
+                        <div className="top-right" onMouseDown={this.handleResizing}></div>
+                        <div className="bottom-left" onMouseDown={this.handleResizing}></div>
+                        <div className="bottom-right" onMouseDown={this.handleResizing}></div>
                       </div>
                       <div id="button-bar" className="text-center">
                         <div className="like" style={likeStyles} onMouseDown={this.handleLike}><i class="fa fa-thumbs-up"></i></div>
@@ -105,6 +109,12 @@ class ImageBox extends Component {
     );
     }
   
+  handleResizing() {
+    this._resizing = true;
+  }
+  handleMouseUp() {
+    this._resizing = false;
+  }
   handleLike() {
     this._like = (!this._like);
     if (this._dislike) this._dislike = false;
