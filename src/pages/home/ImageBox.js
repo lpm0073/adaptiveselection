@@ -1,6 +1,5 @@
 import React, {Component} from 'react';
 import Draggable from 'react-draggable';
-import { createLanguageServiceSourceFile } from 'typescript';
 
 class ImageBox extends Component {
 
@@ -36,13 +35,13 @@ class ImageBox extends Component {
         zIndex: this.getNextZOrder()
       },
       imageFrameStyle: {
-        backgroundImage: "url('" + this.props.url + "')",
-        height: this.props.height,
-        width: this.props.width
+        backgroundImage: "url('" + this.props.image.source_url + "')",
+        height: this.props.image.height,
+        width: this.props.image.width
       },
       grabberStyle: {
-        height: this.props.height,
-        width: this.props.width
+        height: this.props.image.height,
+        width: this.props.image.width
       },
       isClosed: false,
       isHovering: false
@@ -51,8 +50,8 @@ class ImageBox extends Component {
 
   render() {
     // React key
-    const key = "image-box-" + this.props.imageKey;
-    const label = "Box " + this.props.imageKey;
+    const key = "image-box-" + this.props.image.id;
+    const label = "Box " + this.props.image.id;
     var likeStyles = null;
     var dislikeStyles = null;
     var containerClasses = "image-container m-0 p-0 handle";
@@ -63,13 +62,14 @@ class ImageBox extends Component {
     if (this._dislike) dislikeStyles = {fontSize: 'larger'};
     
     // See: https://github.com/STRML/react-draggable
+
     return(
         <React.Fragment >
           <Draggable
             axis="both"
             bounds="parent"
-            defaultPosition={{x: this.props.position_left, y: this.props.position_top}}
             cancel=".body"
+            defaultPosition={{x: this.props.image.position_props.left, y: this.props.image.position_props.top}}
             defaultClassName="react-draggable"
             defaultClassNameDragging="react-draggable-dragging"
             defaultClassNameDragged="react-draggable-dragged"

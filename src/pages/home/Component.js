@@ -113,13 +113,6 @@ class Home extends Component {
               return (
                 <ImageBox 
                   key={image.key}
-                  imageKey={image.key}
-                  url={image.source_url}
-                  height = {image.height}
-                  width = {image.width}
-                  position_left = {image.position_props.left}
-                  position_top = {image.position_props.top}
-                  slope = {image.position_props.slope}
                   image = {image}
                 />
               );
