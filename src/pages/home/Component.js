@@ -193,7 +193,6 @@ class Home extends Component {
       dislikes: dislikes,
       closes: closes
     }
-    console.log("processAnalytics()", analytics);
     return analytics;
 
   }

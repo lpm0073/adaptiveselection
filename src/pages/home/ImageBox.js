@@ -127,11 +127,13 @@ class ImageBox extends Component {
     );
     }
 
-  resetWindowCloseDelay() {
+  resetWindowCloseDelay(delay = 15000 + Math.floor(Math.random() * 45000)) {
     clearTimeout(this.windowCloseDelay);
-    const delay = 15000 + Math.floor(Math.random() * 45000);       // image lifespan of 15 to 60 seconds
+
     const self = this;
-    this.windowCloseDelay = setTimeout(function() {self.handleWindowClose();}, delay);   
+    this.windowCloseDelay = setTimeout(function() {
+        self.handleWindowClose();
+      }, delay);   
   }
   
   handleResizing() {
@@ -147,6 +149,7 @@ class ImageBox extends Component {
   handleDislike() {
     this._dislike = (!this._dislike);
     if (this._like) this._like = false;
+    if (this._dislike) this.resetWindowCloseDelay(1500);
   }
 
   getNextZOrder() {
@@ -187,7 +190,7 @@ class ImageBox extends Component {
       isHovering: !this.state.isHovering
     });
 
-    if (this.state.isHovering) {
+    if (this.state.isHovering && !this._dislike) {
       clearTimeout(this.windowCloseDelay);
     } else {
       if (!this.windowCloseDelay) this.resetWindowCloseDelay();
