@@ -131,8 +131,8 @@ class Home extends Component {
   }
 
   generateNewImageObject() {
-    const max_height = this.state.number_of_images > 3 ? window.screen.height / 2 : Math.floor((2/3) * window.screen.height);
-    const max_width = Math.floor((2/3) * window.screen.width);
+    const max_height = this.state.number_of_images > 3 ? window.screen.height * .85 : window.screen.height;
+    const max_width = window.screen.width;
     const image = this.getNextImage();
     const newImage = wpGetImage(image, max_height, max_width);
     const imageKey = newImage.id;
