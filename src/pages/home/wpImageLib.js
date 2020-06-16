@@ -13,8 +13,8 @@ export const wpGetImage = (item, max_height = 1024, max_width = 2048) => {
 
         // try to retrieve an optimized version of the image, if it exists
         size = sizeChooser(item);
-        imgDict = size === "DEFAULT" ? item.media_details : item.media_details.sizes[size];
-        sizes = item.media_details.hasOwnProperty("sizes") ? item.media_details.sizes : item.media_details;
+        imgDict = size === "DEFAULT" ? item.api_props.media_details : item.api_props.media_details.sizes[size];
+        sizes = item.api_props.media_details.hasOwnProperty("sizes") ? item.api_props.media_details.sizes : item.api_props.media_details;
         height = getHeight(imgDict.height, imgDict.width, aspect_ratio);
         width = getWidth(imgDict.height, imgDict.width, aspect_ratio);
 
@@ -39,8 +39,7 @@ export const wpGetImage = (item, max_height = 1024, max_width = 2048) => {
           aspect_ratio: aspect_ratio,
           valid_sizes: getValidSizes(item),
           size: size,
-          sizes: sizes,
-          data: item
+          sizes: sizes
         };
 
       if(dict.size === "DEFAULT") {
@@ -74,11 +73,11 @@ function getAspectRatio(item) {
       width = 0;
 
   if (item !== null && typeof(item) === "object") {
-    if (item.media_details.hasOwnProperty("height")) {
-      height = item.media_details.height;
+    if (item.api_props.media_details.hasOwnProperty("height")) {
+      height = item.api_props.media_details.height;
     }
-    if (item.media_details.hasOwnProperty("width")) {
-      width = item.media_details.width;
+    if (item.api_props.media_details.hasOwnProperty("width")) {
+      width = item.api_props.media_details.width;
     }
     if (height > 0 && width > 0) return height / width;
   }
@@ -113,10 +112,10 @@ function getValidSizes(item) {
       width = 0,
       validSizes = []
 
-  if (item.hasOwnProperty("media_details")) {
-    if (item.media_details.hasOwnProperty("sizes")) {
-      for (var size in item.media_details.sizes) {
-        x = item.media_details.sizes[size];
+  if (item.api_props.hasOwnProperty("media_details")) {
+    if (item.api_props.media_details.hasOwnProperty("sizes")) {
+      for (var size in item.api_props.media_details.sizes) {
+        x = item.api_props.media_details.sizes[size];
         if (x.hasOwnProperty("width") && x.hasOwnProperty("height")) {
           height = getHeight(x.height, x.width, aspect_ratio);
           width = getWidth(x.height, x.width, aspect_ratio);
@@ -139,9 +138,9 @@ function getLargest(item) {
       x = 0;
   const aspect_ratio = getAspectRatio(item);
 
-  if (item.media_details.hasOwnProperty("sizes")) {
-    for (var size in item.media_details.sizes) {
-      x = item.media_details.sizes[size];
+  if (item.api_props.media_details.hasOwnProperty("sizes")) {
+    for (var size in item.api_props.media_details.sizes) {
+      x = item.api_props.media_details.sizes[size];
       if (x.hasOwnProperty("width") && x.hasOwnProperty("height")) {
 
         if (x.width > largest && aspect_ratio < 1) {
@@ -170,14 +169,16 @@ function getSmallest(item, validSizes) {
   const aspect_ratio = getAspectRatio(item);
 
   validSizes.forEach((obj, idx) => {
-    x = item.media_details.sizes[obj];
-    if (x.width < smallest && aspect_ratio < 1) {
-      smallest = x.width;
-      selected_size = obj;
-    }
-    if (x.height < smallest && aspect_ratio >= 1) {
-      smallest = x.height;
-      selected_size = obj;
+    if (item.api_props.hasOwnProperty("media_details")) {
+      x = item.api_props.media_details.sizes[obj];
+      if (x.width < smallest && aspect_ratio < 1) {
+        smallest = x.width;
+        selected_size = obj;
+      }
+      if (x.height < smallest && aspect_ratio >= 1) {
+        smallest = x.height;
+        selected_size = obj;
+      }
     }
   });
 

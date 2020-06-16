@@ -52,7 +52,6 @@ class Home extends Component {
     this.imagePositioning = this.imagePositioning.bind(this);
     this.removeFromImageCarousel = this.removeFromImageCarousel.bind(this);
     this.getElapsedTime = this.getElapsedTime.bind(this);
-    this.generateNewImageObject = this.generateNewImageObject.bind(this);
     this.existsClass = this.existsClass.bind(this);
     this.removeExclusions = this.removeExclusions.bind(this);
 
@@ -99,62 +98,41 @@ class Home extends Component {
       return(
           <div id="home-page" className="home-page">
             {this.state.image_carousel.length > 0 ? this.state.image_carousel.map((image) => {
+              const max_height = window.screen.height;
+              const max_width = window.screen.width;
+              const imageProps = wpGetImage(image, max_height, max_width);
 
-                /*
-                var homePage = document.getElementById("home-page");
-                const maxWidth = (homePage.offsetWidth * .75);
-                const width = image.width < maxWidth ? image.width : maxWidth;
-                const height = width === image.width ? image.height : width * image.image_data.aspect_ratio;
-                */
+              image.source_url = imageProps.source_url;
+              image.height = imageProps.height;
+              image.width = imageProps.width;
+              image.image_props = imageProps;
+              image.position_props = this.imagePositioning(imageProps.width, imageProps.height);
 
-                return (
-                  <ImageBox 
-                    key={image.key}
-                    imageKey={image.key}
-                    url={image.source_url}
-                    height = {image.height}
-                    width = {image.width}
-                    position_left = {image.position.left}
-                    position_top = {image.position.top}
-                    slope = {image.position.slope}
-                    duration = {image.position.duration}
-                    image = {image}
-                  />
-                );
-              })
-              :
-              <div>i am waiting</div>
+              console.log("render()", image);
+              return (
+                <ImageBox 
+                  key={image.key}
+                  imageKey={image.key}
+                  url={image.source_url}
+                  height = {image.height}
+                  width = {image.width}
+                  position_left = {image.position_props.left}
+                  position_top = {image.position_props.top}
+                  slope = {image.position_props.slope}
+                  duration = {image.position_props.duration}
+                  image = {image}
+                />
+              );
+            })
+            :
+             <div>i am waiting</div>
             }
         </div>
       );
   
   }
 
-  generateNewImageObject() {
-    const max_height = this.state.number_of_images > 3 ? window.screen.height * .85 : window.screen.height;
-    const max_width = window.screen.width;
-    const image = this.getNextImage();
-    const newImage = wpGetImage(image, max_height, max_width);
-    const imageKey = newImage.id;
 
-    if (!newImage) {
-      console.log("queueImage() internal error: wpGetImage() did not return a value");
-      return;
-    }
-
-    return {
-      key: imageKey,
-      id: newImage.id,
-      source_url: newImage.source_url,
-      height: newImage.height,
-      width: newImage.width,
-      timestamp: new Date(),
-      image_data: newImage,
-      position: this.imagePositioning(newImage.width, newImage.height)
-    }        
-
-  }
-  
   /* add a random image at a random location on the device screen. */
   queueImage() {
     // if we have images in our working set, and we need more images on screen
@@ -163,8 +141,13 @@ class Home extends Component {
         !this.existsClass("hovering") &&                                    // we're not hovering over an image at the moment
         this.getElapsedTime(this.last_image_queued) > 4500) {               // its been at least 4.5s since the last image was added
 
-      const newImage = this.generateNewImageObject();   
-      this.addToImageCarousel(newImage);
+      const newImage = this.getNextImage();
+      this.addToImageCarousel({
+        key: newImage.id,
+        id: newImage.id,
+        api_props: newImage,
+        timestamp: new Date()
+      } );
 
       /* setup the dequeue event */
       const dequeueDelay = 15000 + Math.floor(Math.random() * 45000);       // image lifespan of 15 to 60 seconds
