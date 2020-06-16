@@ -88,14 +88,14 @@ class ImageBox extends Component {
                 <div className="image-frame m-0 p-0" 
                       style={this.state.imageFrameStyle}>
                       <div id="grabbers" style={this.state.grabberStyle}>
-                        <div className="top-left text-center" onMouseDown={this.handleWindowClose}>X</div>
+                        <div className="top-left text-center" onMouseDown={this.handleWindowClose}><i class="fa fa-window-close m-0 p-0"></i></div>
                         <div className="top-right"></div>
                         <div className="bottom-left"></div>
                         <div className="bottom-right"></div>
                       </div>
                       <div id="button-bar" className="text-center">
-                        <div className="like" style={likeStyles} onMouseDown={this.handleLike}><i class="fa fa-thumbs-up page-tile-icon"></i></div>
-                        <div className="dislike" style={dislikeStyles} onMouseDown={this.handleDislike}><i class="fa fa-thumbs-down page-tile-icon"></i></div>
+                        <div className="like" style={likeStyles} onMouseDown={this.handleLike}><i class="fa fa-thumbs-up"></i></div>
+                        <div className="dislike" style={dislikeStyles} onMouseDown={this.handleDislike}><i class="fa fa-thumbs-down"></i></div>
                       </div>
                 </div>
               </div>
@@ -112,6 +112,7 @@ class ImageBox extends Component {
   handleDislike() {
     this._dislike = (!this._dislike);
     if (this._like) this._like = false;
+    if (this._dislike) this.handleWindowClose();
   }
 
   getNextZOrder() {

@@ -76,35 +76,46 @@
 }
 #grabbers > div {
   position:absolute;
-  width: 10px;
-  height: 10px;
+  width: 20px;
+  height: 20px;
 }
 #grabbers > div:hover {
-  background-color: goldenrod;
+  vertical-align: text-top;
 }
 
+.hoverable .top-left {
+  display: none;
+}
+.hoverable:hover .top-left {
+  display: inherit;
+}
 .top-left {
   top: 0;
   left: 0;
-  font-size: .25em;
-  background-color: black;
+  font-size: .75em;
   color: #f1f1f1;
 }
+
 .top-right {
   top: 0;
   right: 0;
   cursor: ne-resize;
 }
+.top-right:hover {border-right: 2px solid black; border-top: 2px solid black;}
+
 .bottom-left {
   bottom: 0;
   left: 0;
   cursor: sw-resize;
 }
+.bottom-left:hover {border-left: 2px solid black; border-bottom: 2px solid black;}
+
 .bottom-right {
   bottom: 0;
   right: 0;
   cursor: se-resize;
 }
+.bottom-right:hover {border-right: 2px solid black; border-bottom: 2px solid black;}
 
 /* ------------------- like buttons */
 #button-bar {
