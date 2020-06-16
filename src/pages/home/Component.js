@@ -48,6 +48,7 @@ class Home extends Component {
     this.processClosedWindows = this.processClosedWindows.bind(this);
     this.processAnalytics = this.processAnalytics.bind(this);
     this.setAnalyticsTag = this.setAnalyticsTag.bind(this);
+    this.mergeArrays = this.mergeArrays.bind(this);
 
     var d = new Date();
     
@@ -75,40 +76,6 @@ class Home extends Component {
   }
 
 
-  setAnalyticsTag(tag, elements) {
-
-    for (var i = 0; i < elements.length; i++) {
-      const id = Number(elements[i].id);
-      
-      for (var j = 0; j < this.image_working_set.length; j++) {
-        if (this.image_working_set[j].id === id) {
-          switch (tag) {
-            case "click": this.image_working_set[j].analytics.click = true; break;
-            case "move": this.image_working_set[j].analytics.move = true; break;
-            case "resize": this.image_working_set[j].analytics.resize = true; break;
-            case "like": this.image_working_set[j].analytics.like = true; break;
-            case "dislike": this.image_working_set[j].analytics.dislike = true; break;
-            default: break;
-          }          
-          return;
-        }        
-      }
-    }
-  }
-
-  processAnalytics() {
-    this.setAnalyticsTag("click", document.getElementsByClassName("analytics_click"));
-    this.setAnalyticsTag("move", document.getElementsByClassName("analytics_move"));
-    this.setAnalyticsTag("resize", document.getElementsByClassName("analytics_resize"));
-    this.setAnalyticsTag("like", document.getElementsByClassName("analytics_like"));
-    this.setAnalyticsTag("dislike", document.getElementsByClassName("analytics_dislike"));
-  }
-
-  // returns true if there is an element in the DOM containing this class
-  existsClass(className) {
-    const elements = document.getElementsByClassName(className);
-    return elements.length > 0;
-  }
 
   render() {
       return(
@@ -176,6 +143,65 @@ class Home extends Component {
 
     const self = this;
     this.queueDelay = setTimeout(function() {self.queueImage();}, delay);   
+  }
+  setAnalyticsTag(tag, elements) {
+
+    for (var i = 0; i < elements.length; i++) {
+      const id = Number(elements[i].id);
+      
+      for (var j = 0; j < this.image_working_set.length; j++) {
+        if (this.image_working_set[j].id === id) {
+          switch (tag) {
+            case "click": this.image_working_set[j].analytics.click = true; break;
+            case "move": this.image_working_set[j].analytics.move = true; break;
+            case "resize": this.image_working_set[j].analytics.resize = true; break;
+            case "like": this.image_working_set[j].analytics.like = true; break;
+            case "dislike": this.image_working_set[j].analytics.dislike = true; break;
+            case "close": this.image_working_set[j].analytics.close = true; break;
+            default: break;
+          }          
+          break;
+        }        
+      }
+    }
+  }
+
+  mergeArrays(arr) {
+    return [].concat.apply([], arr);
+  }
+
+  processAnalytics() {
+    this.setAnalyticsTag("click", document.getElementsByClassName("analytics_click"));
+    this.setAnalyticsTag("move", document.getElementsByClassName("analytics_move"));
+    this.setAnalyticsTag("resize", document.getElementsByClassName("analytics_resize"));
+    this.setAnalyticsTag("like", document.getElementsByClassName("analytics_like"));
+    this.setAnalyticsTag("dislike", document.getElementsByClassName("analytics_dislike"));
+    this.setAnalyticsTag("close", document.getElementsByClassName("analytics_close"));
+
+    const clicks = this.image_working_set.filter((image) => image.analytics.click === true);
+    const moves = this.image_working_set.filter((image) => image.analytics.move === true);
+    const resizes = this.image_working_set.filter((image) => image.analytics.resize === true);
+    const likes = this.image_working_set.filter((image) => image.analytics.like === true);
+    const dislikes = this.image_working_set.filter((image) => image.analytics.dislike === true);
+    const closes = this.image_working_set.filter((image) => image.analytics.close === true);
+    
+    const analytics = {
+      clicks: clicks,
+      moves: moves,
+      resizes: resizes,
+      likes: likes,
+      dislikes: dislikes,
+      closes: closes
+    }
+    console.log("processAnalytics()", analytics);
+    return analytics;
+
+  }
+
+  // returns true if there is an element in the DOM containing this class
+  existsClass(className) {
+    const elements = document.getElementsByClassName(className);
+    return elements.length > 0;
   }
 
   processClosedWindows() {
@@ -336,7 +362,8 @@ class Home extends Component {
             move: false,
             resize: false,
             like: false,
-            dislike: false
+            dislike: false,
+            close: false
           };
           return image;
         })

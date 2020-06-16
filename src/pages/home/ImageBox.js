@@ -12,6 +12,7 @@ class ImageBox extends Component {
   _dislike = false;
   _move = false;
   _resizing = false;
+  _close = false;
 
   constructor(props) {
     super(props);
@@ -68,8 +69,8 @@ class ImageBox extends Component {
     if (this.isOnTop()) containerClasses += " hoverable";
     if (this.state.isClosed) containerClasses += " window-closer";
     if (this.state.isHovering) containerClasses += " hovering";
-    if (this._like) likeStyles = {fontSize: 'larger'};
-    if (this._dislike) dislikeStyles = {fontSize: 'larger'};
+    if (this._like) likeStyles = {fontSize: 'larger', color: "green"};
+    if (this._dislike) dislikeStyles = {fontSize: 'larger', color: "red"};
 
     /* behavior tracking */
     if (this._click) containerClasses += " analytics_click";
@@ -77,6 +78,7 @@ class ImageBox extends Component {
     if (this._resizing) containerClasses += " analytics_resize";
     if (this._like) containerClasses += " analytics_like";
     if (this._dislike) containerClasses += " analytics_dislike";
+    if (this._close) containerClasses += " analytics_close";
     
     // See: https://github.com/STRML/react-draggable
 
@@ -177,6 +179,7 @@ class ImageBox extends Component {
     this.setState({
       isClosed: true
     });
+    this._close = true;
   }
 
   toggleHover() {
@@ -205,13 +208,15 @@ class ImageBox extends Component {
 
 
   handleStart() {
-    console.log("handleStart()");
+    // Drag start
   }
   handleDrag() {
-    console.log("handleDrag()");
+    this._move = true;
+
   }
   handleStop() {
-    console.log("handleStop()");
+    // Drag stop
+
   }
 
 }

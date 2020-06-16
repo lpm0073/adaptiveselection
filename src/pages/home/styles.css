@@ -58,6 +58,9 @@
 .analytics_resize {
   transition-delay: 0ms;
 }
+.analytics_close {
+  transition-delay: 0ms;
+}
 
 /* --------------------- Animations --------------------- */
 
