@@ -40,7 +40,7 @@ class Home extends Component {
     this.state = {
       level: 0,
       image_carousel: [],
-      number_of_images: 10,
+      number_of_images: 5,
     }
 
     this.imageFetcher = this.imageFetcher.bind(this);
@@ -100,7 +100,7 @@ class Home extends Component {
             {this.state.image_carousel.length > 0 ? this.state.image_carousel.map((image) => {
               const max_height = window.screen.height;
               const max_width = window.screen.width;
-              const imageProps = wpGetImage(image, max_height, max_width);
+              const imageProps = wpGetImage(image, max_height/2, max_width/2);
 
               image.source_url = imageProps.source_url;
               image.height = imageProps.height;

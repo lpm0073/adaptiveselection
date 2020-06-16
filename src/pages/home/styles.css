@@ -7,6 +7,7 @@
 .hoverable:hover {
   border: 2px solid goldenrod;
   border-radius: 3px;
+  transition-duration: 150ms;
 }
 
 .hovering {
@@ -34,6 +35,25 @@
   border-radius: 3px;
 }
 
+/* --------------------- Interactions --------------------- */
+.hovering {
+  /* do not delete! */
+  transition-delay: 0ms;
+}
+.like {
+  /* do not delete! */
+  transition-delay: 0ms;
+}
+.dislike {
+  /* do not delete! */
+  transition-delay: 0ms;
+}
+.click {
+  /* do not delete! */
+  transition-delay: 0ms;
+}
+
+
 /* --------------------- Animations --------------------- */
 
 .react-draggable {
@@ -53,8 +73,6 @@
 /* --------------------- corner grabbers --------------------- */
 #grabbers {
   position: relative;
-  width: 300px;
-  height: 300px;
 }
 #grabbers > div {
   position:absolute;
@@ -86,4 +104,30 @@
   bottom: 0;
   right: 0;
   cursor: se-resize;
+}
+
+/* ------------------- like buttons */
+#button-bar {
+  position: relative;
+  width: 100%;
+}
+#button-bar > div {
+  position:absolute;
+  bottom: 5px;
+  width: 25px;
+  height: 25px;
+  color: white;
+}
+
+#button-bar > div:hover {
+  font-size: larger;
+  transition-delay: 0ms;
+  transition-duration: 250ms;
+}
+
+.like {
+  left: 40%;
+}
+.dislike {
+  left: 60%;
 }
