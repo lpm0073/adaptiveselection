@@ -4,6 +4,7 @@ import Draggable from 'react-draggable';
 class ImageBox extends Component {
 
   clickTimeStamp;
+  windowCloseDelay;
 
   /* behavior tracking */
   _click = false;
@@ -26,6 +27,7 @@ class ImageBox extends Component {
     this.handleLike = this.handleLike.bind(this);
     this.handleDislike = this.handleDislike.bind(this);
     this.handleResizing = this.handleResizing.bind(this);
+    this.resetWindowCloseDelay = this.resetWindowCloseDelay.bind(this);
     
     var d = new Date();
     this.clickTimeStamp = d.setDate(d.getDate()-5); // make sure initial date is stale,
@@ -46,6 +48,14 @@ class ImageBox extends Component {
       isClosed: false,
       isHovering: false
     }
+  }
+
+  componentDidMount() {
+    this.resetWindowCloseDelay();
+  }
+
+  componentWillUnmount() {
+    clearTimeout(this.windowCloseDelay);
   }
 
   render() {
@@ -107,6 +117,13 @@ class ImageBox extends Component {
         </React.Fragment>
     );
     }
+
+  resetWindowCloseDelay() {
+    clearTimeout(this.windowCloseDelay);
+    const delay = 15000 + Math.floor(Math.random() * 45000);       // image lifespan of 15 to 60 seconds
+    const self = this;
+    this.windowCloseDelay = setTimeout(function() {self.handleWindowClose(self.props.image.id);}, delay);   
+  }
   
   handleResizing() {
     this._resizing = true;
@@ -121,7 +138,6 @@ class ImageBox extends Component {
   handleDislike() {
     this._dislike = (!this._dislike);
     if (this._like) this._like = false;
-    if (this._dislike) this.handleWindowClose();
   }
 
   getNextZOrder() {
@@ -160,6 +176,13 @@ class ImageBox extends Component {
     this.setState({
       isHovering: !this.state.isHovering
     });
+
+    if (this.state.isHovering) {
+      clearTimeout(this.windowCloseDelay);
+    } else {
+      if (!this.windowCloseDelay) this.resetWindowCloseDelay();
+
+    }
   }
 
   handleMouseDown() {
@@ -184,10 +207,6 @@ class ImageBox extends Component {
     console.log("handleStop()");
   }
 
-  eventLogger = (e: MouseEvent, data: Object) => {
-    console.log('Event: ', e);
-    console.log('Data: ', data);
-  };
 }
 
 

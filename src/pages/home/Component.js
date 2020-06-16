@@ -139,13 +139,7 @@ class Home extends Component {
         timestamp: new Date()
       } );
 
-      /* setup the dequeue event */
-      const dequeueDelay = 15000 + Math.floor(Math.random() * 45000);       // image lifespan of 15 to 60 seconds
-      const self = this;
-      setTimeout(function() {self.removeFromImageCarousel(image.id);}, dequeueDelay);   
-
       this.last_image_queued = new Date();
-
     }
     
     /* queue the next iteration */
