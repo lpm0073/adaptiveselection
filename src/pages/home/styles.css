@@ -111,6 +111,14 @@
   position: relative;
   width: 100%;
 }
+
+.hoverable #button-bar {
+  display: none;
+}
+.hoverable:hover #button-bar {
+  display: inherit;
+}
+
 #button-bar > div {
   position:absolute;
   bottom: 5px;
