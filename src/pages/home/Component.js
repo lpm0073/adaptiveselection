@@ -78,6 +78,9 @@ class Home extends Component {
 
 
   render() {
+     // dequeue any windows that were closed by the user
+    this.processClosedWindows();
+
       return(
           <div id="home-page" className="home-page">
             {this.state.image_carousel.length > 0 ? this.state.image_carousel.map((image) => {
@@ -255,7 +258,11 @@ class Home extends Component {
   }
 
   getNextImage() {
-    const images = this.image_working_set;
+    const images = this.image_working_set
+                  .filter((image) => 
+                        image.analytics.dislike === false && 
+                        image.analytics.close === false);
+                        
     if (images === null || images.length === 0) return null;
     var image, 
         i = this.image_last_position + 1,
