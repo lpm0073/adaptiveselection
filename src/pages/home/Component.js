@@ -76,11 +76,11 @@ class Home extends Component {
 
     // window-closer class is added by a mousedown event handler in ImageBox
     var closedWindows = document.getElementsByClassName("window-closer"),
-        key = 0;
+        id = 0;
 
     for (var i = 0; i < closedWindows.length; i++) {
-      key = Number(closedWindows[i].id);
-      this.removeFromImageCarousel(key);
+      id = Number(closedWindows[i].id);
+      this.removeFromImageCarousel(id);
     }
 
     // re-validate the working set and the carousel against our current
@@ -106,9 +106,10 @@ class Home extends Component {
               image.height = imageProps.height;
               image.width = imageProps.width;
               image.image_props = imageProps;
-              image.position_props = this.imagePositioning(imageProps.width, imageProps.height);
+              if (!image.hasOwnProperty("position_props")) {
+                image.position_props = this.imagePositioning(imageProps.width, imageProps.height);
+              }
 
-              console.log("render()", image);
               return (
                 <ImageBox 
                   key={image.key}
@@ -119,7 +120,6 @@ class Home extends Component {
                   position_left = {image.position_props.left}
                   position_top = {image.position_props.top}
                   slope = {image.position_props.slope}
-                  duration = {image.position_props.duration}
                   image = {image}
                 />
               );
@@ -141,18 +141,18 @@ class Home extends Component {
         !this.existsClass("hovering") &&                                    // we're not hovering over an image at the moment
         this.getElapsedTime(this.last_image_queued) > 4500) {               // its been at least 4.5s since the last image was added
 
-      const newImage = this.getNextImage();
+      const image = this.getNextImage();
       this.addToImageCarousel({
-        key: newImage.id,
-        id: newImage.id,
-        api_props: newImage,
+        key: image.id,
+        id: image.id,
+        api_props: image,
         timestamp: new Date()
       } );
 
       /* setup the dequeue event */
       const dequeueDelay = 15000 + Math.floor(Math.random() * 45000);       // image lifespan of 15 to 60 seconds
       const self = this;
-      setTimeout(function() {self.removeFromImageCarousel(newImage.key);}, dequeueDelay);   
+      setTimeout(function() {self.removeFromImageCarousel(image.id);}, dequeueDelay);   
 
       this.last_image_queued = new Date();
 
@@ -184,10 +184,10 @@ class Home extends Component {
     }
   }
 
-  removeFromImageCarousel(key) {
+  removeFromImageCarousel(id) {
     // build an array of all previous keys except for our new imageKey.
     // then push our newly generated image set onto the end of the array.
-    var newImageSet = this.state.image_carousel.filter(carousel_image => carousel_image.key !== key);
+    var newImageSet = this.state.image_carousel.filter(carousel_image => carousel_image.id !== id);
 
     this.setState({
       image_carousel: newImageSet
@@ -253,13 +253,11 @@ class Home extends Component {
     const position_y = Math.floor(Math.random() * (Y - image_height));
 
     const slope = (Math.random() * (2 * Math.PI));
-    const duration = Math.floor(Math.random() * 30000);
 
     const position = {
       left: (window.innerWidth * (1 - canvas_area))/2 + position_x,
       top: (window.innerHeight * (1 - canvas_area))/2 + position_y,
-      slope: slope,
-      duration: duration
+      slope: slope
     }
 
     return position;
