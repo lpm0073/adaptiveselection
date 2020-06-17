@@ -24,7 +24,6 @@ class Home extends Component {
   queueDelay = null;
   highest_confirmed_page = 0;
   image_working_set = [];
-  image_last_position = 0; // the ordinal position of the most recently used image in the working set.
   last_image_queued = null;  // make sure initial date is stale
   page_number = 1 + Math.floor(Math.random() * 40);
   num_pages = 1000;   // <---- start high and interpolate downwards based on success/failure
@@ -49,6 +48,7 @@ class Home extends Component {
     this.processAnalytics = this.processAnalytics.bind(this);
     this.setAnalyticsTag = this.setAnalyticsTag.bind(this);
     this.mergeArrays = this.mergeArrays.bind(this);
+    this.timestampImage = this.timestampImage.bind(this);
 
     var d = new Date();
     
@@ -75,11 +75,16 @@ class Home extends Component {
     clearTimeout(this.queueDelay);
   }
 
-
+  shouldComponentUpdate() {
+      const pendingClose = document.getElementsByClassName("window-closer")
+      if (pendingClose.length > 0) {
+        console.log("need to close some windows", pendingClose.length);
+        this.processClosedWindows();
+      }
+      return true;
+  }
 
   render() {
-     // dequeue any windows that were closed by the user
-    this.processClosedWindows();
 
       return(
           <div id="home-page" className="home-page">
@@ -126,9 +131,10 @@ class Home extends Component {
     if (this.image_working_set.length > 0 &&                                // we have images
         this.state.image_carousel.length < this.state.number_of_images &&   // the desktop wants images
         !this.existsClass("hovering") &&                                    // we're not hovering over an image at the moment
-        this.getElapsedTime(this.last_image_queued) > 4500) {               // its been at least 4.5s since the last image was added
+        this.getElapsedTime(this.last_image_queued) > 2500) {               // its been at least 4.5s since the last image was added
 
       const image = this.getNextImage();
+
       this.addToImageCarousel({
         key: image.id,
         id: image.id,
@@ -145,7 +151,7 @@ class Home extends Component {
     if (this.state.image_carousel.length < this.state.number_of_images) delay = 2000;
 
     const self = this;
-    this.queueDelay = setTimeout(function() {self.queueImage();}, delay);   
+    this.queueDelay = setTimeout(function() {self.queueImage();}, delay);
   }
   setAnalyticsTag(tag, elements) {
 
@@ -239,10 +245,11 @@ class Home extends Component {
     // then push our newly generated image set onto the end of the array.
     var newImageSet = this.state.image_carousel.filter(carousel_image => carousel_image.id !== id);
 
-    this.setState({
-      image_carousel: newImageSet
-    });
-
+    if (newImageSet.length !== this.state.image_carousel.length) {
+      this.setState({
+        image_carousel: newImageSet
+      });
+    }
   }
 
   addToImageCarousel(newImage) {
@@ -257,42 +264,40 @@ class Home extends Component {
 
   }
 
+  timestampImage(image) {
+    var RetVal;
+
+    const next = this.image_working_set.sort((a, b) =>  Number(b.viewing_sequence) - Number(a.viewing_sequence))[0].viewing_sequence + 1;
+
+    for (var i=0; i<this.image_working_set.length; i++) {
+      if (this.image_working_set[i].id === image.id) {
+        this.image_working_set[i].viewing_sequence = next;
+        RetVal = this.image_working_set[i];
+        break;
+      }
+    }
+    return RetVal;
+  }
+
   getNextImage() {
+    if (this.image_working_set === null || this.image_working_set.length === 0) return null;
+
+    // filter images that were disliked or closed but are still pending analytics processing.
+    // sort the list based on what's been viewed so far -- put those at the end of the array to avoid dups.
+    this.image_working_set = this.image_working_set.sort((a, b) => Number(a.viewing_sequence) - Number(b.viewing_sequence));
     const images = this.image_working_set
                   .filter((image) => 
                         image.analytics.dislike === false && 
-                        image.analytics.close === false);
-                        
-    if (images === null || images.length === 0) return null;
-    var image, 
-        i = this.image_last_position + 1,
-        attempts = 0;
-    do {
-        if (i >= (images.length - 1)) i = 0;
-        image = images[i];
-        i++;
-        if (!this.isImageCollision(image)) {
-          this.image_last_position = i;
-          return image;
-        }
-        attempts++;
-    } while (attempts <= 2 * images.length)
+                        (image.analytics.close === false || image.analytics.like === true));
 
-    return null;
+
+    const image = this.timestampImage(images[0]);
+    console.log("getNextImage", image, this.image_working_set);
+    return image;
   }
 
   isImageCollision(imageCandidate) {
-    var retval = false;
-
-    this.state.image_carousel
-    .filter(image => imageCandidate.id === image.id)
-    .map(image => {
-      retval = true;
-      return true;
-    });
-
-    return retval;
-
+    return this.image_working_set.filter(image => imageCandidate.id === image.id).length > 0;
   }
 
   imagePositioning(image_width, image_height) {
@@ -356,13 +361,16 @@ class Home extends Component {
       })
       .then(response => response.json())
       .then(images => {
+
         // only add unique return values, so that we don't accumulated duplicates in the working set
-        var new_images = images.filter(image => !(image.id in this.image_working_set.map(worker => {
-          return worker.id;
-        })));
+        var new_images = [];
+        for (var i=0; i<images.length;  i++) {
+          if (!this.isImageCollision(images[i])) new_images.push(images[i]);
+        }
 
         // initialize analytics data
         new_images = new_images.map((image) => {
+          image.viewing_sequence = 0;
           image.analytics = {
             click: false,
             move: false,
@@ -373,10 +381,11 @@ class Home extends Component {
           };
           return image;
         })
-        
+
+        const isWorkingSetInitialized = this.image_working_set.length > 0;
         this.image_working_set = this.image_working_set.concat(new_images);
 
-        if (this.state.image_carousel.length === 0) this.queueImage();
+        if (!isWorkingSetInitialized) this.queueImage();
 
         this.highest_confirmed_page = this.page_number;
         this.page_number = 1 + Math.floor(Math.random() * this.num_pages)
