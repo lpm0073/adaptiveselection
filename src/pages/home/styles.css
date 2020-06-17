@@ -216,3 +216,35 @@
 .info {
   left: 50%;
 }
+
+
+/* ------------------------ TransitionGroup CSSTransition ------------------------ */
+.CSSTransition-appear {}
+.CSSTransition-active-appear {}
+.CSSTransition-done-appear {}
+
+.CSSTransition-enter {
+  opacity: 0.01;
+  transform: translateX(-100px);
+}
+
+.CSSTransition-enter-active {
+  opacity: 1;
+  transform: translateX(0%);
+  transition: all 1000ms ease-in;
+}
+
+.CSSTransition-enter-done {}
+
+.CSSTransition-exit {
+  opacity: 1;
+  transform: translateX(0%);
+}
+
+.CSSTransition-exit-active {
+  opacity: 0.01;
+  transform: translateX(100%);
+  transition: all 1000ms ease-in-out;
+}
+.CSSTransition-exit-done {}
+

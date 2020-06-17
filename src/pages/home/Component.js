@@ -299,6 +299,8 @@ class Home extends Component {
   }
 
   imagePositioning(image_width, image_height) {
+    // https://www.npmjs.com/package/rectangle-bin-pack
+    //
     // build random trajectory that passes through the
     // interior 2/3 of curr view pane.
     const canvas_area = .90;

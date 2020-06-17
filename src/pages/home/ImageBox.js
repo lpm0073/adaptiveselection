@@ -1,5 +1,6 @@
-import React, {Component} from 'react';
+import React, {Component}  from 'react';
 import Draggable from 'react-draggable';
+import { CSSTransition } from 'react-transition-group';
 
 class ImageBox extends Component {
 
@@ -33,6 +34,7 @@ class ImageBox extends Component {
     this.handleInfoPanelLeave = this.handleInfoPanelLeave.bind(this);
     this.handleResizing = this.handleResizing.bind(this);
     this.resetWindowCloseDelay = this.resetWindowCloseDelay.bind(this);
+    this.CSSTransitionOnEnter = this.CSSTransitionOnEnter.bind(this);
     
     var d = new Date();
     this.clickTimeStamp = d.setDate(d.getDate()-5); // make sure initial date is stale,
@@ -55,12 +57,16 @@ class ImageBox extends Component {
       },
       isClosed: false,
       isHovering: false,
-      showInfoPanel: false
+      showInfoPanel: false,
+      isMounted: false
     }
   }
 
   componentDidMount() {
     this.resetWindowCloseDelay();
+    this.setState({
+      isMounted: true
+    });
   }
 
   componentWillUnmount() {
@@ -70,7 +76,6 @@ class ImageBox extends Component {
   render() {
     // React key
     const key = "image-box-" + this.props.image.id;
-    const label = "Box " + this.props.image.id;
     var likeStyles = null;
     var dislikeStyles = null;
     var containerClasses = "image-container m-0 p-0 handle";
@@ -92,25 +97,44 @@ class ImageBox extends Component {
     if (this._dislike) containerClasses += " analytics_dislike";
     if (this._close) containerClasses += " analytics_close";
     
+    // CSSTransition
+    // https://reactcommunity.org/react-transition-group/css-transition
+    const CSSTransitionClassNames={
+      appear: 'CSSTransition-appear',
+      appearActive: 'CSSTransition-appear-active',
+      appearDone: 'CSSTransition-appear-done',
+      enter: 'CSSTransition-enter',
+      enterActive: 'CSSTransition-enter-active',
+      enterDone: 'CSSTransition-enter-done',
+      exit: 'CSSTransition-exit',
+      exitActive: 'CSSTransition-exit-active',
+      exitDone: 'CSSTransition-exit-done',
+     }  
     // See: https://github.com/STRML/react-draggable
 
     return(
         <React.Fragment >
-          <Draggable
-            axis="both"
-            cancel=".body"
-            defaultPosition={{x: this.props.image.position_props.left, y: this.props.image.position_props.top}}
-            defaultClassName="react-draggable"
-            defaultClassNameDragging="react-draggable-dragging"
-            defaultClassNameDragged="react-draggable-dragged"
-            handle=".handle"
-            onMouseDown={this.handleContainerMouseDown}
-            onStart={this.handleDragStart}
-            onDrag={this.handleDrag}
-            onStop={this.handleDragEnd}
-            >
-
-              <div
+            <CSSTransition 
+                key={key + '-css-transition'} 
+                in={this.state.isMounted}
+                classNames={CSSTransitionClassNames} 
+                timeout={1000} 
+                onEnter={this.CSSTransitionOnEnter}
+                >
+              <Draggable
+              axis="both"
+              cancel=".body"
+              defaultPosition={{x: this.props.image.position_props.left, y: this.props.image.position_props.top}}
+              defaultClassName="react-draggable"
+              defaultClassNameDragging="react-draggable-dragging"
+              defaultClassNameDragged="react-draggable-dragged"
+              handle=".handle"
+              onMouseDown={this.handleContainerMouseDown}
+              onStart={this.handleDragStart}
+              onDrag={this.handleDrag}
+              onStop={this.handleDragEnd}
+              >
+                <div
                 key={key}
                 id={this.props.image.id}
                 className={containerClasses}
@@ -119,30 +143,30 @@ class ImageBox extends Component {
                 onMouseEnter={this.handleMouseEnter}
                 onMouseLeave={this.handleMouseLeave}
                 >
-                <div className="image-frame m-0 p-0" 
-                  style={this.state.imageFrameStyle}>
-                  <div id="info-panel" className={infoPanelClasses} onMouseLeave={this.handleInfoPanelLeave} >
-                    I am the info panel.
-                    <div>Marketing URL: {this.props.image.api_props.acf["marketing_url"]}</div>
-                    <div>Image ID: {this.props.image.id}</div>
-                    <div>Categories: {this.props.image.api_props.categories.join()}</div>
-                    
-                  </div>
-                  <div id="grabbers" style={this.state.grabberStyle}>
-                    <div className="top-left text-center" onMouseDown={this.handleWindowClose}><i className="fa fa-window-close m-0 p-0"></i></div>
-                    <div className="top-right" onMouseDown={this.handleResizing}></div>
-                    <div className="bottom-left" onMouseDown={this.handleResizing}></div>
-                    <div className="bottom-right" onMouseDown={this.handleResizing}></div>
-                  </div>
-                  <div id="button-bar" className="text-center">
-                    <div className="like" style={likeStyles} onMouseDown={this.handleLike}><i className="fa fa-thumbs-up"></i></div>
-                    <div className="info" onMouseDown={this.handleInfoButton}><i className="fa fa-info-circle"></i></div>
-                    <div className="dislike" style={dislikeStyles} onMouseDown={this.handleDislike}><i className="fa fa-thumbs-down"></i></div>
+                  <div className="image-frame m-0 p-0" 
+                    style={this.state.imageFrameStyle}>
+                    <div id="info-panel" className={infoPanelClasses} onMouseLeave={this.handleInfoPanelLeave} >
+                      I am the info panel.
+                      <div>Marketing URL: {this.props.image.api_props.acf["marketing_url"]}</div>
+                      <div>Image ID: {this.props.image.id}</div>
+                      <div>Categories: {this.props.image.api_props.categories.join()}</div>
+                      
+                    </div>
+                    <div id="grabbers" style={this.state.grabberStyle}>
+                      <div className="top-left text-center" onMouseDown={this.handleWindowClose}><i className="fa fa-window-close m-0 p-0"></i></div>
+                      <div className="top-right" onMouseDown={this.handleResizing}></div>
+                      <div className="bottom-left" onMouseDown={this.handleResizing}></div>
+                      <div className="bottom-right" onMouseDown={this.handleResizing}></div>
+                    </div>
+                    <div id="button-bar" className="text-center">
+                      <div className="like" style={likeStyles} onMouseDown={this.handleLike}><i className="fa fa-thumbs-up"></i></div>
+                      <div className="info" onMouseDown={this.handleInfoButton}><i className="fa fa-info-circle"></i></div>
+                      <div className="dislike" style={dislikeStyles} onMouseDown={this.handleDislike}><i className="fa fa-thumbs-down"></i></div>
+                    </div>
                   </div>
                 </div>
-              </div>
-
-          </Draggable>
+              </Draggable>
+            </CSSTransition>
         </React.Fragment>
     );
     }
@@ -268,6 +292,9 @@ class ImageBox extends Component {
 
   }
 
+  CSSTransitionOnEnter() {
+    console.log("i am alive");
+  }
 }
 
 
