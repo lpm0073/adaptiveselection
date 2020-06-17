@@ -190,20 +190,20 @@ function getSmallest(item, validSizes) {
 function getMaxRenderingHeight(max_height = 1024) {
   var homePage = document.getElementById("home-page");
   if (homePage) return  homePage.offsetHeight < max_height ? homePage.offsetHeight : max_height;
-  return max_height;
+  return window.screen.height < max_height ? window.screen.height : max_height;
 }
 function getMaxRenderingWidth(max_width = 2048) {
   var homePage = document.getElementById("home-page");
   if (homePage) return homePage.offsetWidth < max_width ? homePage.offsetWidth : max_width;
-  return max_width;
+  return window.screen.width < max_width ? window.screen.height : max_width;
 }
 function getMaxImageHeight(max_height = 1024) {
   var homePage = document.getElementById("home-page");
   if (homePage) return  homePage.offsetHeight < max_height ? homePage.offsetHeight : max_height;
-  return max_height;
+  return window.screen.height < max_height ? window.screen.height : max_height;
 }
 function getMaxImageWidth(max_width = 2048) {
   var homePage = document.getElementById("home-page");
   if (homePage) return homePage.offsetWidth < max_width ? homePage.offsetWidth : max_width;
-  return max_width;
+  return window.screen.width < max_width ? window.screen.height : max_width;
 }

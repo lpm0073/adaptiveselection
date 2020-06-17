@@ -90,7 +90,7 @@ class ImageBox extends Component {
     const key = "image-box-" + this.props.image.id;
     var likeStyles = null;
     var dislikeStyles = null;
-    var containerClasses = "image-container m-3 p-0 handle";
+    var containerClasses = "image-container m-2 p-0 handle";
     var infoPanelClasses = "info-panel m-0 p-5 text-center";
 
     if (this.isOnTop()) containerClasses += " hoverable";

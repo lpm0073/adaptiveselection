@@ -1,4 +1,7 @@
 
+#loader {
+}
+
 .home-page {
   height: 92vh;
   background-image: url('./canvas-background.jpg');
@@ -26,9 +29,9 @@
   /* position: absolute; */
   border-radius: 3px;
 
-  -webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
-  -moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
-  box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+  -webkit-box-shadow: 5px 5px 3px 3px rgba(0,0,0,0.5);
+  -moz-box-shadow: 5px 5px 3px 3px rgba(0,0,0,0.5);
+  box-shadow: 5px 5px 3px 3px rgba(0,0,0,0.5);
 }
 .image-container:hover {
   border: 2px solid goldenrod;
@@ -250,3 +253,13 @@
 }
 .CSSTransition-exit-done {}
 
+
+/* ------------------------ Masonry ------------------------ */
+
+.masonry-container {
+
+}
+
+.masonry-item {
+
+}

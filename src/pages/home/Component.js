@@ -1,3 +1,6 @@
+// Masonry layout:
+// https://github.com/eiriklv/react-masonry-component
+
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -10,6 +13,7 @@ import ImageBox from './ImageBox';
 import { wpGetExclusions, wpGetExclusionArray } from '../../shared/categories';
 import { mediaUrl } from '../../shared/urls';
 import { wpGetImage } from './wpImageLib';
+import Loading from '../../components/Loading';
 
 const mapStateToProps = state => ({
     ...state
@@ -42,7 +46,6 @@ class Home extends Component {
 
     this.queueImage = this.queueImage.bind(this);
     this.getNextImage = this.getNextImage.bind(this);
-    this.imagePositioning = this.imagePositioning.bind(this);
     this.existsClass = this.existsClass.bind(this);
     this.serializedImage = this.serializedImage.bind(this);
 
@@ -74,18 +77,13 @@ class Home extends Component {
   render() {
       const images = this.props.imageCarousel.items.map((image) => {
         const max_height = window.screen.height / 2;
-        const max_width = window.screen.width / 3;
+        const max_width = window.screen.width / 4;
         const imageProps = wpGetImage(image, max_height, max_width);
 
         image.source_url = imageProps.source_url;
         image.height = imageProps.height;
         image.width = imageProps.width;
         image.image_props = imageProps;
-        /*
-        if (!image.hasOwnProperty("position_props")) {
-          image.position_props = this.imagePositioning(imageProps.width, imageProps.height);
-        }
-        */
 
         return (image);
       });
@@ -96,8 +94,8 @@ class Home extends Component {
       return(
           <div id="home-page m-0 p-0" className="home-page">
             <Masonry
-              className={'my-gallery-class'} // default ''
-              elementType={'ul'} // default 'div'
+              className={'masonry-container'} // default ''
+              elementType={'div'} // default 'div'
               options={masonryOptions} // default {}
               disableImagesLoaded={false} // default false
               updateOnEachImageLoad={false} // default false and works only if disableImagesLoaded is false
@@ -107,15 +105,15 @@ class Home extends Component {
             {this.props.imageCarousel.items.length > 0 ? 
               images.map((image) => {
                 return (
-                  <li className="image-element-class">
+                  <div className="masonry-item">
                     <ImageBox key={image.key} image = {image} />
-                  </li>
+                  </div>
                 );
               })
 
 
             :
-             <div>i am waiting</div>
+            <Loading />
             }
             </Masonry>
           </div>
@@ -261,31 +259,6 @@ class Home extends Component {
     const image = this.serializedImage(images[0]);
     return image;
   }
-
-  imagePositioning(image_width, image_height) {
-    // https://www.npmjs.com/package/rectangle-bin-pack
-    //
-    // build random trajectory that passes through the
-    // interior 2/3 of curr view pane.
-    const canvas_area = .90;
-
-    const X = window.innerWidth * canvas_area;
-    const Y = window.innerHeight * canvas_area;
-
-    const position_x = Math.floor(Math.random() * (X - image_width));
-    const position_y = Math.floor(Math.random() * (Y - image_height));
-
-    const slope = (Math.random() * (2 * Math.PI));
-
-    const position = {
-      left: (window.innerWidth * (1 - canvas_area))/2 + position_x,
-      top: (window.innerHeight * (1 - canvas_area))/2 + position_y,
-      slope: slope
-    }
-
-    return position;
-  }
-
 
   handleChangeLevel() {
 
