@@ -35,17 +35,15 @@ class Home extends Component {
 
     this.imageFetcher = this.imageFetcher.bind(this);
     this.handleChangeLevel = this.handleChangeLevel.bind(this);
-    this.queueImage = this.queueImage.bind(this);
-    this.isImageCollision = this.isImageCollision.bind(this);
-    this.getNextImage = this.getNextImage.bind(this);
-    this.imagePositioning = this.imagePositioning.bind(this);
-    this.getElapsedTime = this.getElapsedTime.bind(this);
-    this.existsClass = this.existsClass.bind(this);
     this.removeExclusions = this.removeExclusions.bind(this);
     this.processAnalytics = this.processAnalytics.bind(this);
     this.setAnalyticsTag = this.setAnalyticsTag.bind(this);
-    this.mergeArrays = this.mergeArrays.bind(this);
-    this.timestampImage = this.timestampImage.bind(this);
+
+    this.queueImage = this.queueImage.bind(this);
+    this.getNextImage = this.getNextImage.bind(this);
+    this.imagePositioning = this.imagePositioning.bind(this);
+    this.existsClass = this.existsClass.bind(this);
+    this.serializedImage = this.serializedImage.bind(this);
 
     var d = new Date();
     
@@ -114,7 +112,7 @@ class Home extends Component {
     if (this.image_working_set.length > 0 &&                                // we have images
         this.props.imageCarousel.items.length < this.state.number_of_images &&   // the desktop wants images
         !this.existsClass("hovering") &&                                    // we're not hovering over an image at the moment
-        this.getElapsedTime(this.last_image_queued) > 2500) {               // its been at least 4.5s since the last image was added
+        new Date() - this.last_image_queued > 2500) {               // its been at least 4.5s since the last image was added
 
       const image = this.getNextImage();
 
@@ -156,10 +154,6 @@ class Home extends Component {
         }        
       }
     }
-  }
-
-  mergeArrays(arr) {
-    return [].concat.apply([], arr);
   }
 
   processAnalytics() {
@@ -212,9 +206,7 @@ class Home extends Component {
     }
   }
 
-
-
-  timestampImage(image) {
+  serializedImage(image) {
     var RetVal;
 
     const next = this.image_working_set.sort((a, b) =>  Number(b.viewing_sequence) - Number(a.viewing_sequence))[0].viewing_sequence + 1;
@@ -241,12 +233,8 @@ class Home extends Component {
                         (image.analytics.close === false || image.analytics.like === true));
 
 
-    const image = this.timestampImage(images[0]);
+    const image = this.serializedImage(images[0]);
     return image;
-  }
-
-  isImageCollision(imageCandidate) {
-    return this.image_working_set.filter(image => imageCandidate.id === image.id).length > 0;
   }
 
   imagePositioning(image_width, image_height) {
@@ -316,7 +304,8 @@ class Home extends Component {
         // only add unique return values, so that we don't accumulated duplicates in the working set
         var new_images = [];
         for (var i=0; i<images.length;  i++) {
-          if (!this.isImageCollision(images[i])) new_images.push(images[i]);
+          const candidate = images[i]
+          if (this.image_working_set.filter(image => candidate.id === image.id).length === 0) new_images.push(images[i]);
         }
 
         // initialize analytics data
@@ -368,11 +357,6 @@ class Home extends Component {
         self.imageFetcher();
     }, delay * Math.random());
 
-  }
-
-  getElapsedTime(timestamp) {
-    const d = new Date();
-        return d - timestamp;
   }
 
 }

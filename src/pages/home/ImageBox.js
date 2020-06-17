@@ -37,8 +37,6 @@ class ImageBox extends Component {
     this.handleDragStart = this.handleDragStart.bind(this);
     this.handleDrag = this.handleDrag.bind(this);
     this.handleDragEnd = this.handleDragEnd.bind(this);
-    this.getNextZOrder = this.getNextZOrder.bind(this);
-    this.isOnTop = this.isOnTop.bind(this);
     this.handleWindowClose = this.handleWindowClose.bind(this);
     this.handleLike = this.handleLike.bind(this);
     this.handleDislike = this.handleDislike.bind(this);
@@ -47,6 +45,8 @@ class ImageBox extends Component {
     this.handleResizing = this.handleResizing.bind(this);
     this.resetWindowCloseDelay = this.resetWindowCloseDelay.bind(this);
     this.CSSTransitionOnEnter = this.CSSTransitionOnEnter.bind(this);
+    this.getNextZOrder = this.getNextZOrder.bind(this);
+    this.isOnTop = this.isOnTop.bind(this);
     
     var d = new Date();
     this.clickTimeStamp = d.setDate(d.getDate()-5); // make sure initial date is stale,
