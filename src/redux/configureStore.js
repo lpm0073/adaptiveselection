@@ -1,5 +1,4 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux';
-import { Specialties } from './specialties';
 import { Categories } from './categories';
 import { HomePageRedux } from './homePage.js';
 
@@ -12,7 +11,6 @@ export const ConfigureStore = () => {
     const store = createStore(
         
         combineReducers({
-            specialties: Specialties,
             categories: Categories,
             homePage: HomePageRedux
         }),

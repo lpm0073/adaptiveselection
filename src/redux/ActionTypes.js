@@ -1,8 +1,4 @@
 
-// Logos on home page and Specialties page
-export const ADD_SPECIALTIES = 'ADD_SPECIALTIES';
-export const SPECIALTIES_FAILED = 'SPECIALTIES_FAILED';
-export const SPECIALTIES_LOADING = 'SPECIALTIES_LOADING';
 
 export const ADD_CATEGORIES = 'ADD_CATEGORIES';
 export const CATEGORIES_FAILED = 'CATEGORIES_FAILED';

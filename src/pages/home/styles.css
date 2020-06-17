@@ -234,7 +234,9 @@
   transition: all 1000ms ease-in;
 }
 
-.CSSTransition-enter-done {}
+.CSSTransition-enter-done {
+  
+}
 
 .CSSTransition-exit {
   opacity: 1;
