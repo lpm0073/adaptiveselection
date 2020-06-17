@@ -4,7 +4,8 @@ import Draggable from 'react-draggable';
 class ImageBox extends Component {
 
   clickTimeStamp;
-  windowCloseDelay;
+  windowCloseDelay = null;
+  mouseEnterDelay = null;
 
   /* behavior tracking */
   _click = false;
@@ -18,13 +19,14 @@ class ImageBox extends Component {
     super(props);
     this.handleMouseDown = this.handleMouseDown.bind(this);
     this.handleMouseUp = this.handleMouseUp.bind(this);
+    this.handleMouseEnter = this.handleMouseEnter.bind(this);
+    this.handleMouseLeave = this.handleMouseLeave.bind(this);
     this.handleStart = this.handleStart.bind(this);
     this.handleDrag = this.handleDrag.bind(this);
     this.handleStop = this.handleStop.bind(this);
     this.getNextZOrder = this.getNextZOrder.bind(this);
     this.isOnTop = this.isOnTop.bind(this);
     this.handleWindowClose = this.handleWindowClose.bind(this);
-    this.toggleHover = this.toggleHover.bind(this);
     this.handleLike = this.handleLike.bind(this);
     this.handleDislike = this.handleDislike.bind(this);
     this.handleInfoButton = this.handleInfoButton.bind(this);
@@ -107,9 +109,9 @@ class ImageBox extends Component {
                 id={this.props.image.id}
                 className={containerClasses}
                 style={this.state.imageContainerStyle}
-                onMouseEnter={this.toggleHover}
-                onMouseLeave={this.toggleHover}
                 onMouseUp={this.handleMouseUp}
+                onMouseEnter={this.handleMouseEnter}
+                onMouseLeave={this.handleMouseLeave}
                 >
                 <div className="image-frame m-0 p-0" 
                   style={this.state.imageFrameStyle}>
@@ -146,6 +148,31 @@ class ImageBox extends Component {
   }
   handleMouseUp() {
     this._resizing = false;
+  }
+  handleMouseEnter() {
+
+    // if the user hovers more than 2500ms then 
+    // cancel the auto-close behavior.
+    this.setState({
+      isHovering: true
+    });
+
+    const self = this;
+    this.mouseEnterDelay = setTimeout(function() {
+      clearTimeout(this.windowCloseDelay);
+      self.windowCloseDelay = null;
+    }, 3000);   
+
+  }
+  handleMouseLeave() {
+    clearTimeout(this.mouseEnterDelay);
+    if (!this.windowCloseDelay) {
+      this.resetWindowCloseDelay();
+    }
+    this.setState({
+      isHovering: false
+    });
+
   }
   handleLike() {
     this._like = (!this._like);
@@ -191,19 +218,6 @@ class ImageBox extends Component {
       isClosed: true
     });
     this._close = true;
-  }
-
-  toggleHover() {
-    this.setState({
-      isHovering: !this.state.isHovering
-    });
-
-    if (this.state.isHovering && !this._dislike) {
-      clearTimeout(this.windowCloseDelay);
-    } else {
-      if (!this.windowCloseDelay) this.resetWindowCloseDelay();
-
-    }
   }
 
   handleMouseDown() {

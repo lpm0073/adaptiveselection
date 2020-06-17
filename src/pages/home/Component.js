@@ -55,7 +55,7 @@ class Home extends Component {
     this.last_image_queued = d.setDate(d.getDate()-5);
 
     this.state = {
-      level: 3,
+      level: 4,
       image_carousel: [],
       number_of_images: 5,
     }
@@ -292,7 +292,6 @@ class Home extends Component {
 
 
     const image = this.timestampImage(images[0]);
-    console.log("getNextImage", image, this.image_working_set);
     return image;
   }
 
