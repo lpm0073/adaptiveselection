@@ -55,7 +55,7 @@ class Home extends Component {
     this.last_image_queued = d.setDate(d.getDate()-5);
 
     this.state = {
-      level: 4,
+      level: 0,
       image_carousel: [],
       number_of_images: 5,
     }
@@ -78,7 +78,6 @@ class Home extends Component {
   shouldComponentUpdate() {
       const pendingClose = document.getElementsByClassName("window-closer")
       if (pendingClose.length > 0) {
-        console.log("need to close some windows", pendingClose.length);
         this.processClosedWindows();
       }
       return true;

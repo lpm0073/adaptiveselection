@@ -17,19 +17,20 @@ class ImageBox extends Component {
 
   constructor(props) {
     super(props);
-    this.handleMouseDown = this.handleMouseDown.bind(this);
+    this.handleContainerMouseDown = this.handleContainerMouseDown.bind(this);
     this.handleMouseUp = this.handleMouseUp.bind(this);
     this.handleMouseEnter = this.handleMouseEnter.bind(this);
     this.handleMouseLeave = this.handleMouseLeave.bind(this);
-    this.handleStart = this.handleStart.bind(this);
+    this.handleDragStart = this.handleDragStart.bind(this);
     this.handleDrag = this.handleDrag.bind(this);
-    this.handleStop = this.handleStop.bind(this);
+    this.handleDragEnd = this.handleDragEnd.bind(this);
     this.getNextZOrder = this.getNextZOrder.bind(this);
     this.isOnTop = this.isOnTop.bind(this);
     this.handleWindowClose = this.handleWindowClose.bind(this);
     this.handleLike = this.handleLike.bind(this);
     this.handleDislike = this.handleDislike.bind(this);
     this.handleInfoButton = this.handleInfoButton.bind(this);
+    this.handleInfoPanelLeave = this.handleInfoPanelLeave.bind(this);
     this.handleResizing = this.handleResizing.bind(this);
     this.resetWindowCloseDelay = this.resetWindowCloseDelay.bind(this);
     
@@ -53,7 +54,8 @@ class ImageBox extends Component {
         width: this.props.image.width
       },
       isClosed: false,
-      isHovering: false
+      isHovering: false,
+      showInfoPanel: false
     }
   }
 
@@ -72,11 +74,15 @@ class ImageBox extends Component {
     var likeStyles = null;
     var dislikeStyles = null;
     var containerClasses = "image-container m-0 p-0 handle";
+    var infoPanelClasses = "info-panel m-0 p-5 text-center";
+
     if (this.isOnTop()) containerClasses += " hoverable";
     if (this.state.isClosed) containerClasses += " window-closer";
     if (this.state.isHovering) containerClasses += " hovering";
     if (this._like) likeStyles = {fontSize: 'larger', color: "black"};
     if (this._dislike) dislikeStyles = {fontSize: 'larger', color: "red"};
+
+    if (!this.state.showInfoPanel) infoPanelClasses += " hidden";
 
     /* behavior tracking */
     if (this._click) containerClasses += " analytics_click";
@@ -98,10 +104,10 @@ class ImageBox extends Component {
             defaultClassNameDragging="react-draggable-dragging"
             defaultClassNameDragged="react-draggable-dragged"
             handle=".handle"
-            onMouseDown={this.handleMouseDown}
-            onStart={this.handleStart}
+            onMouseDown={this.handleContainerMouseDown}
+            onStart={this.handleDragStart}
             onDrag={this.handleDrag}
-            onStop={this.handleStop}
+            onStop={this.handleDragEnd}
             >
 
               <div
@@ -115,6 +121,13 @@ class ImageBox extends Component {
                 >
                 <div className="image-frame m-0 p-0" 
                   style={this.state.imageFrameStyle}>
+                  <div id="info-panel" className={infoPanelClasses} onMouseLeave={this.handleInfoPanelLeave} >
+                    I am the info panel.
+                    <div>Marketing URL: {this.props.image.api_props.acf["marketing_url"]}</div>
+                    <div>Image ID: {this.props.image.id}</div>
+                    <div>Categories: {this.props.image.api_props.categories.join()}</div>
+                    
+                  </div>
                   <div id="grabbers" style={this.state.grabberStyle}>
                     <div className="top-left text-center" onMouseDown={this.handleWindowClose}><i className="fa fa-window-close m-0 p-0"></i></div>
                     <div className="top-right" onMouseDown={this.handleResizing}></div>
@@ -184,7 +197,18 @@ class ImageBox extends Component {
     if (this._dislike) this.resetWindowCloseDelay(1500);
   }
   handleInfoButton () {
-    console.log("handleInfoButton()");
+    this.setState({
+      showInfoPanel: true
+    });
+  }
+  handleInfoPanelLeave() {
+    const self = this;
+    setTimeout(function() {
+      self.setState({
+        showInfoPanel: false
+      });
+  
+    }, 500);
   }
 
   getNextZOrder() {
@@ -220,7 +244,7 @@ class ImageBox extends Component {
     this._close = true;
   }
 
-  handleMouseDown() {
+  handleContainerMouseDown() {
 
     this.clickTimeStamp = new Date();
     this.setState({
@@ -232,14 +256,14 @@ class ImageBox extends Component {
   }
 
 
-  handleStart() {
+  handleDragStart() {
     // Drag start
   }
   handleDrag() {
     this._move = true;
 
   }
-  handleStop() {
+  handleDragEnd() {
     // Drag stop
 
   }

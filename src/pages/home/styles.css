@@ -7,10 +7,12 @@
 }
 
 .hoverable:hover {
+  /* set by ImageBox.render() when a) window has been clicked and b) user is hovering */
+  transition-delay: 0ms;
 }
 
 .hovering {
-  /* do not delete! */
+  /* set by ImageBox.render() when user is hovering */
   transition-delay: 0ms;
 }
 
@@ -22,8 +24,6 @@
 
 .image-container {
   position: absolute;
-  animation: image_mover;
-  animation-duration: 15s;
   border-radius: 3px;
 
   -webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
@@ -38,10 +38,31 @@
 }
 
 .image-frame {
-  color: green;
   background-size: contain;
   background-repeat: no-repeat;
   border-radius: 3px;
+}
+
+.hidden {
+  display: none;
+  height: 0;
+  width: 0;
+}
+
+.info-panel {
+  position: absolute;
+  bottom: 0px;
+  width: 100%;
+  z-index: 1;
+  background-color: rgba(0,0,0, .75);
+  animation: info-panel-slide-up .5s ease-in-out 0ms;
+  animation-fill-mode: forwards;
+  color: white;
+}
+
+@keyframes info-panel-slide-up {
+  from { height: 0%;  }
+  100% { height: 100% }
 }
 
 /* --------------------- Interactions --------------------- */
@@ -57,7 +78,7 @@
   /* do not delete! */
   animation: fade-out 1s ease-in-out 100ms;
   -webkit-animation: fade-out 1s ease-in-out 100ms;
-  animation-fill-mode: forwards;  
+  animation-fill-mode: forwards;
 }
 .analytics_click {
   /* do not delete! */
