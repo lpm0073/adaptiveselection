@@ -1,31 +1,17 @@
 import * as ActionTypes from './ActionTypes';
 import { categoriesUrl } from '../shared/urls';
 
-/*  ----------------------------------- 
-    methods to track whether page entry animations
-    have rendered.
-    -----------------------------------  */
-export const setHomePage = () => {
-    return ({
-        type: ActionTypes.SET_HOMEPAGE_STATE
-        });
+
+export const addImageCarousel = (inserted) => {
+    return {
+        type: ActionTypes.ADD_IMAGE_CAROUSEL,
+        payload: inserted
+        };
 }
 
-export const setLogoState = ({state}) => {
-    return ({
-        type: ActionTypes.SET_LOGOCUBE_STATE,
-        state: state
-        });
-}
-
-export const addImageCarousel = (inserted, imageCarousel) => ({
-    type: ActionTypes.ADD_IMAGE_CAROUSEL,
-    payload: imageCarousel.push(inserted)
-});
-
-export const removeImageCarousel = (deleted, imageCarousel) => ({
+export const removeImageCarousel = (idx) => ({
     type: ActionTypes.DELETE_IMAGE_CAROUSEL,
-    payload: imageCarousel.filter((item) => item.id !== deleted.id)
+    payload: idx
 });
 
 /*  ----------------------------------- 
@@ -189,5 +175,3 @@ export const addCategories = (Categories) => ({
     type: ActionTypes.ADD_CATEGORIES,
     payload: Categories
 });
-// --------------------------------------------------------------------------------------------------------------
-

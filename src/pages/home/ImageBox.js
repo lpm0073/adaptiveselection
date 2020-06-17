@@ -1,6 +1,18 @@
 import React, {Component}  from 'react';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import * as Actions from '../../redux/ActionCreators';
+
+
 import Draggable from 'react-draggable';
 import { CSSTransition } from 'react-transition-group';
+
+const mapStateToProps = state => ({
+  ...state
+});
+const mapDispatchToProps = (dispatch) => ({
+actions: bindActionCreators(Actions, dispatch)
+});
 
 class ImageBox extends Component {
 
@@ -266,7 +278,11 @@ class ImageBox extends Component {
       isClosed: true
     });
     this._close = true;
+
+    const idx = this.props.imageCarousel.items.findIndex((item) => item.id === this.props.image.id); 
+    this.props.actions.removeImageCarousel(idx);
   }
+
 
   handleContainerMouseDown() {
 
@@ -293,10 +309,9 @@ class ImageBox extends Component {
   }
 
   CSSTransitionOnEnter() {
-    console.log("i am alive");
+    // was using this to debug CSSTransition 
   }
 }
 
 
-export default ImageBox;
-
+export default connect(mapStateToProps, mapDispatchToProps)(ImageBox);

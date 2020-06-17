@@ -38,13 +38,10 @@ class Home extends Component {
     this.queueImage = this.queueImage.bind(this);
     this.isImageCollision = this.isImageCollision.bind(this);
     this.getNextImage = this.getNextImage.bind(this);
-    this.addToImageCarousel = this.addToImageCarousel.bind(this);
     this.imagePositioning = this.imagePositioning.bind(this);
-    this.removeFromImageCarousel = this.removeFromImageCarousel.bind(this);
     this.getElapsedTime = this.getElapsedTime.bind(this);
     this.existsClass = this.existsClass.bind(this);
     this.removeExclusions = this.removeExclusions.bind(this);
-    this.processClosedWindows = this.processClosedWindows.bind(this);
     this.processAnalytics = this.processAnalytics.bind(this);
     this.setAnalyticsTag = this.setAnalyticsTag.bind(this);
     this.mergeArrays = this.mergeArrays.bind(this);
@@ -56,7 +53,6 @@ class Home extends Component {
 
     this.state = {
       level: 0,
-      image_carousel: [],
       number_of_images: 5,
     }
   }
@@ -68,6 +64,7 @@ class Home extends Component {
         self.handleChangeLevel();
         self.imageFetcher();
     }, 50);    
+
   }
 
   componentWillUnmount() {
@@ -75,19 +72,10 @@ class Home extends Component {
     clearTimeout(this.queueDelay);
   }
 
-  shouldComponentUpdate() {
-      const pendingClose = document.getElementsByClassName("window-closer")
-      if (pendingClose.length > 0) {
-        this.processClosedWindows();
-      }
-      return true;
-  }
-
   render() {
-
       return(
           <div id="home-page" className="home-page">
-            {this.state.image_carousel.length > 0 ? this.state.image_carousel.map((image) => {
+            {this.props.imageCarousel.items.length > 0 ? this.props.imageCarousel.items.map((image) => {
               const max_height = window.screen.height / 2;
               const max_width = window.screen.width / 3;
               const imageProps = wpGetImage(image, max_height, max_width);
@@ -112,15 +100,11 @@ class Home extends Component {
   
   }
 
-
   /* add a random image at a random location on the device screen. */
   queueImage() {
     // do this first.
-    // gather user analytics signals from class data embedded in the items in image_carousel
+    // gather user analytics signals from class data embedded in the items in props.imageCarousel
     this.processAnalytics();
-
-    // dequeue any windows that were closed by the user
-    this.processClosedWindows();
 
     // re-validate the working set and the carousel against our current
     // list of category exclusions.
@@ -128,13 +112,13 @@ class Home extends Component {
 
     // if we have images in our working set, and we need more images on screen
     if (this.image_working_set.length > 0 &&                                // we have images
-        this.state.image_carousel.length < this.state.number_of_images &&   // the desktop wants images
+        this.props.imageCarousel.items.length < this.state.number_of_images &&   // the desktop wants images
         !this.existsClass("hovering") &&                                    // we're not hovering over an image at the moment
         this.getElapsedTime(this.last_image_queued) > 2500) {               // its been at least 4.5s since the last image was added
 
       const image = this.getNextImage();
 
-      this.addToImageCarousel({
+      this.props.actions.addImageCarousel({
         key: image.id,
         id: image.id,
         api_props: image,
@@ -146,8 +130,8 @@ class Home extends Component {
     
     /* queue the next iteration */
     var delay = 5000;
-    if (this.state.image_carousel.length <= 1) delay = 500;
-    if (this.state.image_carousel.length < this.state.number_of_images) delay = 2000;
+    if (this.props.imageCarousel.length <= 1) delay = 500;
+    if (this.props.imageCarousel.length < this.state.number_of_images) delay = 2000;
 
     const self = this;
     this.queueDelay = setTimeout(function() {self.queueImage();}, delay);
@@ -211,17 +195,6 @@ class Home extends Component {
     return elements.length > 0;
   }
 
-  processClosedWindows() {
-    // window-closer class is added by a mousedown event handler in ImageBox
-    var closedWindows = document.getElementsByClassName("window-closer"),
-        id = 0;
-
-    for (var i = 0; i < closedWindows.length; i++) {
-      id = Number(closedWindows[i].id);
-      this.removeFromImageCarousel(id);
-    }
-
-  }
   // if level has changed downwards then the working set probably contains
   // content that is no longer conforms and needs to be purged.
   removeExclusions() {
@@ -233,35 +206,13 @@ class Home extends Component {
         const intersection = this_categories.filter(element => category_exclusions.includes(element))
         if (intersection.length > 0 ) {
           const this_image = this.image_working_set[i]
-          this.removeFromImageCarousel(this_image.id);
+          this.removeFromImageCarousel(this_image);
           this.image_working_set = this.image_working_set.filter(image => image.id !== this_image.id);
         }
     }
   }
 
-  removeFromImageCarousel(id) {
-    // build an array of all previous keys except for our new imageKey.
-    // then push our newly generated image set onto the end of the array.
-    var newImageSet = this.state.image_carousel.filter(carousel_image => carousel_image.id !== id);
 
-    if (newImageSet.length !== this.state.image_carousel.length) {
-      this.setState({
-        image_carousel: newImageSet
-      });
-    }
-  }
-
-  addToImageCarousel(newImage) {
-    // build an array of all previous keys except for our new imageKey.
-    // then push our newly generated image set onto the end of the array.
-    var newImageSet = this.state.image_carousel;
-    newImageSet.push(newImage);
-
-    this.setState({
-      image_carousel: newImageSet
-    });
-
-  }
 
   timestampImage(image) {
     var RetVal;
