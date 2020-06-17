@@ -23,6 +23,15 @@
   display: none !important;
   width: 0 !important;
   height: 0 !important;
+
+  transition-delay: 1500s;
+  transition-duration: 1ms;
+}
+
+.window-closing {
+  animation: fade-out 1s ease-in-out 100ms;
+  -webkit-animation: fade-out 1s ease-in-out 100ms;
+  animation-fill-mode: forwards;
 }
 
 .image-container {
@@ -79,9 +88,6 @@
 }
 .analytics_dislike {
   /* do not delete! */
-  animation: fade-out 1s ease-in-out 100ms;
-  -webkit-animation: fade-out 1s ease-in-out 100ms;
-  animation-fill-mode: forwards;
 }
 .analytics_click {
   /* do not delete! */

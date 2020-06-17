@@ -21,15 +21,16 @@ class ImageBox extends Component {
   mouseEnterDelay = null;
 
   /* behavior tracking */
-  _click = false;
-  _like = false;
-  _dislike = false;
-  _move = false;
-  _resizing = false;
-  _close = false;
+  _click = false;         // true if user clicked anywhere on window, for any reason
+  _like = false;          // true if user click Like
+  _dislike = false;       // true if user clicks Dislike
+  _move = false;          // true if user moved the window
+  _resizing = false;      // true if user is re-sizing the window
+  _close = false;         // true if user clicked the close button
 
   constructor(props) {
     super(props);
+    this.handleWindowClose = this.handleWindowClose.bind(this);
     this.handleContainerMouseDown = this.handleContainerMouseDown.bind(this);
     this.handleMouseUp = this.handleMouseUp.bind(this);
     this.handleMouseEnter = this.handleMouseEnter.bind(this);
@@ -37,7 +38,6 @@ class ImageBox extends Component {
     this.handleDragStart = this.handleDragStart.bind(this);
     this.handleDrag = this.handleDrag.bind(this);
     this.handleDragEnd = this.handleDragEnd.bind(this);
-    this.handleWindowClose = this.handleWindowClose.bind(this);
     this.handleLike = this.handleLike.bind(this);
     this.handleDislike = this.handleDislike.bind(this);
     this.handleInfoButton = this.handleInfoButton.bind(this);
@@ -94,7 +94,7 @@ class ImageBox extends Component {
     var infoPanelClasses = "info-panel m-0 p-5 text-center";
 
     if (this.isOnTop()) containerClasses += " hoverable";
-    if (this.state.isClosed) containerClasses += " window-closer";
+    if (this.state.isClosed) containerClasses += " window-closer window-closing";
     if (this.state.isHovering) containerClasses += " hovering";
     if (this._like) likeStyles = {fontSize: 'larger', color: "black"};
     if (this._dislike) dislikeStyles = {fontSize: 'larger', color: "red"};
@@ -106,7 +106,7 @@ class ImageBox extends Component {
     if (this._move) containerClasses += " analytics_move";
     if (this._resizing) containerClasses += " analytics_resize";
     if (this._like) containerClasses += " analytics_like";
-    if (this._dislike) containerClasses += " analytics_dislike";
+    if (this._dislike) containerClasses += " analytics_dislike window-closing";
     if (this._close) containerClasses += " analytics_close";
     
     // CSSTransition

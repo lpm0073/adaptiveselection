@@ -48,13 +48,14 @@ class Home extends Component {
     this.getNextImage = this.getNextImage.bind(this);
     this.existsClass = this.existsClass.bind(this);
     this.serializedImage = this.serializedImage.bind(this);
+    this.utilizedScreenArea = this.utilizedScreenArea.bind(this);
 
     var d = new Date();
     
     this.last_image_queued = d.setDate(d.getDate()-5);
 
     this.state = {
-      level: 0,
+      level: 4,
       number_of_images: 5,
     }
   }
@@ -77,7 +78,7 @@ class Home extends Component {
   render() {
       const images = this.props.imageCarousel.items.map((image) => {
         const max_height = window.screen.height / 2;
-        const max_width = window.screen.width / 4;
+        const max_width = window.screen.width / 3.5;
         const imageProps = wpGetImage(image, max_height, max_width);
 
         image.source_url = imageProps.source_url;
@@ -87,38 +88,35 @@ class Home extends Component {
 
         return (image);
       });
-      const masonryOptions = {
-        transitionDuration: 0
-      };
-      const imagesLoadedOptions = { }
       return(
           <div id="home-page m-0 p-0" className="home-page">
-            <Masonry
-              className={'masonry-container'} // default ''
-              elementType={'div'} // default 'div'
-              options={masonryOptions} // default {}
-              disableImagesLoaded={false} // default false
-              updateOnEachImageLoad={false} // default false and works only if disableImagesLoaded is false
-              imagesLoadedOptions={imagesLoadedOptions} // default {}
-            >
-
-            {this.props.imageCarousel.items.length > 0 ? 
-              images.map((image) => {
-                return (
-                  <div className="masonry-item">
-                    <ImageBox key={image.key} image = {image} />
-                  </div>
-                );
-              })
-
-
+            <Masonry className={'masonry-container'} >
+              {this.props.imageCarousel.items.length > 0 ? images.map((image) => {
+                  return (
+                    <div className="masonry-item">
+                      <ImageBox key={image.key} image = {image} />
+                    </div>
+                  );
+                })
             :
-            <Loading />
+              <Loading />
             }
             </Masonry>
           </div>
       );
   
+  }
+  utilizedScreenArea() {
+    const screenArea = window.screen.height * window.screen.width;
+    var utilized = 0;
+
+    if (screenArea === 0) return false;
+    for (var i=0; i<this.props.imageCarousel.items.length; i++) {
+      var image = this.props.imageCarousel.items[i];
+      utilized += image.width * image.height;
+    }
+
+    return utilized / screenArea;
   }
 
   /* add a random image at a random location on the device screen. */
@@ -132,30 +130,21 @@ class Home extends Component {
     this.removeExclusions();
 
     // if we have images in our working set, and we need more images on screen
-    if (this.image_working_set.length > 0 &&                                // we have images
-        this.props.imageCarousel.items.length < this.state.number_of_images &&   // the desktop wants images
-        !this.existsClass("hovering") &&                                    // we're not hovering over an image at the moment
-        new Date() - this.last_image_queued > 2500) {               // its been at least 4.5s since the last image was added
+    if (this.image_working_set.length > 0 && !this.existsClass("hovering")) {
+      while (this.utilizedScreenArea() < .75 && this.props.imageCarousel.items.length < 6) {
+        const image = this.getNextImage();
 
-      const image = this.getNextImage();
-
-      this.props.actions.addImageCarousel({
-        key: image.id,
-        id: image.id,
-        api_props: image,
-        timestamp: new Date()
-      } );
-
-      this.last_image_queued = new Date();
+        this.props.actions.addImageCarousel({
+          key: image.id,
+          id: image.id,
+          api_props: image,
+          timestamp: new Date()
+        } );
+  
+        this.last_image_queued = new Date();
+      }
     }
     
-    /* queue the next iteration */
-    var delay = 5000;
-    if (this.props.imageCarousel.length <= 1) delay = 500;
-    if (this.props.imageCarousel.length < this.state.number_of_images) delay = 2000;
-
-    const self = this;
-    this.queueDelay = setTimeout(function() {self.queueImage();}, delay);
   }
   setAnalyticsTag(tag, elements) {
 
@@ -241,6 +230,7 @@ class Home extends Component {
         break;
       }
     }
+    console.log("serializedImage()", RetVal, RetVal.viewing_sequence);
     return RetVal;
   }
 
@@ -250,11 +240,13 @@ class Home extends Component {
     // filter images that were disliked or closed but are still pending analytics processing.
     // sort the list based on what's been viewed so far -- put those at the end of the array to avoid dups.
     this.image_working_set = this.image_working_set.sort((a, b) => Number(a.viewing_sequence) - Number(b.viewing_sequence));
-    const images = this.image_working_set
+    var images = this.image_working_set
                   .filter((image) => 
                         image.analytics.dislike === false && 
-                        (image.analytics.close === false || image.analytics.like === true));
-
+                        (image.analytics.close === false || image.analytics.like === true))
+                  .filter((image) => !(image.id in this.props.imageCarousel.items.map((carouselItem) => {
+                    return carouselItem.id;
+                  })));
 
     const image = this.serializedImage(images[0]);
     return image;
