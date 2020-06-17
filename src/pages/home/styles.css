@@ -9,10 +9,6 @@
   overflow-y: scroll;
 }
 
-.hoverable:hover {
-  /* set by ImageBox.render() when a) window has been clicked and b) user is hovering */
-  transition-delay: 0ms;
-}
 
 .hovering {
   /* set by ImageBox.render() when user is hovering */
@@ -140,12 +136,13 @@
   vertical-align: text-top;
 }
 
-.hoverable .top-left {
+#grabbers .top-left {
   display: none;
 }
-.hoverable:hover .top-left {
+#grabbers:hover .top-left {
   display: inherit;
 }
+
 .top-left {
   top: 0;
   left: 0;

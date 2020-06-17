@@ -49,9 +49,10 @@ class Home extends Component {
     this.serializedImage = this.serializedImage.bind(this);
     this.nextSerialNumber = this.nextSerialNumber.bind(this);
     this.utilizedScreenArea = this.utilizedScreenArea.bind(this);
+    this.handleMasonryLayoutComplete = this.handleMasonryLayoutComplete.bind(this);
 
     this.state = {
-      level: 4,
+      level: 0,
       number_of_images: 5,
     }
   }
@@ -74,7 +75,7 @@ class Home extends Component {
   render() {
       const images = this.props.imageCarousel.items.map((image) => {
         var max_height, max_width;
-        if (this.utilizedScreenArea() < .30) {
+        if (Math.random() > 0.50) {
           max_height = (window.screen.height / 4) + (Math.random() * window.screen.height * 1/2);
           max_width = (window.screen.width / 4) + (Math.random() * window.screen.width * 1/4);
           } else {
@@ -92,7 +93,10 @@ class Home extends Component {
       });
       return(
           <div id="home-page m-0 p-0" className="home-page">
-            <Masonry className={'masonry-container'} >
+            <Masonry 
+              className={'masonry-container'} 
+              onLayoutComplete={laidOutItems => this.handleMasonryLayoutComplete(laidOutItems)}              
+            >
               {this.props.imageCarousel.items.length > 0 ? images.map((image) => {
                   return (
                     <div className="masonry-item">
@@ -365,7 +369,9 @@ class Home extends Component {
     return utilized / screenArea;
   }
 
-
+  handleMasonryLayoutComplete(laidOutItems) {
+    //console.log("handleMasonryLayoutComplete()", laidOutItems);
+  }
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);

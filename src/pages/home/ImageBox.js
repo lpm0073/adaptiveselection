@@ -46,7 +46,6 @@ class ImageBox extends Component {
     this.resetWindowCloseDelay = this.resetWindowCloseDelay.bind(this);
     this.CSSTransitionOnEnter = this.CSSTransitionOnEnter.bind(this);
     this.getNextZOrder = this.getNextZOrder.bind(this);
-    this.isOnTop = this.isOnTop.bind(this);
     
     var d = new Date();
     this.clickTimeStamp = d.setDate(d.getDate()-5); // make sure initial date is stale,
@@ -87,13 +86,13 @@ class ImageBox extends Component {
 
   render() {
     // React key
+
     const key = "image-box-" + this.props.image.id;
     var likeStyles = null;
     var dislikeStyles = null;
     var containerClasses = "image-container m-2 p-0 handle";
     var infoPanelClasses = "info-panel m-0 p-5 text-center";
 
-    if (this.isOnTop()) containerClasses += " hoverable";
     if (this.state.isClosed) containerClasses += " window-closer window-closing";
     if (this.state.isHovering) containerClasses += " hovering";
     if (this._like) likeStyles = {fontSize: 'larger', color: "black"};
@@ -261,18 +260,6 @@ class ImageBox extends Component {
     return zIndex;
   }
   
-  isOnTop() {
-
-    var imageContainers = document.getElementsByClassName("image-container"),
-        thisZIndex = 0;
-
-    for (var i = 0; i < imageContainers.length; i++) {
-      thisZIndex = Number(imageContainers[i].style.zIndex);
-      if (thisZIndex > this.state.imageContainerStyle.zIndex) return false;
-    }
-    return true;
-  }
-
   handleWindowClose() {
     this.setState({
       isClosed: true
