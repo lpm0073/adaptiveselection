@@ -1,5 +1,6 @@
 import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { Categories } from './categories';
+import { ImageCarousel } from './imageCarousel';
 import { HomePageRedux } from './homePage.js';
 
 import thunk from 'redux-thunk';
@@ -12,7 +13,8 @@ export const ConfigureStore = () => {
         
         combineReducers({
             categories: Categories,
-            homePage: HomePageRedux
+            homePage: HomePageRedux,
+            imageCarousel: ImageCarousel
         }),
         applyMiddleware(thunk, logger)
     );
