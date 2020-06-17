@@ -73,7 +73,7 @@ class ImageBox extends Component {
     if (this.isOnTop()) containerClasses += " hoverable";
     if (this.state.isClosed) containerClasses += " window-closer";
     if (this.state.isHovering) containerClasses += " hovering";
-    if (this._like) likeStyles = {fontSize: 'larger', color: "green"};
+    if (this._like) likeStyles = {fontSize: 'larger', color: "black"};
     if (this._dislike) dislikeStyles = {fontSize: 'larger', color: "red"};
 
     /* behavior tracking */
@@ -154,7 +154,7 @@ class ImageBox extends Component {
   handleDislike() {
     this._dislike = (!this._dislike);
     if (this._like) this._like = false;
-    if (this._dislike) this.resetWindowCloseDelay(2500);
+    if (this._dislike) this.resetWindowCloseDelay(1500);
   }
   handleInfoButton () {
     console.log("handleInfoButton()");
