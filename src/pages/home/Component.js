@@ -89,8 +89,8 @@ class Home extends Component {
       return(
           <div id="home-page" className="home-page">
             {this.state.image_carousel.length > 0 ? this.state.image_carousel.map((image) => {
-              const max_height = window.screen.height;
-              const max_width = window.screen.width;
+              const max_height = window.screen.height / 2;
+              const max_width = window.screen.width / 3;
               const imageProps = wpGetImage(image, max_height, max_width);
 
               image.source_url = imageProps.source_url;

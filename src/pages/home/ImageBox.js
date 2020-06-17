@@ -154,7 +154,7 @@ class ImageBox extends Component {
   handleDislike() {
     this._dislike = (!this._dislike);
     if (this._like) this._like = false;
-    if (this._dislike) this.resetWindowCloseDelay(1500);
+    if (this._dislike) this.resetWindowCloseDelay(2500);
   }
   handleInfoButton () {
     console.log("handleInfoButton()");

@@ -1,7 +1,7 @@
 
 .home-page {
   height: 92vh;
-  background-color: black;
+  background-image: url('./burlap-background.jpg');
 }
 
 .hoverable:hover {
@@ -26,6 +26,10 @@
   animation: image_mover;
   animation-duration: 15s;
   border-radius: 3px;
+
+  -webkit-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+  -moz-box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);
+  box-shadow: 10px 10px 5px 0px rgba(0,0,0,0.75);  
 }
 
 .image-frame {
@@ -46,7 +50,9 @@
 }
 .analytics_dislike {
   /* do not delete! */
-  transition-delay: 0ms;
+  animation: fade-out 1s ease-in-out 100ms;
+  -webkit-animation: fade-out 1s ease-in-out 100ms;
+  animation-fill-mode: forwards;  
 }
 .analytics_click {
   /* do not delete! */
@@ -63,6 +69,13 @@
 }
 
 /* --------------------- Animations --------------------- */
+@keyframes fade-out {
+  from { opacity: 1;  }
+  25% { opacity: 0.75; }
+  50% { opacity: 0.5; }
+  75% { opacity: 0.25; }
+  100% { opacity: 0}
+}
 
 .react-draggable {
   
