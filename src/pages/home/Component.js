@@ -29,7 +29,6 @@ class Home extends Component {
   queueDelay = null;
   highest_confirmed_page = 0;
   image_working_set = [];
-  last_image_queued = null;  // make sure initial date is stale
   page_number = 1 + Math.floor(Math.random() * 40);
   num_pages = 1000;   // <---- start high and interpolate downwards based on success/failure
   category_exclusions = [];
@@ -48,11 +47,8 @@ class Home extends Component {
     this.getNextImage = this.getNextImage.bind(this);
     this.existsClass = this.existsClass.bind(this);
     this.serializedImage = this.serializedImage.bind(this);
+    this.nextSerialNumber = this.nextSerialNumber.bind(this);
     this.utilizedScreenArea = this.utilizedScreenArea.bind(this);
-
-    var d = new Date();
-    
-    this.last_image_queued = d.setDate(d.getDate()-5);
 
     this.state = {
       level: 4,
@@ -77,8 +73,14 @@ class Home extends Component {
 
   render() {
       const images = this.props.imageCarousel.items.map((image) => {
-        const max_height = window.screen.height / 2;
-        const max_width = window.screen.width / 3.5;
+        var max_height, max_width;
+        if (this.utilizedScreenArea() < .30) {
+          max_height = (window.screen.height / 4) + (Math.random() * window.screen.height * 1/2);
+          max_width = (window.screen.width / 4) + (Math.random() * window.screen.width * 1/4);
+          } else {
+            max_height = (window.screen.height / 5) + (Math.random() * window.screen.height * 1/5);
+            max_width = (window.screen.width / 5) + (Math.random() * window.screen.width * 1/5);
+            }
         const imageProps = wpGetImage(image, max_height, max_width);
 
         image.source_url = imageProps.source_url;
@@ -106,21 +108,9 @@ class Home extends Component {
       );
   
   }
-  utilizedScreenArea() {
-    const screenArea = window.screen.height * window.screen.width;
-    var utilized = 0;
-
-    if (screenArea === 0) return false;
-    for (var i=0; i<this.props.imageCarousel.items.length; i++) {
-      var image = this.props.imageCarousel.items[i];
-      utilized += image.width * image.height;
-    }
-
-    return utilized / screenArea;
-  }
-
   /* add a random image at a random location on the device screen. */
   queueImage() {
+    var i = 0;
     // do this first.
     // gather user analytics signals from class data embedded in the items in props.imageCarousel
     this.processAnalytics();
@@ -130,20 +120,32 @@ class Home extends Component {
     this.removeExclusions();
 
     // if we have images in our working set, and we need more images on screen
-    if (this.image_working_set.length > 0 && !this.existsClass("hovering")) {
-      while (this.utilizedScreenArea() < .75 && this.props.imageCarousel.items.length < 6) {
+    while (this.image_working_set.length > 0 
+        && !this.existsClass("hovering") 
+        && this.utilizedScreenArea() < .75 
+        && i < 10
+        && this.props.imageCarousel.items.length < 10) {
         const image = this.getNextImage();
 
+        const duplicate = this.props.imageCarousel.items.filter((item) => item.id === image.id);
+        if (duplicate.length > 0) {
+          // our working set is too small. we need to wait for more data from the api.
+          break;
+        }
         this.props.actions.addImageCarousel({
           key: image.id,
           id: image.id,
           api_props: image,
           timestamp: new Date()
         } );
-  
-        this.last_image_queued = new Date();
-      }
+        i ++;
     }
+
+    const self = this;
+    this.queueDelay = setTimeout(function() {
+      self.queueImage();      
+    }, 1000);
+
     
   }
   setAnalyticsTag(tag, elements) {
@@ -218,19 +220,21 @@ class Home extends Component {
     }
   }
 
+  nextSerialNumber() {
+    return this.image_working_set.sort((a, b) =>  Number(b.viewing_sequence) - Number(a.viewing_sequence))[0].viewing_sequence + 1;
+  }
+
   serializedImage(image) {
     var RetVal;
 
-    const next = this.image_working_set.sort((a, b) =>  Number(b.viewing_sequence) - Number(a.viewing_sequence))[0].viewing_sequence + 1;
 
     for (var i=0; i<this.image_working_set.length; i++) {
       if (this.image_working_set[i].id === image.id) {
-        this.image_working_set[i].viewing_sequence = next;
+        this.image_working_set[i].viewing_sequence = this.nextSerialNumber();
         RetVal = this.image_working_set[i];
         break;
       }
     }
-    console.log("serializedImage()", RetVal, RetVal.viewing_sequence);
     return RetVal;
   }
 
@@ -348,6 +352,19 @@ class Home extends Component {
     }, delay * Math.random());
 
   }
+  utilizedScreenArea() {
+    const screenArea = window.screen.height * window.screen.width;
+    var utilized = 0;
+
+    if (screenArea === 0) return false;
+    for (var i=0; i<this.props.imageCarousel.items.length; i++) {
+      var image = this.props.imageCarousel.items[i];
+      utilized += image.width * image.height;
+    }
+
+    return utilized / screenArea;
+  }
+
 
 }
 

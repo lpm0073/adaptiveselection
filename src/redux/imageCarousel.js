@@ -8,8 +8,6 @@ export const ImageCarousel = (state = {
     }, action) => {
         switch(action.type) {
         case ActionTypes.ADD_IMAGE_CAROUSEL:
-            const duplicates = [...state.items].filter((item) => item.id === action.payload.id);
-            if (duplicates.length > 0) console.log("ImageCarousel() - duplicates", duplicates.length, action, state);
             return {...state, added: true, deleted: false, items: [...state.items, action.payload]};
 
         case ActionTypes.DELETE_IMAGE_CAROUSEL:
