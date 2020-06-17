@@ -90,7 +90,7 @@ class ImageBox extends Component {
     const key = "image-box-" + this.props.image.id;
     var likeStyles = null;
     var dislikeStyles = null;
-    var containerClasses = "image-container m-0 p-0 handle";
+    var containerClasses = "image-container m-3 p-0 handle";
     var infoPanelClasses = "info-panel m-0 p-5 text-center";
 
     if (this.isOnTop()) containerClasses += " hoverable";
@@ -136,7 +136,7 @@ class ImageBox extends Component {
               <Draggable
               axis="both"
               cancel=".body"
-              defaultPosition={{x: this.props.image.position_props.left, y: this.props.image.position_props.top}}
+              /*defaultPosition={{x: this.props.image.position_props.left, y: this.props.image.position_props.top}}*/
               defaultClassName="react-draggable"
               defaultClassNameDragging="react-draggable-dragging"
               defaultClassNameDragged="react-draggable-dragged"

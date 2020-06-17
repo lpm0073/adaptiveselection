@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as Actions from '../../redux/ActionCreators';
 
+import Masonry from 'react-masonry-component';
 
 import './styles.css';
 import ImageBox from './ImageBox';
@@ -71,29 +72,53 @@ class Home extends Component {
   }
 
   render() {
+      const images = this.props.imageCarousel.items.map((image) => {
+        const max_height = window.screen.height / 2;
+        const max_width = window.screen.width / 3;
+        const imageProps = wpGetImage(image, max_height, max_width);
+
+        image.source_url = imageProps.source_url;
+        image.height = imageProps.height;
+        image.width = imageProps.width;
+        image.image_props = imageProps;
+        /*
+        if (!image.hasOwnProperty("position_props")) {
+          image.position_props = this.imagePositioning(imageProps.width, imageProps.height);
+        }
+        */
+
+        return (image);
+      });
+      const masonryOptions = {
+        transitionDuration: 0
+      };
+      const imagesLoadedOptions = { }
       return(
-          <div id="home-page" className="home-page">
-            {this.props.imageCarousel.items.length > 0 ? this.props.imageCarousel.items.map((image) => {
-              const max_height = window.screen.height / 2;
-              const max_width = window.screen.width / 3;
-              const imageProps = wpGetImage(image, max_height, max_width);
+          <div id="home-page m-0 p-0" className="home-page">
+            <Masonry
+              className={'my-gallery-class'} // default ''
+              elementType={'ul'} // default 'div'
+              options={masonryOptions} // default {}
+              disableImagesLoaded={false} // default false
+              updateOnEachImageLoad={false} // default false and works only if disableImagesLoaded is false
+              imagesLoadedOptions={imagesLoadedOptions} // default {}
+            >
 
-              image.source_url = imageProps.source_url;
-              image.height = imageProps.height;
-              image.width = imageProps.width;
-              image.image_props = imageProps;
-              if (!image.hasOwnProperty("position_props")) {
-                image.position_props = this.imagePositioning(imageProps.width, imageProps.height);
-              }
+            {this.props.imageCarousel.items.length > 0 ? 
+              images.map((image) => {
+                return (
+                  <li className="image-element-class">
+                    <ImageBox key={image.key} image = {image} />
+                  </li>
+                );
+              })
 
-              return (
-                <ImageBox key={image.key} image = {image} />
-              );
-            })
+
             :
              <div>i am waiting</div>
             }
-        </div>
+            </Masonry>
+          </div>
       );
   
   }
