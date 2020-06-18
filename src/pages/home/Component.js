@@ -6,7 +6,6 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as Actions from '../../redux/ActionCreators';
-import { USER_SIGNALS } from '../../redux/userSignals';
 
 import Masonry from 'react-masonry-component';
 

@@ -1,5 +1,4 @@
 import * as ActionTypes from './ActionTypes';
-import { addCategories } from './ActionCreators';
 
 
 

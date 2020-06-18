@@ -20,7 +20,8 @@ export const ImageCarousel = (state = {
                 ...state.items.slice(0, action.payload),
                 ...state.items.slice(action.payload + 1),
             ]};
-        
+            break;
+            
         default: 
             return state;
     }
