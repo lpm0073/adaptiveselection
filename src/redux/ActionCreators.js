@@ -9,9 +9,9 @@ export const addImageCarousel = (inserted) => {
         };
 }
 
-export const removeImageCarousel = (idx) => ({
+export const removeImageCarousel = (cnt) => ({
     type: ActionTypes.DELETE_IMAGE_CAROUSEL,
-    payload: idx
+    payload: cnt
 });
 
 /*  ----------------------------------- 

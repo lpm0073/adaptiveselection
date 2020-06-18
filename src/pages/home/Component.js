@@ -25,6 +25,8 @@ const mapDispatchToProps = (dispatch) => ({
   actions: bindActionCreators(Actions, dispatch)
 });
 
+const CAROUSEL_SIZE = 25;
+
 class Home extends Component {
 
   isCategoryInitialized = false;
@@ -46,12 +48,11 @@ class Home extends Component {
     this.processAnalytics = this.processAnalytics.bind(this);
     this.setAnalyticsTag = this.setAnalyticsTag.bind(this);
 
-    this.queueImage = this.queueImage.bind(this);
+    this.queueImages = this.queueImages.bind(this);
     this.getNextImage = this.getNextImage.bind(this);
     this.existsClass = this.existsClass.bind(this);
     this.serializedImage = this.serializedImage.bind(this);
     this.nextSerialNumber = this.nextSerialNumber.bind(this);
-    this.utilizedScreenArea = this.utilizedScreenArea.bind(this);
     this.handleMasonryLayoutComplete = this.handleMasonryLayoutComplete.bind(this);
     this.getNextPage = this.getNextPage.bind(this);
 
@@ -125,8 +126,8 @@ class Home extends Component {
   
   }
   /* add a random image at a random location on the device screen. */
-  queueImage() {
-    console.log("queueImage()");
+  queueImages() {
+    console.log("queueImages() - begin", this.props.imageCarousel.items.length);
     var i = 0;
     // do this first.
     // gather user analytics signals from class data embedded in the items in props.imageCarousel
@@ -137,40 +138,40 @@ class Home extends Component {
     this.removeExclusions();
 
     // if we have images in our working set, and we need more images on screen
-    while (this.image_working_set.length > 0 
-        && !this.existsClass("hovering") 
-        //&& this.utilizedScreenArea() < .75 
-        && i < 10) {
-        //&& this.props.imageCarousel.items.length < 10) {
-        const image = this.getNextImage();
+    while (
+           this.image_working_set.length > 0    // we have images
+        && !this.existsClass("hovering")        // user is not currently hovering over an image
+        && this.props.imageCarousel.items.length < (CAROUSEL_SIZE + 10) // the carousel is not overloaded
+        && this.props.imageCarousel.items.length < this.image_working_set.length // we haven't exhausted our supply of available images
+        && i < 25) {        // stop gap
 
-        const duplicate = this.props.imageCarousel.items.filter((item) => item.id === image.id);
-        if (duplicate.length > 0 && this.props.imageCarousel.items.length < 30) {
-          console.log("duplicate image in a short list");
+        const image = this.getNextImage();
+        const duplicate = this.props.imageCarousel.items.filter((item) => item.id === image.id).length > 0;
+        if (!(duplicate && this.props.imageCarousel.items.length < CAROUSEL_SIZE)) {
           // our working set is too small. we need to wait for more data from the api.
-          break;
+          this.props.actions.addImageCarousel({
+            key: image.id,
+            id: image.id,
+            api_props: image,
+            timestamp: new Date()
+          } );
         }
-        this.props.actions.addImageCarousel({
-          key: image.id,
-          id: image.id,
-          api_props: image,
-          timestamp: new Date()
-        } );
         i ++;
     }
 
-    // prune the bottom of the list
-    while (this.imageCarousel.items.length > 50) {
-      this.props.actions.removeImageCarousel(0);
+    while (this.props.imageCarousel.items.length > CAROUSEL_SIZE) {
+      console.log("queueImages() - purging", this.props.imageCarousel.items.length - CAROUSEL_SIZE);
+      // prune the imageCarousel
+      this.props.actions.removeImageCarousel(this.props.imageCarousel.items.length - CAROUSEL_SIZE);
+      console.log("queueImages() - purged. new size: ", this.props.imageCarousel.items.length);
     }
 
-    console.log("requeuing queueImage()");
+    console.log("queueImages() - requeuing", this.props.imageCarousel.items.length);
     const self = this;
     this.queueDelay = setTimeout(function() {
-      self.queueImage();      
-    }, 1500);
+      self.queueImages();      
+    }, this.props.imageCarousel.items.length < CAROUSEL_SIZE ? 1000 : 20000);
 
-    
   }
   setAnalyticsTag(tag, elements) {
 
@@ -280,7 +281,6 @@ class Home extends Component {
                      .sort((a, b) =>  Number(b.sort_key) - Number(a.sort_key));
     }
     const image = this.serializedImage(images[0]);
-    console.log("getNextImage()", this.image_working_set.length, this.props.imageCarousel.items.length);
     return image;
   }
 
@@ -303,6 +303,8 @@ class Home extends Component {
   
   }
 
+  // find the next random page number to query by choosing
+  // a random page that has not already been queried.
   getNextPage() {
     var potential_pages = [];
     for (var i=1; i<this.num_pages; i++) {
@@ -312,12 +314,11 @@ class Home extends Component {
     }
     if (potential_pages.length === 0) return 0;
     var idx = Math.floor(Math.random() * potential_pages.length);
-    console.log("getNextPage()", this.num_pages, potential_pages[idx], potential_pages.length);
+    //console.log("getNextPage()", potential_pages[idx], this.image_working_set.length, this.image_working_set);
     return potential_pages[idx];
 
   }
   imageFetcher() {
-
       const url = this.media_query + "&page=" + this.page_number;
       fetch(url)
       .then(response => {
@@ -335,7 +336,6 @@ class Home extends Component {
       })
       .then(response => response.json())
       .then(images => {
-
         // only add unique return values, so that we don't accumulated duplicates in the working set
         var new_images = [];
         for (var i=0; i<images.length;  i++) {
@@ -361,7 +361,7 @@ class Home extends Component {
         const isWorkingSetInitialized = this.image_working_set.length > 0;
         this.image_working_set = this.image_working_set.concat(new_images);
 
-        if (!isWorkingSetInitialized) this.queueImage();
+        if (!isWorkingSetInitialized) this.queueImages();
 
         this.pages_returned.push(this.page_number);
         this.page_number = this.getNextPage(); 
@@ -395,18 +395,6 @@ class Home extends Component {
       }, delay);
     } 
 
-  }
-  utilizedScreenArea() {
-    const screenArea = window.screen.height * window.screen.width;
-    var utilized = 0;
-
-    if (screenArea === 0) return false;
-    for (var i=0; i<this.props.imageCarousel.items.length; i++) {
-      var image = this.props.imageCarousel.items[i];
-      utilized += image.width * image.height;
-    }
-
-    return utilized / screenArea;
   }
 
   handleMasonryLayoutComplete(laidOutItems) {

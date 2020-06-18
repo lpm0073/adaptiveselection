@@ -12,8 +12,7 @@ export const ImageCarousel = (state = {
 
         case ActionTypes.DELETE_IMAGE_CAROUSEL:
             return {...state, added: false, deleted: true, items: [
-                ...state.items.slice(0, action.payload),
-                ...state.items.slice(action.payload + 1)
+                ...state.items.slice(action.payload)
             ]};
             
         default: 
