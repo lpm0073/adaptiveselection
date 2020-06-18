@@ -1,6 +1,9 @@
 // Masonry layout:
 // https://github.com/eiriklv/react-masonry-component
 
+// infinite scroll
+// https://www.digitalocean.com/community/tutorials/react-react-infinite-scroll
+
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -52,7 +55,7 @@ class Home extends Component {
     this.handleMasonryLayoutComplete = this.handleMasonryLayoutComplete.bind(this);
 
     this.state = {
-      level: 0,
+      level: 4,
       number_of_images: 5,
     }
   }
@@ -75,13 +78,22 @@ class Home extends Component {
   render() {
       const images = this.props.imageCarousel.items.map((image) => {
         var max_height, max_width;
-        if (Math.random() > 0.50) {
-          max_height = (window.screen.height / 4) + (Math.random() * window.screen.height * 1/2);
-          max_width = (window.screen.width / 4) + (Math.random() * window.screen.width * 1/4);
-          } else {
-            max_height = (window.screen.height / 6) + (Math.random() * window.screen.height * 1/2);
-            max_width = (window.screen.width / 6) + (Math.random() * window.screen.width * 1/4);
-            }
+        const high_level = wpGetExclusionArray(1, this.props.categories.items);
+
+        const intersection = image.api_props.categories.filter(element => high_level.includes(element))
+        if (intersection.length > 0) {
+          max_height = (window.screen.height / 5) + (Math.random() * window.screen.height * 4/5);
+          max_width = (window.screen.width / 5) + (Math.random() * window.screen.width * 4/5);
+        } else {
+          if (Math.random() > 0.50) {
+            max_height = (window.screen.height / 4) + (Math.random() * window.screen.height * 1/2);
+            max_width = (window.screen.width / 4) + (Math.random() * window.screen.width * 1/4);
+            } else {
+              max_height = (window.screen.height / 6) + (Math.random() * window.screen.height * 1/2);
+              max_width = (window.screen.width / 6) + (Math.random() * window.screen.width * 1/4);
+          }
+        }
+
         const imageProps = wpGetImage(image, max_height, max_width);
 
         image.source_url = imageProps.source_url;
