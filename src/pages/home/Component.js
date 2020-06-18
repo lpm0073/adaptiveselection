@@ -1,8 +1,6 @@
 // Masonry layout:
 // https://github.com/eiriklv/react-masonry-component
 
-// infinite scroll
-// https://www.digitalocean.com/community/tutorials/react-react-infinite-scroll
 
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
@@ -45,9 +43,7 @@ class Home extends Component {
 
     this.imageFetcher = this.imageFetcher.bind(this);
     this.handleChangeLevel = this.handleChangeLevel.bind(this);
-    this.removeExclusions = this.removeExclusions.bind(this);
     this.processAnalytics = this.processAnalytics.bind(this);
-    this.setAnalyticsTag = this.setAnalyticsTag.bind(this);
 
     this.queueImages = this.queueImages.bind(this);
     this.getNextImage = this.getNextImage.bind(this);
@@ -140,11 +136,7 @@ class Home extends Component {
     var i = 0;
     // do this first.
     // gather user analytics signals from class data embedded in the items in props.imageCarousel
-    //this.processAnalytics();
-
-    // re-validate the working set and the carousel against our current
-    // list of category exclusions.
-    //this.removeExclusions();
+    this.processAnalytics();
 
     // if we have images in our working set, and we need more images on screen
     while (
@@ -170,7 +162,7 @@ class Home extends Component {
 
     if (this.props.imageCarousel.items.length > CAROUSEL_SIZE) {
       // prune the imageCarousel
-      this.props.actions.removeImageCarousel(this.props.imageCarousel.items.length - CAROUSEL_SIZE);
+      this.props.actions.removeImageCarousel(this.props.imageCarousel.items.length - CAROUSEL_SIZE, "quantity");
     }
 
     if (this.props.imageCarousel.items.length < CAROUSEL_SIZE) {
@@ -183,52 +175,14 @@ class Home extends Component {
     }
     this.setState({queueing: false});
   }
-  setAnalyticsTag(tag, elements) {
 
-    for (var i = 0; i < elements.length; i++) {
-      const id = Number(elements[i].id);
-      
-      for (var j = 0; j < this.image_working_set.length; j++) {
-        if (this.image_working_set[j].id === id) {
-          switch (tag) {
-            case "click": this.image_working_set[j].analytics.click = true; break;
-            case "move": this.image_working_set[j].analytics.move = true; break;
-            case "resize": this.image_working_set[j].analytics.resize = true; break;
-            case "like": this.image_working_set[j].analytics.like = true; break;
-            case "dislike": this.image_working_set[j].analytics.dislike = true; break;
-            case "close": this.image_working_set[j].analytics.close = true; break;
-            default: break;
-          }          
-          break;
-        }        
-      }
-    }
-  }
 
   processAnalytics() {
-    this.setAnalyticsTag("click", document.getElementsByClassName("analytics_click"));
-    this.setAnalyticsTag("move", document.getElementsByClassName("analytics_move"));
-    this.setAnalyticsTag("resize", document.getElementsByClassName("analytics_resize"));
-    this.setAnalyticsTag("like", document.getElementsByClassName("analytics_like"));
-    this.setAnalyticsTag("dislike", document.getElementsByClassName("analytics_dislike"));
-    this.setAnalyticsTag("close", document.getElementsByClassName("analytics_close"));
-
-    const clicks = this.image_working_set.filter((image) => image.analytics.click === true);
-    const moves = this.image_working_set.filter((image) => image.analytics.move === true);
-    const resizes = this.image_working_set.filter((image) => image.analytics.resize === true);
-    const likes = this.image_working_set.filter((image) => image.analytics.like === true);
-    const dislikes = this.image_working_set.filter((image) => image.analytics.dislike === true);
-    const closes = this.image_working_set.filter((image) => image.analytics.close === true);
     
-    const analytics = {
-      clicks: clicks,
-      moves: moves,
-      resizes: resizes,
-      likes: likes,
-      dislikes: dislikes,
-      closes: closes
+    for (var i=0; i<this.props.userSignals.items.length; i++) {
+      const image = this.props.userSignals.items[i];
+      console.log("processAnalytics() - raw data ", image.signal, image.api_props.categories);
     }
-    return analytics;
 
   }
 
@@ -238,22 +192,6 @@ class Home extends Component {
     return elements.length > 0;
   }
 
-  // if level has changed downwards then the working set probably contains
-  // content that is no longer conforms and needs to be purged.
-  removeExclusions() {
-    var category_exclusions = wpGetExclusionArray(this.state.level, this.props.categories.items),
-        this_categories = [];
-
-    for (var i=0; i < this.image_working_set.length; i++) {
-        this_categories = this.image_working_set[i].categories;
-        const intersection = this_categories.filter(element => category_exclusions.includes(element))
-        if (intersection.length > 0 ) {
-          const this_image = this.image_working_set[i]
-          this.removeFromImageCarousel(this_image);
-          this.image_working_set = this.image_working_set.filter(image => image.id !== this_image.id);
-        }
-    }
-  }
 
   nextSerialNumber() {
     return this.image_working_set.sort((a, b) =>  Number(b.viewing_sequence) - Number(a.viewing_sequence))[0].viewing_sequence + 1;
@@ -309,7 +247,6 @@ class Home extends Component {
     this.isCategoryInitialized = true;
     this.category_exclusions = wpGetExclusions(this.state.level, cats);
     this.media_query = mediaUrl + "&" + this.category_exclusions;
-    this.removeExclusions();
   
   }
 
@@ -414,7 +351,7 @@ class Home extends Component {
     if (page) {
       const scrollable_area = page.scrollHeight - page.offsetHeight;
       const scroll_position = scrollable_area > 0 ? page.scrollTop / scrollable_area : 0;
-      return (scroll_position > .90);
+      return (scroll_position > .80);
     }
     return false;
   }

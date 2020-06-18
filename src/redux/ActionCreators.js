@@ -2,6 +2,13 @@ import * as ActionTypes from './ActionTypes';
 import { categoriesUrl } from '../shared/urls';
 
 
+export const addUserSignal = (signal, image) => {
+    return {
+        type: ActionTypes.ADD_USER_SIGNAL,
+        signal: signal,
+        payload: image
+    }
+}
 export const addImageCarousel = (inserted) => {
     return {
         type: ActionTypes.ADD_IMAGE_CAROUSEL,
@@ -9,8 +16,9 @@ export const addImageCarousel = (inserted) => {
         };
 }
 
-export const removeImageCarousel = (cnt) => ({
+export const removeImageCarousel = (cnt, action) => ({
     type: ActionTypes.DELETE_IMAGE_CAROUSEL,
+    action: action,
     payload: cnt
 });
 

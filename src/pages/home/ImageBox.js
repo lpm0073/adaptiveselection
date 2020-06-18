@@ -2,6 +2,7 @@ import React, {Component}  from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as Actions from '../../redux/ActionCreators';
+import * as Signals from '../../redux/userSignals';
 
 
 import Draggable from 'react-draggable';
@@ -11,7 +12,7 @@ const mapStateToProps = state => ({
   ...state
 });
 const mapDispatchToProps = (dispatch) => ({
-actions: bindActionCreators(Actions, dispatch)
+  actions: bindActionCreators(Actions, dispatch)
 });
 
 class ImageBox extends Component {
@@ -225,16 +226,22 @@ class ImageBox extends Component {
   handleLike() {
     this._like = (!this._like);
     if (this._dislike) this._dislike = false;
+    if (this._like) this.props.actions.addUserSignal(Signals.LIKE, this.props.image);
+    else this.props.actions.addUserSignal(Signals.UNLIKE, this.props.image);
   }
   handleDislike() {
     this._dislike = (!this._dislike);
     if (this._like) this._like = false;
-    if (this._dislike) this.resetWindowCloseDelay(1500);
+    if (this._dislike) {
+      this.props.actions.addUserSignal(Signals.DISLIKE, this.props.image);
+      this.resetWindowCloseDelay(1500);
+    }
   }
   handleInfoButton () {
     this.setState({
       showInfoPanel: true
     });
+    this.props.actions.addUserSignal(Signals.INFO, this.props.image);
   }
   handleInfoPanelLeave() {
     const self = this;
@@ -265,9 +272,10 @@ class ImageBox extends Component {
       isClosed: true
     });
     this._close = true;
+    this.props.actions.addUserSignal(Signals.CLOSE, this.props.image);
 
     const idx = this.props.imageCarousel.items.findIndex((item) => item.id === this.props.image.id); 
-    this.props.actions.removeImageCarousel(idx);
+    this.props.actions.removeImageCarousel(idx, "item");
   }
 
 
@@ -280,19 +288,20 @@ class ImageBox extends Component {
       }
     });
     this._click = true;
+    // FIX NOTE: this breaks the LIKE redux addition.
+    //this.props.actions.addUserSignal(Signals.CLICK, this.props.image);
   }
 
 
   handleDragStart() {
-    // Drag start
   }
   handleDrag() {
+    // want this to only be called once.
+    if (!this._move) this.props.actions.addUserSignal(Signals.MOVE, this.props.image);
     this._move = true;
-
   }
   handleDragEnd() {
-    // Drag stop
-
+    this._move = false;
   }
 
   CSSTransitionOnEnter() {
