@@ -51,8 +51,8 @@ class ImageBox extends Component {
     var d = new Date();
     this.clickTimeStamp = d.setDate(d.getDate()-5); // make sure initial date is stale,
 
-    this._like = props.image.api_props.analytics.like;
-    this._dislike = props.image.api_props.analytics.dislike;
+    this._like = false;
+    this._dislike = false;
 
     this.state = {
       imageContainerStyle: {
@@ -79,6 +79,13 @@ class ImageBox extends Component {
     this.setState({
       isMounted: true
     });
+
+    // if the user has already seen this image, and liked it.
+    this._like = this.props.userSignals.items.filter((image) => (
+                  image.id === this.props.image.id && 
+                  image.signal === 'LIKE'
+                )).length > 0;
+
   }
 
   componentWillUnmount() {
