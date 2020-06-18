@@ -6,6 +6,8 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as Actions from '../../redux/ActionCreators';
+import * as Signals from '../../redux/userSignals';
+
 
 import Masonry from 'react-masonry-component';
 
@@ -44,6 +46,7 @@ class Home extends Component {
     this.imageFetcher = this.imageFetcher.bind(this);
     this.handleChangeLevel = this.handleChangeLevel.bind(this);
     this.processAnalytics = this.processAnalytics.bind(this);
+    this.weightCategory = this.weightCategory.bind(this);
 
     this.queueImages = this.queueImages.bind(this);
     this.getNextImage = this.getNextImage.bind(this);
@@ -56,7 +59,7 @@ class Home extends Component {
     this.requeueRange = this.requeueRange.bind(this);
 
     this.state = {
-      level: 0,
+      level: 4,
       queueing: false
     }
   }
@@ -178,9 +181,6 @@ class Home extends Component {
 
 
 
-  processAnalytics() {
-    console.log("processAnalytics()", this.props.categories);
-  }
 
   // returns true if there is an element in the DOM containing this class
   existsClass(className) {
@@ -217,9 +217,11 @@ class Home extends Component {
 
     // list contains not-yet seen images
     if (images[0].viewing_sequence === 0) {
-      images = images.filter((image) => image.viewing_sequence === 0)
-                     .sort((a, b) =>  Number(b.sort_key) - Number(a.sort_key));
+      images = images.filter((image) => image.viewing_sequence === 0);
+                     
     }
+    // randomize the presentation order.
+    images = images.sort((a, b) =>  Math.random());
     const image = this.serializedImage(images[0]);
     return image;
   }
@@ -343,6 +345,59 @@ class Home extends Component {
     if (this.requeueRange() && !this.state.queueing) this.queueImages();
 
   }
+
+  processAnalytics() {
+    if (!this.props.categories.isLoading) {
+      for (var i=0; i<this.props.categories.items.categories.length; i++) {
+        var category = this.props.categories.items.categories[i];
+        this.props.categories.items.categories[i].factor_weight = this.weightCategory(category);
+      }  
+    }
+    console.log("processAnalytics()", this.props.categories.items.categories);
+  }
+
+  weightCategory(category) {
+    const user_signals = category.user_signals;
+
+    var factor_weight = 0,
+        weighted_signals = 0;
+
+    switch(this.state.level) {
+      case 0:
+      factor_weight = category.level0_weight;
+      break;
+
+      case 1:
+      factor_weight = category.level1_weight;
+      break;
+
+      case 2:
+      factor_weight = category.level2_weight;
+      break;
+
+      case 3:
+      factor_weight = category.level3_weight;
+      break;
+
+      case 4:
+      factor_weight = category.level4_weight;
+      break;
+
+      default: 
+      factor_weight = category.level0_weight;
+      break;
+    }
+    weighted_signals = (Signals.LIKE_WEIGHT * user_signals.like) +
+                      (Signals.UNLIKE_WEIGHT * user_signals.unlike) +
+                      (Signals.DISLIKE_WEIGHT * user_signals.dislike) +
+                      (Signals.INFO_WEIGHT * user_signals.info) +
+                      (Signals.CLOSE_WEIGHT * user_signals.close) +
+                      (Signals.CLICK_WEIGHT * user_signals.click) +
+                      (Signals.MOVE_WEIGHT * user_signals.move) +
+                      (Signals.RESIZE_WEIGHT * user_signals.resize);
+    weighted_signals = weighted_signals > 0 ? weighted_signals : 1;
+    return weighted_signals * factor_weight;
+  }  
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);
