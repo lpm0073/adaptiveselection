@@ -25,7 +25,8 @@ const mapDispatchToProps = (dispatch) => ({
   actions: bindActionCreators(Actions, dispatch)
 });
 
-const CAROUSEL_SIZE = 25;
+const CAROUSEL_SIZE = 20;
+const QUEUE_SIZE = 5;
 
 class Home extends Component {
 
@@ -128,6 +129,7 @@ class Home extends Component {
   /* add a random image at a random location on the device screen. */
   queueImages() {
     console.log("queueImages() - begin", this.props.imageCarousel.items.length);
+    console.log("queueImages() - working set size:", this.image_working_set.length);
     var i = 0;
     // do this first.
     // gather user analytics signals from class data embedded in the items in props.imageCarousel
@@ -141,14 +143,15 @@ class Home extends Component {
     while (
            this.image_working_set.length > 0    // we have images
         && !this.existsClass("hovering")        // user is not currently hovering over an image
-        && this.props.imageCarousel.items.length < (CAROUSEL_SIZE + 10) // the carousel is not overloaded
+        && this.props.imageCarousel.items.length < (CAROUSEL_SIZE + QUEUE_SIZE) // the carousel is not overloaded
         && this.props.imageCarousel.items.length < this.image_working_set.length // we haven't exhausted our supply of available images
-        && i < 25) {        // stop gap
+        && i < CAROUSEL_SIZE) {        // stop gap to avoid infinites loops
 
         const image = this.getNextImage();
         const duplicate = this.props.imageCarousel.items.filter((item) => item.id === image.id).length > 0;
         if (!(duplicate && this.props.imageCarousel.items.length < CAROUSEL_SIZE)) {
           // our working set is too small. we need to wait for more data from the api.
+          console.log("queueImages() - adding", i);
           this.props.actions.addImageCarousel({
             key: image.id,
             id: image.id,
