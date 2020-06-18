@@ -3,9 +3,10 @@
   height: 92vh;
   background-image: url('./cork2-background.jpg');
   overflow-x: hidden;
-  overflow-y: scroll;
 }
-
+.home-page::-webkit-scrollbar {
+  display: none;
+}
 
 .hovering {
   /* set by ImageBox.render() when user is hovering */

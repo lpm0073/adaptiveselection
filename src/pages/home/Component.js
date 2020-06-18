@@ -25,8 +25,8 @@ const mapDispatchToProps = (dispatch) => ({
   actions: bindActionCreators(Actions, dispatch)
 });
 
-const CAROUSEL_SIZE = 40;
-const QUEUE_SIZE = 5;
+const CAROUSEL_SIZE = 12;
+const QUEUE_SIZE = 3;
 
 class Home extends Component {
 
@@ -57,6 +57,7 @@ class Home extends Component {
     this.handleMasonryLayoutComplete = this.handleMasonryLayoutComplete.bind(this);
     this.getNextPage = this.getNextPage.bind(this);
     this.handleScroll = this.handleScroll.bind(this);
+    this.requeueRange = this.requeueRange.bind(this);
 
     this.state = {
       level: 0,
@@ -124,13 +125,17 @@ class Home extends Component {
               <Loading />
             }
             </Masonry>
+            {this.requeueRange() && this.props.imageCarousel.items.length < CAROUSEL_SIZE ?
+              <Loading />
+              :
+              <React.Fragment></React.Fragment>
+            }
           </div>
       );
   
   }
   /* add a random image at a random location on the device screen. */
   queueImages() {
-    console.log("queueImages() - 1");
     this.setState({queueing: true});
     var i = 0;
     // do this first.
@@ -163,14 +168,11 @@ class Home extends Component {
         i ++;
     }
 
-    console.log("queueImages() - 2");
     if (this.props.imageCarousel.items.length > CAROUSEL_SIZE) {
       // prune the imageCarousel
       this.props.actions.removeImageCarousel(this.props.imageCarousel.items.length - CAROUSEL_SIZE);
-      console.log("queueImages() - 2b");
     }
 
-    console.log("queueImages() - 3");
     if (this.props.imageCarousel.items.length < CAROUSEL_SIZE) {
       // keep calling ourselves until we have a full imageCarousel
       const self = this;
@@ -179,7 +181,6 @@ class Home extends Component {
       }, this.props.imageCarousel.items.length < CAROUSEL_SIZE ? 1000 : 20000);
   
     }
-    console.log("queueImages() - 4");
     this.setState({queueing: false});
   }
   setAnalyticsTag(tag, elements) {
@@ -407,13 +408,19 @@ class Home extends Component {
 
   handleMasonryLayoutComplete(laidOutItems) {
   }
-  handleScroll() {
-    console.log("handleScroll()");
-    const page = document.getElementById("home-page");
-    const scrollable_area = page.scrollHeight - page.offsetHeight;
-    const scroll_position = scrollable_area > 0 ? page.scrollTop / scrollable_area : 0;
 
-    if (scroll_position > .95 && !this.state.queueing) this.queueImages();
+  requeueRange() {
+    const page = document.getElementById("home-page");
+    if (page) {
+      const scrollable_area = page.scrollHeight - page.offsetHeight;
+      const scroll_position = scrollable_area > 0 ? page.scrollTop / scrollable_area : 0;
+      return (scroll_position > .90);
+    }
+    return false;
+  }
+  handleScroll() {
+
+    if (this.requeueRange() && !this.state.queueing) this.queueImages();
 
   }
 }
