@@ -47,6 +47,8 @@ class Home extends Component {
     this.handleChangeLevel = this.handleChangeLevel.bind(this);
     this.processAnalytics = this.processAnalytics.bind(this);
     this.weightCategory = this.weightCategory.bind(this);
+    this.rankWorkingSet = this.rankWorkingSet.bind(this);
+    this.getCategoryScore = this.getCategoryScore.bind(this);
 
     this.queueImages = this.queueImages.bind(this);
     this.getNextImage = this.getNextImage.bind(this);
@@ -59,7 +61,7 @@ class Home extends Component {
     this.requeueRange = this.requeueRange.bind(this);
 
     this.state = {
-      level: 4,
+      level: 2,
       queueing: false
     }
   }
@@ -140,6 +142,7 @@ class Home extends Component {
     // do this first.
     // gather user analytics signals from class data embedded in the items in props.imageCarousel
     this.processAnalytics();
+    this.rankWorkingSet();
 
     // if we have images in our working set, and we need more images on screen
     while (
@@ -285,7 +288,7 @@ class Home extends Component {
 
         new_images = new_images.map((image) => {
           image.viewing_sequence = 0;
-          image.sort_key = Math.random * 1000000;
+          image.rank = 1;   // pre-initialize image rank based on user signals. 
           return image;
         })
 
@@ -340,6 +343,7 @@ class Home extends Component {
     }
     return false;
   }
+
   handleScroll() {
 
     if (this.requeueRange() && !this.state.queueing) this.queueImages();
@@ -350,10 +354,30 @@ class Home extends Component {
     if (!this.props.categories.isLoading) {
       for (var i=0; i<this.props.categories.items.categories.length; i++) {
         var category = this.props.categories.items.categories[i];
-        this.props.categories.items.categories[i].factor_weight = this.weightCategory(category);
+        this.props.categories.items.categories[i].factor_score = this.weightCategory(category);
       }  
     }
     console.log("processAnalytics()", this.props.categories.items.categories);
+  }
+
+  getCategoryScore(id) {
+    if (!this.props.categories.isLoading) {
+      for (var i=0; i<this.props.categories.items.categories.length; i++) {
+        if (this.props.categories.items.categories[i].id === id) return this.props.categories.items.categories[i].factor_score
+      }
+    }
+    return 1;
+  }
+
+  rankWorkingSet() {
+    var rank = 0;
+    for (var i=0; i<this.image_working_set.length; i++) {
+        for (var j=0; j<this.image_working_set[i].categories.length; j++) {
+          rank += this.getCategoryScore(this.image_working_set[i].categories[j]);
+        }
+        this.image_working_set[i].rank = rank;
+        console.log("rankWorkingSet", this.image_working_set[i]);
+    }
   }
 
   weightCategory(category) {

@@ -164,6 +164,9 @@ export const fetchCategories = () => (dispatch) => {
             x.level3_weight = (1 + (level3_pct / x.level3_item_pct));
             x.level4_weight = (1 + (level4_pct / x.level4_item_pct));
 
+            // initialize scoring metric
+            x.factor_score = 0;
+
             delete x.acf;
             factorweighted_categories.push(x);
         }
