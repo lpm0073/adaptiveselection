@@ -30,10 +30,10 @@ class Home extends Component {
   isCategoryInitialized = false;
   fetcherDelay = null;
   queueDelay = null;
-  highest_confirmed_page = 0;
   image_working_set = [];
+  pages_returned = []   // integer page numbers of api page numbers returned so far
   page_number = 1 + Math.floor(Math.random() * 40);
-  num_pages = 1000;   // <---- start high and interpolate downwards based on success/failure
+  num_pages = 100;   // <---- start high and interpolate downwards based on success/failure
   category_exclusions = [];
   media_query;
 
@@ -53,10 +53,10 @@ class Home extends Component {
     this.nextSerialNumber = this.nextSerialNumber.bind(this);
     this.utilizedScreenArea = this.utilizedScreenArea.bind(this);
     this.handleMasonryLayoutComplete = this.handleMasonryLayoutComplete.bind(this);
+    this.getNextPage = this.getNextPage.bind(this);
 
     this.state = {
-      level: 4,
-      number_of_images: 5,
+      level: 0
     }
   }
 
@@ -126,6 +126,7 @@ class Home extends Component {
   }
   /* add a random image at a random location on the device screen. */
   queueImage() {
+    console.log("queueImage()");
     var i = 0;
     // do this first.
     // gather user analytics signals from class data embedded in the items in props.imageCarousel
@@ -144,7 +145,8 @@ class Home extends Component {
         const image = this.getNextImage();
 
         const duplicate = this.props.imageCarousel.items.filter((item) => item.id === image.id);
-        if (duplicate.length > 0) {
+        if (duplicate.length > 0 && this.props.imageCarousel.items.length < 30) {
+          console.log("duplicate image in a short list");
           // our working set is too small. we need to wait for more data from the api.
           break;
         }
@@ -157,6 +159,12 @@ class Home extends Component {
         i ++;
     }
 
+    // prune the bottom of the list
+    while (this.imageCarousel.items.length > 50) {
+      this.props.actions.removeImageCarousel(0);
+    }
+
+    console.log("requeuing queueImage()");
     const self = this;
     this.queueDelay = setTimeout(function() {
       self.queueImage();      
@@ -264,11 +272,15 @@ class Home extends Component {
                   .filter((image) => 
                         image.analytics.dislike === false && 
                         (image.analytics.close === false || image.analytics.like === true))
-                  .filter((image) => !(image.id in this.props.imageCarousel.items.map((carouselItem) => {
-                    return carouselItem.id;
-                  })));
+                  .filter((image) => !this.props.imageCarousel.items.includes(image));
 
+    // list contains not-yet seen images
+    if (images[0].viewing_sequence === 0) {
+      images = images.filter((image) => image.viewing_sequence === 0)
+                     .sort((a, b) =>  Number(b.sort_key) - Number(a.sort_key));
+    }
     const image = this.serializedImage(images[0]);
+    console.log("getNextImage()", this.image_working_set.length, this.props.imageCarousel.items.length);
     return image;
   }
 
@@ -291,6 +303,19 @@ class Home extends Component {
   
   }
 
+  getNextPage() {
+    var potential_pages = [];
+    for (var i=1; i<this.num_pages; i++) {
+      if (! this.pages_returned.includes(i)) {
+        potential_pages.push(i);
+      }
+    }
+    if (potential_pages.length === 0) return 0;
+    var idx = Math.floor(Math.random() * potential_pages.length);
+    console.log("getNextPage()", this.num_pages, potential_pages[idx], potential_pages.length);
+    return potential_pages[idx];
+
+  }
   imageFetcher() {
 
       const url = this.media_query + "&page=" + this.page_number;
@@ -321,6 +346,7 @@ class Home extends Component {
         // initialize analytics data
         new_images = new_images.map((image) => {
           image.viewing_sequence = 0;
+          image.sort_key = Math.random * 1000000;
           image.analytics = {
             click: false,
             move: false,
@@ -337,8 +363,8 @@ class Home extends Component {
 
         if (!isWorkingSetInitialized) this.queueImage();
 
-        this.highest_confirmed_page = this.page_number;
-        this.page_number = 1 + Math.floor(Math.random() * this.num_pages)
+        this.pages_returned.push(this.page_number);
+        this.page_number = this.getNextPage(); 
       })
       .catch(error => {
         /* most common error is when we query for non-existent page (we don't know how many pages there are) */
@@ -353,19 +379,21 @@ class Home extends Component {
         */
 
       // try to reverse engineer the total number of pages avaiable.
-        var num_pages = this.num_pages > this.page_number ? this.num_pages - (this.num_pages - this.page_number)/2  : this.num_pages;
-        num_pages = num_pages > this.highest_confirmed_page ? num_pages : this.highest_confirmed_page;
+        var num_pages = this.num_pages > this.page_number ? this.num_pages - Math.floor((this.num_pages - this.page_number)/2)  : this.num_pages;
+        num_pages = num_pages > Math.max( ...this.pages_returned ) ? num_pages - 1 : Math.max( ...this.pages_returned );
         this.num_pages = num_pages;
-        this.page_number = 1 + Math.floor(Math.random() * num_pages);
+        this.page_number = this.getNextPage();
 
       });
   
-    const delay = this.image_working_set.length < (10 * this.state.number_of_images) ? 1000: 15000;
 
-    const self = this;
-    this.fetcherDelay = setTimeout(function() {
-        self.imageFetcher();
-    }, delay * Math.random());
+    if (this.page_number !== 0) {
+      const delay = 1000;
+      const self = this;
+      this.fetcherDelay = setTimeout(function() {
+          self.imageFetcher();
+      }, delay);
+    } 
 
   }
   utilizedScreenArea() {
@@ -382,7 +410,6 @@ class Home extends Component {
   }
 
   handleMasonryLayoutComplete(laidOutItems) {
-    //console.log("handleMasonryLayoutComplete()", laidOutItems);
   }
 }
 
