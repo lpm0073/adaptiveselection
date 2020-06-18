@@ -25,7 +25,7 @@ const mapDispatchToProps = (dispatch) => ({
   actions: bindActionCreators(Actions, dispatch)
 });
 
-const CAROUSEL_SIZE = 20;
+const CAROUSEL_SIZE = 40;
 const QUEUE_SIZE = 5;
 
 class Home extends Component {
@@ -56,9 +56,11 @@ class Home extends Component {
     this.nextSerialNumber = this.nextSerialNumber.bind(this);
     this.handleMasonryLayoutComplete = this.handleMasonryLayoutComplete.bind(this);
     this.getNextPage = this.getNextPage.bind(this);
+    this.handleScroll = this.handleScroll.bind(this);
 
     this.state = {
-      level: 0
+      level: 0,
+      queueing: false
     }
   }
 
@@ -106,7 +108,7 @@ class Home extends Component {
         return (image);
       });
       return(
-          <div id="home-page m-0 p-0" className="home-page">
+          <div id="home-page" className="home-page m-0 p-0" onScroll={this.handleScroll}>
             <Masonry 
               className={'masonry-container'} 
               onLayoutComplete={laidOutItems => this.handleMasonryLayoutComplete(laidOutItems)}              
@@ -128,16 +130,16 @@ class Home extends Component {
   }
   /* add a random image at a random location on the device screen. */
   queueImages() {
-    console.log("queueImages() - begin", this.props.imageCarousel.items.length);
-    console.log("queueImages() - working set size:", this.image_working_set.length);
+    console.log("queueImages() - 1");
+    this.setState({queueing: true});
     var i = 0;
     // do this first.
     // gather user analytics signals from class data embedded in the items in props.imageCarousel
-    this.processAnalytics();
+    //this.processAnalytics();
 
     // re-validate the working set and the carousel against our current
     // list of category exclusions.
-    this.removeExclusions();
+    //this.removeExclusions();
 
     // if we have images in our working set, and we need more images on screen
     while (
@@ -151,7 +153,6 @@ class Home extends Component {
         const duplicate = this.props.imageCarousel.items.filter((item) => item.id === image.id).length > 0;
         if (!(duplicate && this.props.imageCarousel.items.length < CAROUSEL_SIZE)) {
           // our working set is too small. we need to wait for more data from the api.
-          console.log("queueImages() - adding", i);
           this.props.actions.addImageCarousel({
             key: image.id,
             id: image.id,
@@ -162,19 +163,24 @@ class Home extends Component {
         i ++;
     }
 
-    while (this.props.imageCarousel.items.length > CAROUSEL_SIZE) {
-      console.log("queueImages() - purging", this.props.imageCarousel.items.length - CAROUSEL_SIZE);
+    console.log("queueImages() - 2");
+    if (this.props.imageCarousel.items.length > CAROUSEL_SIZE) {
       // prune the imageCarousel
       this.props.actions.removeImageCarousel(this.props.imageCarousel.items.length - CAROUSEL_SIZE);
-      console.log("queueImages() - purged. new size: ", this.props.imageCarousel.items.length);
+      console.log("queueImages() - 2b");
     }
 
-    console.log("queueImages() - requeuing", this.props.imageCarousel.items.length);
-    const self = this;
-    this.queueDelay = setTimeout(function() {
-      self.queueImages();      
-    }, this.props.imageCarousel.items.length < CAROUSEL_SIZE ? 1000 : 20000);
-
+    console.log("queueImages() - 3");
+    if (this.props.imageCarousel.items.length < CAROUSEL_SIZE) {
+      // keep calling ourselves until we have a full imageCarousel
+      const self = this;
+      this.queueDelay = setTimeout(function() {
+        self.queueImages();      
+      }, this.props.imageCarousel.items.length < CAROUSEL_SIZE ? 1000 : 20000);
+  
+    }
+    console.log("queueImages() - 4");
+    this.setState({queueing: false});
   }
   setAnalyticsTag(tag, elements) {
 
@@ -317,7 +323,6 @@ class Home extends Component {
     }
     if (potential_pages.length === 0) return 0;
     var idx = Math.floor(Math.random() * potential_pages.length);
-    //console.log("getNextPage()", potential_pages[idx], this.image_working_set.length, this.image_working_set);
     return potential_pages[idx];
 
   }
@@ -401,6 +406,15 @@ class Home extends Component {
   }
 
   handleMasonryLayoutComplete(laidOutItems) {
+  }
+  handleScroll() {
+    console.log("handleScroll()");
+    const page = document.getElementById("home-page");
+    const scrollable_area = page.scrollHeight - page.offsetHeight;
+    const scroll_position = scrollable_area > 0 ? page.scrollTop / scrollable_area : 0;
+
+    if (scroll_position > .95 && !this.state.queueing) this.queueImages();
+
   }
 }
 
