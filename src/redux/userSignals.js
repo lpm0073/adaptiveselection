@@ -19,3 +19,14 @@ export const CLOSE_WEIGHT = -3;
 export const CLICK_WEIGHT = 1;
 export const MOVE_WEIGHT = 2;
 export const RESIZE_WEIGHT = 2;
+
+export const USER_SIGNALS = {
+    like: 0,
+    unlike: 0,
+    dislike: 0,
+    info: 0,
+    close: 0,
+    click: 0,
+    move: 0,
+    resize: 0
+}

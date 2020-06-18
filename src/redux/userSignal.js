@@ -1,4 +1,6 @@
 import * as ActionTypes from './ActionTypes';
+import { addCategories } from './ActionCreators';
+
 
 
 export const UserSignal = (state = {
@@ -6,17 +8,19 @@ export const UserSignal = (state = {
     }, action) => {
         switch(action.type) {
         case ActionTypes.ADD_USER_SIGNAL:
-            const image = action.payload;
-            image.signal = action.signal;
+            const signal = action.payload;
+            signal.signal = action.signal;
             const duplicate = [...state.items].filter((item) => (
-                item.id === image.id && 
-                item.signal === image.signal
+                item.id === signal.id && 
+                item.signal === signal.signal
                 ));
-            if (image.signal === "LIKE") console.log("UserSignal its a LIKE", image, duplicate);
-            if (duplicate.length === 0) return {...state, items: [...state.items, image]};
+            if (duplicate.length === 0) {
+                return {...state, items: [...state.items, signal]};
+            }
             return {...state, items: [...state.items]};
             
         default: 
             return state;
     }
 };
+

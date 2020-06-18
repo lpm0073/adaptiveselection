@@ -6,6 +6,7 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as Actions from '../../redux/ActionCreators';
+import { USER_SIGNALS } from '../../redux/userSignals';
 
 import Masonry from 'react-masonry-component';
 
@@ -177,13 +178,9 @@ class Home extends Component {
   }
 
 
-  processAnalytics() {
-    
-    for (var i=0; i<this.props.userSignals.items.length; i++) {
-      const image = this.props.userSignals.items[i];
-      console.log("processAnalytics() - raw data ", image.signal, image.api_props.categories);
-    }
 
+  processAnalytics() {
+    console.log("processAnalytics()", this.props.categories);
   }
 
   // returns true if there is an element in the DOM containing this class
@@ -217,11 +214,7 @@ class Home extends Component {
     // filter images that were disliked or closed but are still pending analytics processing.
     // sort the list based on what's been viewed so far -- put those at the end of the array to avoid dups.
     this.image_working_set = this.image_working_set.sort((a, b) => Number(a.viewing_sequence) - Number(b.viewing_sequence));
-    var images = this.image_working_set
-                  .filter((image) => 
-                        image.analytics.dislike === false && 
-                        (image.analytics.close === false || image.analytics.like === true))
-                  .filter((image) => !this.props.imageCarousel.items.includes(image));
+    var images = this.image_working_set.filter((image) => !this.props.imageCarousel.items.includes(image));
 
     // list contains not-yet seen images
     if (images[0].viewing_sequence === 0) {
@@ -289,18 +282,9 @@ class Home extends Component {
           if (this.image_working_set.filter(image => candidate.id === image.id).length === 0) new_images.push(images[i]);
         }
 
-        // initialize analytics data
         new_images = new_images.map((image) => {
           image.viewing_sequence = 0;
           image.sort_key = Math.random * 1000000;
-          image.analytics = {
-            click: false,
-            move: false,
-            resize: false,
-            like: false,
-            dislike: false,
-            close: false
-          };
           return image;
         })
 

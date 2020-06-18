@@ -135,6 +135,17 @@ export const fetchCategories = () => (dispatch) => {
             
             var x = categories[i];
 
+            // initialize analytics data
+            x.user_signals = {
+                like: 0,
+                unlike: 0,
+                dislike: 0,
+                info: 0,
+                close: 0,
+                click: 0,
+                move: 0,
+                resize: 0
+            }
             explicitness = 0;
             if (x.acf.explicitness) explicitness = x.acf.explicitness
             explicitness = parseInt(explicitness, 10);
