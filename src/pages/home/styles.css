@@ -1,10 +1,7 @@
 
-#loader {
-}
-
 .home-page {
   height: 92vh;
-  background-image: url('./canvas-background.jpg');
+  background-image: url('./cork2-background.jpg');
   overflow-x: hidden;
   overflow-y: scroll;
 }

@@ -79,8 +79,8 @@ class Home extends Component {
           max_height = (window.screen.height / 4) + (Math.random() * window.screen.height * 1/2);
           max_width = (window.screen.width / 4) + (Math.random() * window.screen.width * 1/4);
           } else {
-            max_height = (window.screen.height / 5) + (Math.random() * window.screen.height * 1/5);
-            max_width = (window.screen.width / 5) + (Math.random() * window.screen.width * 1/5);
+            max_height = (window.screen.height / 6) + (Math.random() * window.screen.height * 1/2);
+            max_width = (window.screen.width / 6) + (Math.random() * window.screen.width * 1/4);
             }
         const imageProps = wpGetImage(image, max_height, max_width);
 
@@ -126,9 +126,9 @@ class Home extends Component {
     // if we have images in our working set, and we need more images on screen
     while (this.image_working_set.length > 0 
         && !this.existsClass("hovering") 
-        && this.utilizedScreenArea() < .75 
-        && i < 10
-        && this.props.imageCarousel.items.length < 10) {
+        //&& this.utilizedScreenArea() < .75 
+        && i < 10) {
+        //&& this.props.imageCarousel.items.length < 10) {
         const image = this.getNextImage();
 
         const duplicate = this.props.imageCarousel.items.filter((item) => item.id === image.id);
@@ -148,7 +148,7 @@ class Home extends Component {
     const self = this;
     this.queueDelay = setTimeout(function() {
       self.queueImage();      
-    }, 1000);
+    }, 1500);
 
     
   }

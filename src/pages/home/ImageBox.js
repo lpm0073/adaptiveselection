@@ -30,6 +30,7 @@ class ImageBox extends Component {
 
   constructor(props) {
     super(props);
+    this.resetWindowCloseDelay = this.resetWindowCloseDelay.bind(this);
     this.handleWindowClose = this.handleWindowClose.bind(this);
     this.handleContainerMouseDown = this.handleContainerMouseDown.bind(this);
     this.handleMouseUp = this.handleMouseUp.bind(this);
@@ -43,7 +44,6 @@ class ImageBox extends Component {
     this.handleInfoButton = this.handleInfoButton.bind(this);
     this.handleInfoPanelLeave = this.handleInfoPanelLeave.bind(this);
     this.handleResizing = this.handleResizing.bind(this);
-    this.resetWindowCloseDelay = this.resetWindowCloseDelay.bind(this);
     this.CSSTransitionOnEnter = this.CSSTransitionOnEnter.bind(this);
     this.getNextZOrder = this.getNextZOrder.bind(this);
     
@@ -182,7 +182,7 @@ class ImageBox extends Component {
     );
     }
 
-  resetWindowCloseDelay(delay = 15000 + Math.floor(Math.random() * 45000)) {
+  resetWindowCloseDelay(delay = 15000000 + Math.floor(Math.random() * 15000)) {
     clearTimeout(this.windowCloseDelay);
 
     const self = this;
