@@ -74,7 +74,21 @@ export const fetchCategories = () => (dispatch) => {
             level1_pct = 0,
             level2_pct = 0,
             level3_pct = 0,
-            level4_pct = 0
+            level4_pct = 0,
+
+            level0_normalization_factor = 0,
+            level1_normalization_factor = 0,
+            level2_normalization_factor = 0,
+            level3_normalization_factor = 0,
+            level4_normalization_factor = 0,
+
+            SumOfCountWeight_0 = 0,
+            SumOfCountWeight_1 = 0,
+            SumOfCountWeight_2 = 0,
+            SumOfCountWeight_3 = 0,
+            SumOfCountWeight_4 = 0;
+
+        
 
         for (i=0; i < categories.length; i++) {
             const x = categories[i]
@@ -124,11 +138,14 @@ export const fetchCategories = () => (dispatch) => {
         level2_i += level1_i + level0_i;
         level1_i += level0_i;
 
+        // might delete?
+        /*
         level0_pct = (level0_cnt / level0_i) / level0_cnt;
         level1_pct = (level1_cnt / level1_i) / level1_cnt;
         level2_pct = (level2_cnt / level2_i) / level2_cnt;
         level3_pct = (level3_cnt / level3_i) / level3_cnt;
         level4_pct = (level4_cnt / level4_i) / level4_cnt;
+        */
 
         // add percentage weights by level
         for (i=0; i < categories.length; i++) {
@@ -158,11 +175,19 @@ export const fetchCategories = () => (dispatch) => {
             x.level4_item_pct = x.count / level4_cnt;
 
             // (1+(L$49/S9))
+            /*
             x.level0_weight = (1 + (level0_pct / x.level0_item_pct));
             x.level1_weight = (1 + (level1_pct / x.level1_item_pct));
             x.level2_weight = (1 + (level2_pct / x.level2_item_pct));
             x.level3_weight = (1 + (level3_pct / x.level3_item_pct));
             x.level4_weight = (1 + (level4_pct / x.level4_item_pct));
+            */
+
+            x.level0_count_weight = x.count / (level0_cnt / level0_i);
+            x.level1_count_weight = x.count / (level1_cnt / level1_i);
+            x.level2_count_weight = x.count / (level2_cnt / level2_i);
+            x.level3_count_weight = x.count / (level3_cnt / level3_i);
+            x.level4_count_weight = x.count / (level4_cnt / level4_i);
 
             // initialize scoring metric
             x.factor_score = 0;
@@ -170,12 +195,46 @@ export const fetchCategories = () => (dispatch) => {
             delete x.acf;
             factorweighted_categories.push(x);
         }
+        // normalize factor results (step 1)
+        for (i=0; i < factorweighted_categories.length; i++) {
+            SumOfCountWeight_0 += factorweighted_categories[i].level0_count_weight;
+            SumOfCountWeight_1 += factorweighted_categories[i].level1_count_weight;
+            SumOfCountWeight_2 += factorweighted_categories[i].level2_count_weight;
+            SumOfCountWeight_3 += factorweighted_categories[i].level3_count_weight;
+            SumOfCountWeight_4 += factorweighted_categories[i].level4_count_weight;
+        }
+
+        level0_normalization_factor = SumOfCountWeight_0 / level0_i;
+        level1_normalization_factor = SumOfCountWeight_1 / level1_i;
+        level2_normalization_factor = SumOfCountWeight_2 / level2_i;
+        level3_normalization_factor = SumOfCountWeight_3 / level3_i;
+        level4_normalization_factor = SumOfCountWeight_4 / level4_i;
+
+
+        for (i=0; i < factorweighted_categories.length; i++) {
+            factorweighted_categories[i].level0_weight = factorweighted_categories[i].level0_count_weight / level0_normalization_factor;
+            factorweighted_categories[i].level1_weight = factorweighted_categories[i].level1_count_weight / level1_normalization_factor;
+            factorweighted_categories[i].level2_weight = factorweighted_categories[i].level2_count_weight / level2_normalization_factor;
+            factorweighted_categories[i].level3_weight = factorweighted_categories[i].level3_count_weight / level3_normalization_factor;
+            factorweighted_categories[i].level4_weight = factorweighted_categories[i].level4_count_weight / level4_normalization_factor;
+        }
+
         const retval = {
             level0_exclusions: level0_exclusions,
             level1_exclusions: level1_exclusions,
             level2_exclusions: level2_exclusions,
             level3_exclusions: level3_exclusions,
             level4_exclusions: level4_exclusions,
+            level0_i: level0_i,
+            level1_i: level1_i,
+            level2_i: level2_i,
+            level3_i: level3_i,
+            level4_i: level4_i,
+            level0_normalization_factor: level0_normalization_factor,
+            level1_normalization_factor: level1_normalization_factor,
+            level2_normalization_factor: level2_normalization_factor,
+            level3_normalization_factor: level3_normalization_factor,
+            level4_normalization_factor: level4_normalization_factor,
             categories: factorweighted_categories
         }
         dispatch(addCategories(retval));
