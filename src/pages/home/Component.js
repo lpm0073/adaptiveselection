@@ -67,7 +67,7 @@ class Home extends Component {
     this.requeueRange = this.requeueRange.bind(this);
 
     this.state = {
-      level: 2,
+      level: 4,
       queueing: false
     }
   }
@@ -244,7 +244,15 @@ class Home extends Component {
     const disliked = this.props.userSignals.items
                       .filter((image) => (image.signal === 'DISLIKE' || image.signal === 'CLOSE'))
                       .map((image) => {return image.id;});
-    console.log("getNextImage() - disliked", disliked);                      
+    console.log("getNextImage() - disliked", disliked);    
+    
+    // negative category ranks
+    const bad_categories = this.props.categories.items.categories.filter((category) => category.factor_score < 0);
+    const good_categories = this.props.categories.items.categories
+                              .filter((category) => category.factor_score > 0)
+                              .sort((a, b) => b.factor_score - a.factor_score);
+    console.log("getNextImage() - bad categories", bad_categories, good_categories, this.props.categories.items.categories);                      
+
 
     console.log("getNextImage() - purging disliked", images.length);                      
     images = images.filter((item) => disliked.indexOf(item.id) === -1);
