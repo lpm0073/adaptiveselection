@@ -21,16 +21,21 @@ import { mediaUrl } from '../../shared/urls';
 import { wpGetImage } from './wpImageLib';
 import Loading from '../../components/Loading';
 
+var local_dispatch;
+
 const mapStateToProps = state => ({
     ...state
 });
-const mapDispatchToProps = (dispatch) => ({
-  actions: bindActionCreators(Actions, dispatch)
-});
+const mapDispatchToProps = (dispatch) => {
+  local_dispatch = dispatch;
+  return({
+    actions: bindActionCreators(Actions, dispatch)
+  });
+};
 
-const CAROUSEL_SIZE = 12;
-const QUEUE_SIZE = 4;
-const RANKTILE = 3
+const CAROUSEL_SIZE = 6;      // # of images on screen
+const QUEUE_SIZE = 2;         // # of images added to the carousel on each iteration
+const RANKTILE = 3            // groupings between ranked image selection
 
 class Home extends Component {
 
@@ -55,9 +60,12 @@ class Home extends Component {
     this.getCategoryScore = this.getCategoryScore.bind(this);
     this.getRankPercentile = this.getRankPercentile.bind(this);
 
-    this.getMaxDimensions = this.getMaxDimensions.bind(this);
     this.queueImages = this.queueImages.bind(this);
+    this.undoQueueImages = this.undoQueueImages.bind(this);
+    this.redoQueueImages = this.redoQueueImages.bind(this);
+
     this.getNextImage = this.getNextImage.bind(this);
+    this.getMaxDimensions = this.getMaxDimensions.bind(this);
     this.existsClass = this.existsClass.bind(this);
     this.serializedImage = this.serializedImage.bind(this);
     this.nextSerialNumber = this.nextSerialNumber.bind(this);
@@ -125,7 +133,7 @@ class Home extends Component {
   }
 
   render() {
-      const images = this.props.imageCarousel.items.map((image) => {
+      const images = this.props.imageCarousel.present.items.map((image) => {
         var max_height, max_width, obj = this.getMaxDimensions(image);
         max_height = obj.max_height;
         max_width = obj.max_width;
@@ -145,7 +153,7 @@ class Home extends Component {
               className={'masonry-container'} 
               onLayoutComplete={laidOutItems => this.handleMasonryLayoutComplete(laidOutItems)}              
             >
-              {this.props.imageCarousel.items.length > 0 ? images.map((image) => {
+              {this.props.imageCarousel.present.items.length > 0 ? images.map((image) => {
                   return (
                     <div className="masonry-item">
                       <ImageBox key={image.key} image = {image} />
@@ -156,7 +164,7 @@ class Home extends Component {
               <Loading />
             }
             </Masonry>
-            {this.requeueRange() && this.props.imageCarousel.items.length < CAROUSEL_SIZE ?
+            {this.requeueRange() && this.props.imageCarousel.present.items.length < CAROUSEL_SIZE ?
               <Loading />
               :
               <React.Fragment></React.Fragment>
@@ -164,6 +172,13 @@ class Home extends Component {
           </div>
       );
   
+  }
+  
+  redoQueueImages() {
+    local_dispatch(Actions.redoImageCarousel(3));
+  }
+  undoQueueImages() {
+    local_dispatch(Actions.undoImageCarousel(3));
   }
   /* add a random image at a random location on the device screen. */
   queueImages() {
@@ -178,13 +193,13 @@ class Home extends Component {
     while (
            this.image_working_set.length > 0    // we have images
         && !this.existsClass("hovering")        // user is not currently hovering over an image
-        && this.props.imageCarousel.items.length < (CAROUSEL_SIZE + QUEUE_SIZE) // the carousel is not overloaded
-        && this.props.imageCarousel.items.length < this.image_working_set.length // we haven't exhausted our supply of available images
+        && this.props.imageCarousel.present.items.length < (CAROUSEL_SIZE + QUEUE_SIZE) // the carousel is not overloaded
+        && this.props.imageCarousel.present.items.length < this.image_working_set.length // we haven't exhausted our supply of available images
         && i < CAROUSEL_SIZE) {        // stop gap to avoid infinites loops
 
         const image = this.getNextImage();
-        const duplicate = this.props.imageCarousel.items.filter((item) => item.id === image.id).length > 0;
-        if (!(duplicate && this.props.imageCarousel.items.length < CAROUSEL_SIZE)) {
+        const duplicate = this.props.imageCarousel.present.items.filter((item) => item.id === image.id).length > 0;
+        if (!(duplicate && this.props.imageCarousel.present.items.length < CAROUSEL_SIZE)) {
           // our working set is too small. we need to wait for more data from the api.
           this.props.actions.addImageCarousel({
             key: image.id,
@@ -196,17 +211,17 @@ class Home extends Component {
         i ++;
     }
 
-    if (this.props.imageCarousel.items.length > CAROUSEL_SIZE) {
+    if (this.props.imageCarousel.present.items.length > CAROUSEL_SIZE) {
       // prune the imageCarousel
-      this.props.actions.removeImageCarousel(this.props.imageCarousel.items.length - CAROUSEL_SIZE, "quantity");
+      this.props.actions.removeImageCarousel(this.props.imageCarousel.present.items.length - CAROUSEL_SIZE, "quantity");
     }
 
-    if (this.props.imageCarousel.items.length < CAROUSEL_SIZE) {
+    if (this.props.imageCarousel.present.items.length < CAROUSEL_SIZE) {
       // keep calling ourselves until we have a full imageCarousel
       const self = this;
       this.queueDelay = setTimeout(function() {
         self.queueImages();      
-      }, this.props.imageCarousel.items.length < CAROUSEL_SIZE ? 1000 : 20000);
+      }, this.props.imageCarousel.present.items.length < CAROUSEL_SIZE ? 1000 : 20000);
   
     }
     this.setState({queueing: false});
@@ -259,7 +274,7 @@ class Home extends Component {
     console.log("getNextImage() - purged disliked", images.length);                      
 
     // exclude images that are currently on screen
-    images = images.filter((image) => !this.props.imageCarousel.items.includes(image));
+    images = images.filter((image) => !this.props.imageCarousel.present.items.includes(image));
 
     // sort the list based on what's been viewed so far -- put those at the end of the array to avoid dups.
     images = images.sort((a, b) => a.viewing_sequence - b.viewing_sequence);

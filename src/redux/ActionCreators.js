@@ -9,6 +9,18 @@ export const addUserSignal = (signal, image) => {
         payload: image
     }
 }
+export const undoImageCarousel = (i) => {
+    return {
+        type: ActionTypes.UNDO_IMAGE_CAROUSEL,
+        payload: i
+        };
+}
+export const redoImageCarousel = (i) => {
+    return {
+        type: ActionTypes.REDO_IMAGE_CAROUSEL,
+        payload: i
+        };
+}
 export const addImageCarousel = (inserted) => {
     return {
         type: ActionTypes.ADD_IMAGE_CAROUSEL,
