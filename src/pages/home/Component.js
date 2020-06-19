@@ -29,7 +29,7 @@ const mapDispatchToProps = (dispatch) => ({
 });
 
 const CAROUSEL_SIZE = 12;
-const QUEUE_SIZE = 3;
+const QUEUE_SIZE = 4;
 const RANKTILE = 3
 
 class Home extends Component {
@@ -99,7 +99,6 @@ class Home extends Component {
     if (this.props.userSignals.items.length > 10 && this.getRankPercentile(image) > .80) {
       max_height = (window.screen.height / 3) + (Math.random() * window.screen.height * 4/5);
       max_width = (window.screen.width / 2) + (Math.random() * window.screen.width );
-      console.log("getMaxDimensions() - high rank");
     } else {
       // priority 2: explicit content
       const high_level = wpGetExclusionArray(1, this.props.categories.items);
@@ -107,9 +106,7 @@ class Home extends Component {
       if (intersection.length > 0) {
         max_height = (window.screen.height / 5) + (Math.random() * window.screen.height * 4/5);
         max_width = (window.screen.width / 5) + (Math.random() * window.screen.width * 4/5);
-        console.log("getMaxDimensions() - explicit");
       } else {
-        console.log("getMaxDimensions() - random");
         // priority 3: random sizing
         if (Math.random() > 0.50) {
           max_height = (window.screen.height / 4) + (Math.random() * window.screen.height * 1/2);
@@ -241,26 +238,47 @@ class Home extends Component {
 
   getNextImage() {
     if (this.image_working_set === null || this.image_working_set.length === 0) return null;
+    var images = this.image_working_set;
 
     // filter images that were disliked or closed but are still pending analytics processing.
-    // sort the list based on what's been viewed so far -- put those at the end of the array to avoid dups.
-    this.image_working_set = this.image_working_set.sort((a, b) => Number(a.viewing_sequence) - Number(b.viewing_sequence));
-    var images = this.image_working_set.filter((image) => !this.props.imageCarousel.items.includes(image));
+    const disliked = this.props.userSignals.items
+                      .filter((image) => (image.signal === 'DISLIKE' || image.signal === 'CLOSE'))
+                      .map((image) => {return image.id;});
+    console.log("getNextImage() - disliked", disliked);                      
 
-    // list contains not-yet seen images
+    console.log("getNextImage() - purging disliked", images.length);                      
+    images = images.filter((item) => disliked.indexOf(item.id) === -1);
+    console.log("getNextImage() - purged disliked", images.length);                      
+
+    // exclude images that are currently on screen
+    images = images.filter((image) => !this.props.imageCarousel.items.includes(image));
+
+    // sort the list based on what's been viewed so far -- put those at the end of the array to avoid dups.
+    images = images.sort((a, b) => a.viewing_sequence - b.viewing_sequence);
+
+    // hive off recently viewed so that these cannot be reselected due to high rank.
+    if (images.length > 50) {
+      console.log("getNextImage() - pruning recently viewed", images.length);                      
+      images = images
+                .sort((a, b) => a.viewing_sequence - b.viewing_sequence)
+                .splice(0, Math.floor(images.length * (3/4)));
+      console.log("getNextImage() - pruned recently viewed", images.length);                      
+    }
+
+    // if list contains not-yet seen images then prioritize these
     if (images[0].viewing_sequence === 0) {
-      images = images.filter((image) => image.viewing_sequence === 0);
-                     
+      images = images.filter((image) => image.viewing_sequence === 0);                     
     }
 
     // optimize presentation order: either based on image rank
     // or randomization.
     if (this.props.userSignals.items.length > 10 && Math.random() < (1 / RANKTILE)) {
       images = images.sort((a, b) =>  b.rank - a.rank);
-      console.log("choosing a highly ranked image:", images);
+      console.log("getNextImage() - choosing a highly ranked image", images);                      
     } else images = images.sort((a, b) =>  Math.random());
 
     const image = this.serializedImage(images[0]);
+    console.log("getNextImage() - final", image)
     return image;
   }
 
