@@ -357,7 +357,6 @@ class Home extends Component {
         this.props.categories.items.categories[i].factor_score = this.weightCategory(category);
       }  
     }
-    console.log("processAnalytics()", this.props.categories.items.categories);
   }
 
   getCategoryScore(id) {
@@ -370,13 +369,13 @@ class Home extends Component {
   }
 
   rankWorkingSet() {
-    var rank = 0;
+    var rank = 1;
     for (var i=0; i<this.image_working_set.length; i++) {
         for (var j=0; j<this.image_working_set[i].categories.length; j++) {
           rank += this.getCategoryScore(this.image_working_set[i].categories[j]);
         }
+        if (this.image_working_set[i].categories.length > 0) rank = rank / this.image_working_set[i].categories.length
         this.image_working_set[i].rank = rank;
-        console.log("rankWorkingSet", this.image_working_set[i]);
     }
   }
 

@@ -9,12 +9,12 @@ export const CLOSE = 'CLOSE';       //
 export const INFO = 'INFO';         //
 
 
-export const LIKE_WEIGHT = 1.25;
-export const UNLIKE_WEIGHT = -1.25;
-export const DISLIKE_WEIGHT = -1.25;
+export const LIKE_WEIGHT = 3;
+export const UNLIKE_WEIGHT = -3;
+export const DISLIKE_WEIGHT = -3;
 
-export const INFO_WEIGHT = 1;
-export const CLOSE_WEIGHT = -1;
+export const INFO_WEIGHT = 1.25;
+export const CLOSE_WEIGHT = 1.25;
 
 export const CLICK_WEIGHT = 0;
 export const MOVE_WEIGHT = 0;

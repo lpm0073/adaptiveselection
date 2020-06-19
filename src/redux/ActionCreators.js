@@ -70,12 +70,6 @@ export const fetchCategories = () => (dispatch) => {
             level3_i = 0,
             level4_i = 0,
 
-            level0_pct = 0,
-            level1_pct = 0,
-            level2_pct = 0,
-            level3_pct = 0,
-            level4_pct = 0,
-
             level0_normalization_factor = 0,
             level1_normalization_factor = 0,
             level2_normalization_factor = 0,
