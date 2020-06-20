@@ -97,7 +97,6 @@ class Home extends Component {
 
   getMaxDimensions(image) {
     var max_height, max_width;
-
     // top priority: responsive
     if (window.screen.width <= 768) {
       max_height = window.screen.height;
@@ -110,7 +109,7 @@ class Home extends Component {
     } else {
       // priority 2: explicit content
       const high_level = wpGetExclusionArray(1, this.props.categories.items);
-      const intersection = image.api_props.categories.filter(element => high_level.includes(element))
+      const intersection = image.categories.filter(element => high_level.includes(element))
       if (intersection.length > 0) {
         max_height = (window.screen.height / 5) + (Math.random() * window.screen.height * 4/5);
         max_width = (window.screen.width / 5) + (Math.random() * window.screen.width * 4/5);
@@ -133,20 +132,8 @@ class Home extends Component {
   }
 
   render() {
-      const images = this.props.imageCarousel.present.items.map((image) => {
-        var max_height, max_width, obj = this.getMaxDimensions(image);
-        max_height = obj.max_height;
-        max_width = obj.max_width;
-
-        const imageProps = wpGetImage(image, max_height, max_width);
-
-        image.source_url = imageProps.source_url;
-        image.height = imageProps.height;
-        image.width = imageProps.width;
-        image.image_props = imageProps;
-
-        return (image);
-      });
+      const images = this.props.imageCarousel.present.items;
+      console.log("render()", images);
       return(
           <div id="home-page" className="home-page m-0 p-0" onScroll={this.handleScroll}>
             <Masonry 
@@ -204,6 +191,11 @@ class Home extends Component {
           this.props.actions.addImageCarousel({
             key: image.id,
             id: image.id,
+            
+            source_url: image.source_url,
+            height: image.height,
+            width: image.width,
+        
             api_props: image,
             timestamp: new Date()
           } );
@@ -259,19 +251,15 @@ class Home extends Component {
     const disliked = this.props.userSignals.items
                       .filter((image) => (image.signal === 'DISLIKE' || image.signal === 'CLOSE'))
                       .map((image) => {return image.id;});
-    console.log("getNextImage() - disliked", disliked);    
     
     // negative category ranks
     const bad_categories = this.props.categories.items.categories.filter((category) => category.factor_score < 0);
     const good_categories = this.props.categories.items.categories
                               .filter((category) => category.factor_score > 0)
                               .sort((a, b) => b.factor_score - a.factor_score);
-    console.log("getNextImage() - bad categories", bad_categories, good_categories, this.props.categories.items.categories);                      
 
 
-    console.log("getNextImage() - purging disliked", images.length);                      
     images = images.filter((item) => disliked.indexOf(item.id) === -1);
-    console.log("getNextImage() - purged disliked", images.length);                      
 
     // exclude images that are currently on screen
     images = images.filter((image) => !this.props.imageCarousel.present.items.includes(image));
@@ -281,11 +269,9 @@ class Home extends Component {
 
     // hive off recently viewed so that these cannot be reselected due to high rank.
     if (images.length > 50) {
-      console.log("getNextImage() - pruning recently viewed", images.length);                      
       images = images
                 .sort((a, b) => a.viewing_sequence - b.viewing_sequence)
                 .splice(0, Math.floor(images.length * (3/4)));
-      console.log("getNextImage() - pruned recently viewed", images.length);                      
     }
 
     // if list contains not-yet seen images then prioritize these
@@ -297,10 +283,20 @@ class Home extends Component {
     // or randomization.
     if (this.props.userSignals.items.length > 10 && Math.random() < (1 / RANKTILE)) {
       images = images.sort((a, b) =>  b.rank - a.rank);
-      console.log("getNextImage() - choosing a highly ranked image", images);                      
     } else images = images.sort((a, b) =>  Math.random());
 
     const image = this.serializedImage(images[0]);
+    var max_height, max_width, obj = this.getMaxDimensions(image);
+    max_height = obj.max_height;
+    max_width = obj.max_width;
+
+    const imageProps = wpGetImage(image, max_height, max_width);
+
+    image.source_url = imageProps.source_url;
+    image.height = imageProps.height;
+    image.width = imageProps.width;
+    image.image_props = imageProps;
+
     console.log("getNextImage() - final", image)
     return image;
   }
