@@ -20,7 +20,6 @@ import { WPImages, wpGetImage, wpGetExclusionArray } from '../../shared/wpImages
 import Loading from '../../components/Loading';
 
 var local_dispatch;
-
 const mapStateToProps = state => ({
     ...state
 });
@@ -44,27 +43,32 @@ class Home extends Component {
   constructor(props) {
     super(props);
 
+    // content management
     this.handleChangeLevel = this.handleChangeLevel.bind(this);
+    this.addMasterContent = this.addMasterContent.bind(this);
+
+    // real-time analytics
     this.processAnalytics = this.processAnalytics.bind(this);
     this.weightCategory = this.weightCategory.bind(this);
     this.rankWorkingSet = this.rankWorkingSet.bind(this);
     this.getCategoryScore = this.getCategoryScore.bind(this);
     this.getRankPercentile = this.getRankPercentile.bind(this);
 
-    this.queueImages = this.queueImages.bind(this);
-    this.undoQueueImages = this.undoQueueImages.bind(this);
-    this.redoQueueImages = this.redoQueueImages.bind(this);
-
+    // content selection
     this.getNextImage = this.getNextImage.bind(this);
     this.getMaxDimensions = this.getMaxDimensions.bind(this);
     this.serializedImage = this.serializedImage.bind(this);
     this.nextSerialNumber = this.nextSerialNumber.bind(this);
 
-    this.existsClass = this.existsClass.bind(this);
-    this.handleMasonryLayoutComplete = this.handleMasonryLayoutComplete.bind(this);
+    // UI
+    this.queueImages = this.queueImages.bind(this);
+    this.undoQueueImages = this.undoQueueImages.bind(this);
+    this.redoQueueImages = this.redoQueueImages.bind(this);
     this.handleScroll = this.handleScroll.bind(this);
     this.requeueRange = this.requeueRange.bind(this);
-    this.addMasterContent = this.addMasterContent.bind(this);
+
+    this.existsClass = this.existsClass.bind(this);
+    this.handleMasonryLayoutComplete = this.handleMasonryLayoutComplete.bind(this);
 
     this.state = {
       level: 0,
@@ -73,31 +77,9 @@ class Home extends Component {
 
   }
 
-  addMasterContent(items) {
-    this.masterContent = this.masterContent.concat(items);
-    if (this.props.imageCarousel.present.items.length === 0) this.queueImages();
-
-  }
 
   componentDidMount() {
-
-    this.wpImages = new WPImages(this.level, null, this.addMasterContent);
-    this.handleChangeLevel();
-
-  }
-
-  handleChangeLevel() {
-
-    if (this.props.categories.isLoading) {
-      // we're not ready, so wait 500ms and then try again.
-      const self = this;
-      setTimeout(function() {
-          self.handleChangeLevel();
-      }, 500);
-      return;
-    }
-    this.wpImages = new WPImages(this.level, this.props.categories.items, this.addMasterContent);
-
+    this.wpImages = new WPImages(this.level, this.props.categories, this.addMasterContent);
   }
   componentWillUnmount() {
     clearTimeout(this.queueDelay);
@@ -131,6 +113,29 @@ class Home extends Component {
       );
   
   }
+  
+  addMasterContent(items) {
+    this.masterContent = this.masterContent.concat(items);
+    if (this.props.imageCarousel.present.items.length === 0) this.queueImages();
+  }
+
+  handleChangeLevel() {
+
+    if (this.props.categories.isLoading) {
+      // we're not ready, so wait 500ms and then try again.
+      const self = this;
+      setTimeout(function() {
+          self.handleChangeLevel();
+      }, 500);
+      return;
+    }
+    
+    // reset content data
+    this.masterContent = [];
+    this.props.actions.removeImageCarousel(this.props.imageCarousel.present.items.length, "quantity");
+    this.wpImages = new WPImages(this.level, this.props.categories, this.addMasterContent);
+
+  }  
   
   redoQueueImages() {
     local_dispatch(Actions.redoImageCarousel(3));

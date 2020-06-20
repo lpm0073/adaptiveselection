@@ -42,7 +42,7 @@ export class WPImages {
   
     fetch() {
       var url;
-      if (!this.categories && !this.gettingSplashData && !this.gotSplashData) {
+      if (this.categories.isLoading && !this.gettingSplashData && !this.gotSplashData) {
         this.gettingSplashData = true;
         url = wpSplashUrl;
       }
