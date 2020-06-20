@@ -37,7 +37,6 @@ const RANKTILE = 3            // groupings between ranked image selection
 
 class Home extends Component {
 
-  fetcherDelay = null;
   queueDelay = null;
   masterContent = [];
   wpImages = null;
@@ -74,18 +73,16 @@ class Home extends Component {
   }
 
   addMasterContent(items) {
-    this.masterContent = items;
-    console.log("addMasterContent()", this.masterContent);
+    this.masterContent = this.masterContent.concat(items);
     if (this.props.imageCarousel.present.items.length === 0) this.queueImages();
+    console.log("addMasterContent()", this.masterContent);
 
   }
 
   componentDidMount() {
 
     const self = this;
-    this.fetcherDelay = setTimeout(function() {
-        self.handleChangeLevel();
-    }, 50);    
+    self.handleChangeLevel();
 
   }
 
@@ -103,7 +100,6 @@ class Home extends Component {
 
   }
   componentWillUnmount() {
-    clearTimeout(this.fetcherDelay);
     clearTimeout(this.queueDelay);
   }
 

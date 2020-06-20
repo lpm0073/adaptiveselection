@@ -1,20 +1,23 @@
-import { mediaUrl } from './urls';
-
+export const wpBackendUrl = 'https://api.fotomashup.com/wp-json/wp/v2/';
+export const wpMediaUrl = wpBackendUrl + 'media?_fields=id,categories,acf,media_details&per_page=100';
+export const wpCategoriesUrl = wpBackendUrl + 'categories?per_page=100&_fields=id,count,acf';
 
 export class WPImages {
 
     level = 0;
     mediaQuery;
-    pageNumber = 100;
+    pageNumber = 1;
+    numPages = 25;
     pagesReturned = [];
     items = [];
     callBackMethod = null;
+    fetchDelay = null;
   
     constructor(level, categories, callBackMethod) {
   
         this.level = level;
         this.callBackMethod = callBackMethod;
-        this.mediaQuery = mediaUrl + "&" + wpGetExclusions(level, categories);
+        this.mediaQuery = wpMediaUrl + "&" + wpGetExclusions(level, categories);
 
         this.fetch();
 
@@ -64,14 +67,19 @@ export class WPImages {
           image.rank = 1;   // pre-initialize image rank based on user signals. 
           return image;
         })
-  
-        const isWorkingSetInitialized = this.items.length > 0;
+        this.callBackMethod(new_images);
         this.items = this.items.concat(new_images);
-  
-        if (!isWorkingSetInitialized) this.callBackMethod(this.items);
-  
         this.pagesReturned.push(this.pageNumber);
         this.pageNumber = this.getNextPage(); 
+
+        console.log("fetch() - next", this.numPages, this.pagesReturned.length, this.pageNumber);
+        if (this.pagesReturned.length < this.numPages) {
+          const self = this;
+          this.fetchDelay = setTimeout(function() {
+            self.fetch();      
+          }, 1000);
+        }
+
       })
       .catch(error => {
         /* most common error is when we query for non-existent page (we don't know how many pages there are) */
@@ -85,11 +93,19 @@ export class WPImages {
             }
         */
   
-      // try to reverse engineer the total number of pages avaiable.
+      // try to reverse engineer the total number of pages available.
         var numPages = this.numPages > this.pageNumber ? this.numPages - Math.floor((this.numPages - this.pageNumber)/2)  : this.numPages;
         numPages = numPages > Math.max( ...this.pagesReturned ) ? numPages - 1 : Math.max( ...this.pagesReturned );
         this.numPages = numPages;
         this.pageNumber = this.getNextPage();
+
+        const self = this;
+        console.log("fetch() - error", this.numPages, this.pagesReturned.length, this.pageNumber);
+        if (this.pagesReturned.length < this.numPages) {
+          this.fetchDelay = setTimeout(function() {
+            self.fetch();      
+          }, 1000);
+          }
   
       });
   
