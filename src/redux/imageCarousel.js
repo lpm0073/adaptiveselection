@@ -17,11 +17,13 @@ export const ImageCarousel = (state = {
                 ]};
             if (action.action === "item") {
                 const idx = [...state.items].map(function(image) {return image.id;}).indexOf(action.payload.id);
+
                 if (!idx === 0)  
                     return {...state, added: false, deleted: true, items: [
                         ...state.items.slice(0, idx),
                         ...state.items.slice(idx + 1),
                     ]};
+                else return {...state, added: false, deleted: true, items: [...state.items]};
             }
             break;
         
