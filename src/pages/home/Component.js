@@ -31,7 +31,6 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 const CAROUSEL_SIZE = 6;      // # of images on screen
-const QUEUE_SIZE = 2;         // # of images added to the carousel on each iteration
 const RANKTILE = 3            // groupings between ranked image selection
 
 class Home extends Component {
@@ -55,15 +54,15 @@ class Home extends Component {
     this.getRankPercentile = this.getRankPercentile.bind(this);
 
     // content selection
-    this.getNextImage = this.getNextImage.bind(this);
+    this.getNextItem = this.getNextItem.bind(this);
     this.getMaxDimensions = this.getMaxDimensions.bind(this);
     this.serializedImage = this.serializedImage.bind(this);
     this.nextSerialNumber = this.nextSerialNumber.bind(this);
 
     // UI
-    this.queueImages = this.queueImages.bind(this);
-    this.undoQueueImages = this.undoQueueImages.bind(this);
-    this.redoQueueImages = this.redoQueueImages.bind(this);
+    this.fetchRow = this.fetchRow.bind(this);
+    this.undoFetchRow = this.undoFetchRow.bind(this);
+    this.redoFetchRow = this.redoFetchRow.bind(this);
     this.handleScroll = this.handleScroll.bind(this);
     this.requeueRange = this.requeueRange.bind(this);
 
@@ -72,7 +71,7 @@ class Home extends Component {
 
     this.state = {
       level: 0,
-      queueing: false
+      fetching: false
     }
 
   }
@@ -84,7 +83,10 @@ class Home extends Component {
   componentWillUnmount() {
     clearTimeout(this.queueDelay);
   }
-
+  componentDidUpdate() {
+    console.log("componentDidUpdate()");
+    //this.fetchRow();
+  }
   render() {
       const images = this.props.imageCarousel.present.items;
       return(
@@ -116,7 +118,7 @@ class Home extends Component {
   
   addMasterContent(items) {
     this.masterContent = this.masterContent.concat(items);
-    if (this.props.imageCarousel.present.items.length === 0) this.queueImages();
+    if (this.props.imageCarousel.present.items.length === 0) this.fetchRow();
   }
 
   handleChangeLevel() {
@@ -137,57 +139,67 @@ class Home extends Component {
 
   }  
   
-  redoQueueImages() {
+  redoFetchRow() {
     local_dispatch(Actions.redoImageCarousel(3));
   }
-  undoQueueImages() {
+  undoFetchRow() {
     local_dispatch(Actions.undoImageCarousel(3));
   }
-  /* add a random image at a random location on the device screen. */
-  queueImages() {
-    this.setState({queueing: true});
-    var i = 0;
+  
+  fetchRow() {
+    this.setState({fetching: true});
+    const MAX_ITEMS = 3;
+
+    function shouldFetch(self) {
+      if (!self.masterContent.length > 0) return false;
+      if (self.existsClass("hovering")) return false ;
+      if (self.props.imageCarousel.present.items.length >= CAROUSEL_SIZE) return false;
+      return true;
+    }
+    function numItems(self) {
+      if (self.masterContent.length < MAX_ITEMS) return MAX_ITEMS;
+      return (Math.random() * 10) % MAX_ITEMS;
+    }
+    function isDuplicate(self,subject) {
+      return self.props.imageCarousel.present.items.filter((item) => item.id === subject.id).length > 0;      
+    }
     // do this first.
     // gather user analytics signals from class data embedded in the items in props.imageCarousel
-    this.processAnalytics();
-    this.rankWorkingSet();
+    //this.processAnalytics();
+    //this.rankWorkingSet();
 
     // if we have images in our working set, and we need more images on screen
-    while (
-           this.masterContent.length > 0    // we have images
-        && !this.existsClass("hovering")        // user is not currently hovering over an image
-        && this.props.imageCarousel.present.items.length < (CAROUSEL_SIZE + QUEUE_SIZE) // the carousel is not overloaded
-        && this.props.imageCarousel.present.items.length < this.masterContent.length // we haven't exhausted our supply of available images
-        && i < CAROUSEL_SIZE) {        // stop gap to avoid infinites loops
+    if (shouldFetch(this)) {
+      var n = numItems(this);
+      for (var i=0; i<n; i++) {
+        const item = this.getNextItem();
+        this.props.actions.addImageCarousel({
+          key: item.id,
+          id: item.id,
+          
+          source_url: item.source_url,
+          height: item.height,
+          width: item.width,
+      
+          api_props: item,
+          timestamp: new Date()
+        } );
 
-        const image = this.getNextImage();
-        const duplicate = this.props.imageCarousel.present.items.filter((item) => item.id === image.id).length > 0;
-        if (!(duplicate && this.props.imageCarousel.present.items.length < CAROUSEL_SIZE)) {
-          // our working set is too small. we need to wait for more data from the api.
-          this.props.actions.addImageCarousel({
-            key: image.id,
-            id: image.id,
-            
-            source_url: image.source_url,
-            height: image.height,
-            width: image.width,
-        
-            api_props: image,
-            timestamp: new Date()
-          } );
-        }
-        i ++;
+      }
+
     }
 
     if (this.props.imageCarousel.present.items.length < CAROUSEL_SIZE) {
+      console.log("fetchRow() - 5");
+
       // keep calling ourselves until we have a full imageCarousel
       const self = this;
       this.queueDelay = setTimeout(function() {
-        self.queueImages();      
+        self.fetchRow();      
       }, this.props.imageCarousel.present.items.length < CAROUSEL_SIZE ? 1000 : 20000);
   
     }
-    this.setState({queueing: false});
+    this.setState({fetching: false});
   }
 
   // returns true if there is an element in the DOM containing this class
@@ -248,7 +260,7 @@ class Home extends Component {
       max_width: max_width
     }
   }
-    getNextImage() {
+    getNextItem() {
     if (this.masterContent === null || this.masterContent.length === 0) return null;
     var images = this.masterContent;
 
@@ -320,7 +332,7 @@ class Home extends Component {
   }
 
   handleScroll() {
-    if (this.requeueRange() && !this.state.queueing) this.queueImages();
+    if (this.requeueRange() && !this.state.fetching) this.fetchRow();
 
     var page = document.getElementById("home-page"); 
     const images = [].concat(this.props.imageCarousel.present.items);
@@ -333,11 +345,11 @@ class Home extends Component {
   
       if (hasPast) {
         this.props.actions.removeImageCarousel(image, "item");
+        this.fetchRow();
       }
 
     }
 
-    //console.log("handleScroll() - image, height, bottom position, scrolltop", image.id, image.height, bottom, page.scrollTop, hasPast);
   }
 
   processAnalytics() {

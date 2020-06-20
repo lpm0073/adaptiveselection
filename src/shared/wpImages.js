@@ -3,6 +3,7 @@ export const wpMediaUrl = wpBackendUrl + 'media?_fields=id,categories,acf,media_
 export const wpCategoriesUrl = wpBackendUrl + 'categories?per_page=100&_fields=id,count,acf';
 const wpSplashUrl = wpMediaUrl + '&categories=41';
 
+// https://api.fotomashup.com/wp-json/wp/v2/media?_fields=id,categories,acf,media_details&per_page=100&categories=41
 export class WPImages {
 
     level = 0;
