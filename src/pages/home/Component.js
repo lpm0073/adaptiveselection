@@ -16,11 +16,8 @@ import Masonry from 'react-masonry-component';
 // my stuff
 import './styles.css';
 import ImageBox from './ImageBox';
-import { wpGetExclusions, wpGetExclusionArray } from '../../shared/categories';
-import { mediaUrl } from '../../shared/urls';
-import { wpGetImage } from './wpImage';
+import { WPImages, wpGetImage, wpGetExclusionArray } from './wpImages';
 import Loading from '../../components/Loading';
-import { WPImages } from './wpImages';
 
 var local_dispatch;
 
@@ -40,22 +37,14 @@ const RANKTILE = 3            // groupings between ranked image selection
 
 class Home extends Component {
 
-  isCategoryInitialized = false;
   fetcherDelay = null;
   queueDelay = null;
   masterContent = [];
-  pages_returned = []   // integer page numbers of api page numbers returned so far
-  pageNumber = 1 + Math.floor(Math.random() * 40);
-  numPages = 100;   // <---- start high and interpolate downwards based on success/failure
-  categoryExclusions = [];
-  media_query;
-
   wpImages = null;
 
   constructor(props) {
     super(props);
 
-    this.imageFetcher = this.imageFetcher.bind(this);
     this.handleChangeLevel = this.handleChangeLevel.bind(this);
     this.processAnalytics = this.processAnalytics.bind(this);
     this.weightCategory = this.weightCategory.bind(this);
@@ -74,9 +63,9 @@ class Home extends Component {
 
     this.existsClass = this.existsClass.bind(this);
     this.handleMasonryLayoutComplete = this.handleMasonryLayoutComplete.bind(this);
-    this.getNextPage = this.getNextPage.bind(this);
     this.handleScroll = this.handleScroll.bind(this);
     this.requeueRange = this.requeueRange.bind(this);
+    this.addMasterContent = this.addMasterContent.bind(this);
 
     this.state = {
       level: 0,
@@ -84,19 +73,23 @@ class Home extends Component {
     }
   }
 
+  addMasterContent(items) {
+    this.masterContent = items;
+    console.log("addMasterContent()", this.masterContent);
+  }
+
   componentDidMount() {
 
     const self = this;
     this.fetcherDelay = setTimeout(function() {
         self.handleChangeLevel();
-        self.imageFetcher();
     }, 50);    
 
   }
 
   handleChangeLevel() {
 
-    if (this.props.categories.isLoading && !this.isCategoryInitialized) {
+    if (this.props.categories.isLoading) {
       // we're not ready, so wait 500ms and then try again.
       const self = this;
       setTimeout(function() {
@@ -104,12 +97,7 @@ class Home extends Component {
       }, 500);
       return;
     }
-
-    const cats = this.props.categories.items;
-    this.isCategoryInitialized = true;
-    this.categoryExclusions = wpGetExclusions(this.state.level, cats);
-    this.media_query = mediaUrl + "&" + this.categoryExclusions;
-    this.wpImages = new WPImages(this.level, this.queueImages);
+    this.wpImages = new WPImages(this.level, this.props.categories.items, this.addMasterContent);
 
   }
   componentWillUnmount() {
@@ -320,92 +308,7 @@ class Home extends Component {
     return image;
   }
 
-
-
-  // find the next random page number to query by choosing
-  // a random page that has not already been queried.
-  getNextPage() {
-    var potential_pages = [];
-    for (var i=1; i<this.numPages; i++) {
-      if (! this.pages_returned.includes(i)) {
-        potential_pages.push(i);
-      }
-    }
-    if (potential_pages.length === 0) return 0;
-    var idx = Math.floor(Math.random() * potential_pages.length);
-    return potential_pages[idx];
-
-  }
-
-  imageFetcher() {
-      const url = this.media_query + "&page=" + this.pageNumber;
-      fetch(url)
-      .then(response => {
-            if (response.ok) {
-                return response;
-            } else {
-                var error = new Error('Error ' + response.status + ': ' + response.statusText);
-                error.response = response;
-                throw error;
-            }
-        },
-        error => {
-            throw new Error(error.message);
-      })
-      .then(response => response.json())
-      .then(images => {
-        // only add unique return values, so that we don't accumulated duplicates in the working set
-        var new_images = [];
-        for (var i=0; i<images.length;  i++) {
-          const candidate = images[i]
-          if (this.masterContent.filter(image => candidate.id === image.id).length === 0) new_images.push(images[i]);
-        }
-
-        new_images = new_images.map((image) => {
-          image.viewing_sequence = 0;
-          image.rank = 1;   // pre-initialize image rank based on user signals. 
-          return image;
-        })
-
-        const isWorkingSetInitialized = this.masterContent.length > 0;
-        this.masterContent = this.masterContent.concat(new_images);
-
-        if (!isWorkingSetInitialized) this.queueImages();
-
-        this.pages_returned.push(this.pageNumber);
-        this.pageNumber = this.getNextPage(); 
-      })
-      .catch(error => {
-        /* most common error is when we query for non-existent page (we don't know how many pages there are) */
-         /*
-            {
-              "code": "rest_post_invalid_page_number",
-              "message": "The page number requested is larger than the number of pages available.",
-              "data": {
-                "status": 400
-                }
-            }
-        */
-
-      // try to reverse engineer the total number of pages avaiable.
-        var numPages = this.numPages > this.pageNumber ? this.numPages - Math.floor((this.numPages - this.pageNumber)/2)  : this.numPages;
-        numPages = numPages > Math.max( ...this.pages_returned ) ? numPages - 1 : Math.max( ...this.pages_returned );
-        this.numPages = numPages;
-        this.pageNumber = this.getNextPage();
-
-      });
-  
-
-    if (this.pageNumber !== 0) {
-      const delay = 1000;
-      const self = this;
-      this.fetcherDelay = setTimeout(function() {
-          self.imageFetcher();
-      }, delay);
-    } 
-
-  }
-
+ 
   handleMasonryLayoutComplete(laidOutItems) {
   }
 
