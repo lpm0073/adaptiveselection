@@ -179,11 +179,6 @@ class Home extends Component {
         i ++;
     }
 
-    if (this.props.imageCarousel.present.items.length > CAROUSEL_SIZE) {
-      // prune the imageCarousel
-      this.props.actions.removeImageCarousel(this.props.imageCarousel.present.items.length - CAROUSEL_SIZE, "quantity");
-    }
-
     if (this.props.imageCarousel.present.items.length < CAROUSEL_SIZE) {
       // keep calling ourselves until we have a full imageCarousel
       const self = this;
@@ -325,9 +320,24 @@ class Home extends Component {
   }
 
   handleScroll() {
-
     if (this.requeueRange() && !this.state.queueing) this.queueImages();
 
+    var page = document.getElementById("home-page"); 
+    const images = [].concat(this.props.imageCarousel.present.items);
+
+    for (var i=0; i<images.length; i++) {
+      const image = this.props.imageCarousel.present.items[i];
+      const element = document.getElementById(image.id);
+      var bottom = element.offsetTop + image.height; 
+      var hasPast = (page.scrollTop > bottom);
+  
+      if (hasPast) {
+        this.props.actions.removeImageCarousel(image, "item");
+      }
+
+    }
+
+    //console.log("handleScroll() - image, height, bottom position, scrolltop", image.id, image.height, bottom, page.scrollTop, hasPast);
   }
 
   processAnalytics() {

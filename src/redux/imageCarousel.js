@@ -15,11 +15,14 @@ export const ImageCarousel = (state = {
                 return {...state, added: false, deleted: true, items: [
                     ...state.items.slice(action.payload)
                 ]};
-            if (action.action === "item")
-            return {...state, added: false, deleted: true, items: [
-                ...state.items.slice(0, action.payload),
-                ...state.items.slice(action.payload + 1),
-            ]};
+            if (action.action === "item") {
+                const idx = [...state.items].map(function(image) {return image.id;}).indexOf(action.payload.id);
+                if (!idx === 0)  
+                    return {...state, added: false, deleted: true, items: [
+                        ...state.items.slice(0, idx),
+                        ...state.items.slice(idx + 1),
+                    ]};
+            }
             break;
         
         case ActionTypes.UNDO_IMAGE_CAROUSEL:
