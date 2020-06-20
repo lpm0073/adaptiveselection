@@ -1,7 +1,7 @@
 
 .home-page {
   height: 92vh;
-  background-image: url('./cork-background.jpg');
+  background-image: url('/images/cork-background.jpg');
   overflow-x: hidden;
 }
 .home-page::-webkit-scrollbar {

@@ -15,8 +15,8 @@ import Masonry from 'react-masonry-component';
 
 // my stuff
 import './styles.css';
-import ImageBox from './ImageBox';
-import { WPImages, wpGetImage, wpGetExclusionArray } from './wpImages';
+import ImageBox from '../../components/ImageBox';
+import { WPImages, wpGetImage, wpGetExclusionArray } from '../../shared/wpImages';
 import Loading from '../../components/Loading';
 
 var local_dispatch;

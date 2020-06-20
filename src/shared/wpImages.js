@@ -1,4 +1,4 @@
-import { mediaUrl } from '../../shared/urls';
+import { mediaUrl } from './urls';
 
 
 export class WPImages {
