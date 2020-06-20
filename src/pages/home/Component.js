@@ -70,19 +70,19 @@ class Home extends Component {
       level: 0,
       queueing: false
     }
+
   }
 
   addMasterContent(items) {
     this.masterContent = this.masterContent.concat(items);
     if (this.props.imageCarousel.present.items.length === 0) this.queueImages();
-    console.log("addMasterContent()", this.masterContent);
 
   }
 
   componentDidMount() {
 
-    const self = this;
-    self.handleChangeLevel();
+    this.wpImages = new WPImages(this.level, null, this.addMasterContent);
+    this.handleChangeLevel();
 
   }
 

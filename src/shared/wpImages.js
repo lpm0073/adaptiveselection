@@ -1,23 +1,25 @@
 export const wpBackendUrl = 'https://api.fotomashup.com/wp-json/wp/v2/';
 export const wpMediaUrl = wpBackendUrl + 'media?_fields=id,categories,acf,media_details&per_page=100';
 export const wpCategoriesUrl = wpBackendUrl + 'categories?per_page=100&_fields=id,count,acf';
+const wpSplashUrl = wpMediaUrl + '&categories=41';
 
 export class WPImages {
 
     level = 0;
-    mediaQuery;
     pageNumber = 1;
     numPages = 25;
     pagesReturned = [];
     items = [];
     callBackMethod = null;
     fetchDelay = null;
+    categories = null;
+    gettingSplashData = false;
+    gotSplashData = false;
   
     constructor(level, categories, callBackMethod) {
-  
+        this.categories = categories;
         this.level = level;
         this.callBackMethod = callBackMethod;
-        this.mediaQuery = wpMediaUrl + "&" + wpGetExclusions(level, categories);
 
         this.fetch();
 
@@ -39,7 +41,13 @@ export class WPImages {
     }
   
     fetch() {
-      const url = this.mediaQuery + "&page=" + this.pageNumber;
+      var url;
+      if (!this.categories && !this.gettingSplashData && !this.gotSplashData) {
+        this.gettingSplashData = true;
+        url = wpSplashUrl;
+      }
+      else url = wpMediaUrl + "&" + wpGetExclusions(this.level, this.categories);
+
       fetch(url)
       .then(response => {
             if (response.ok) {
@@ -55,6 +63,11 @@ export class WPImages {
       })
       .then(response => response.json())
       .then(images => {
+        if (this.gettingSplashData) {
+          this.gotSplashData = true;
+          this.gettingSplashData = false;
+        }
+
         // only add unique return values, so that we don't accumulated duplicates in the working set
         var new_images = [];
         for (var i=0; i<images.length;  i++) {
@@ -72,7 +85,6 @@ export class WPImages {
         this.pagesReturned.push(this.pageNumber);
         this.pageNumber = this.getNextPage(); 
 
-        console.log("fetch() - next", this.numPages, this.pagesReturned.length, this.pageNumber);
         if (this.pagesReturned.length < this.numPages) {
           const self = this;
           this.fetchDelay = setTimeout(function() {
