@@ -21,8 +21,20 @@ export const ImageCarousel = (state = {
                 ...state.items.slice(action.payload + 1),
             ]};
             break;
-            
-        default: 
+        
+        case ActionTypes.UNDO_IMAGE_CAROUSEL:
+            return {...state, added: false, deleted: true, items: [
+                ...state.items.slice(0, action.payload),
+                ...state.items.slice(action.payload + 1),
+            ]};
+
+        case ActionTypes.REDO_IMAGE_CAROUSEL:
+            return {...state, added: false, deleted: true, items: [
+                ...state.items.slice(0, action.payload),
+                ...state.items.slice(action.payload + 1),
+            ]};
+
+            default: 
             return state;
     }
 };

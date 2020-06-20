@@ -1,5 +1,6 @@
+// https://github.com/omnidan/redux-undo
+
 import { createStore, combineReducers, applyMiddleware } from 'redux';
-import { ReduxUndo } from 'redux-undo'; 
 import undoable from 'redux-undo';
 
 import { Categories } from './categories';
