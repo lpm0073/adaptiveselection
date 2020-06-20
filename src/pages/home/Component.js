@@ -71,7 +71,8 @@ class Home extends Component {
 
     this.state = {
       level: 0,
-      fetching: false
+      fetching: false,
+      deleting: 0
     }
 
   }
@@ -83,11 +84,8 @@ class Home extends Component {
   componentWillUnmount() {
     clearTimeout(this.queueDelay);
   }
-  componentDidUpdate() {
-    console.log("componentDidUpdate()");
-    //this.fetchRow();
-  }
   render() {
+      if (this.props.imageCarousel.present == null) console.log("render()", this.props.imageCarousel);
       const images = this.props.imageCarousel.present.items;
       return(
           <div key="home-page" id="home-page" className="home-page m-0 p-0" onScroll={this.handleScroll}>
@@ -153,7 +151,6 @@ class Home extends Component {
     function shouldFetch(self) {
       if (!self.masterContent.length > 0) return false;
       if (self.existsClass("hovering")) return false ;
-      if (self.props.imageCarousel.present.items.length >= CAROUSEL_SIZE) return false;
       return true;
     }
     function numItems(self) {
@@ -170,10 +167,11 @@ class Home extends Component {
 
     // if we have images in our working set, and we need more images on screen
     if (shouldFetch(this)) {
+      console.log("fetchRow() - imageCarousel:", this.props.imageCarousel.present.items.length);
       var n = numItems(this);
       for (var i=0; i<n; i++) {
         const item = this.getNextItem();
-        this.props.actions.addImageCarousel({
+        var obj = {
           key: item.id,
           id: item.id,
           
@@ -183,14 +181,14 @@ class Home extends Component {
       
           api_props: item,
           timestamp: new Date()
-        } );
+        };
+        this.props.actions.addImageCarousel(obj);
 
       }
 
     }
 
     if (this.props.imageCarousel.present.items.length < CAROUSEL_SIZE) {
-      console.log("fetchRow() - 5");
 
       // keep calling ourselves until we have a full imageCarousel
       const self = this;
@@ -332,7 +330,6 @@ class Home extends Component {
   }
 
   handleScroll() {
-    if (this.requeueRange() && !this.state.fetching) this.fetchRow();
 
     var page = document.getElementById("home-page"); 
     const images = [].concat(this.props.imageCarousel.present.items);
@@ -343,12 +340,15 @@ class Home extends Component {
       var bottom = element.offsetTop + image.height; 
       var hasPast = (page.scrollTop > bottom);
   
-      if (hasPast) {
+      if (hasPast && image.id !== this.state.deleting) {
+        this.setState({deleting: image.id});
         this.props.actions.removeImageCarousel(image, "item");
-        this.fetchRow();
+        if (this.requeueRange() && !this.state.fetching) this.fetchRow();
+        return;
       }
 
     }
+    if (this.requeueRange() && !this.state.fetching) this.fetchRow();
 
   }
 
