@@ -1,8 +1,9 @@
-export const wpGetImage = (item, max_height = 1024, max_width = 2048) => {
+
   /*
     return a dict of image meta data based on available
     images, screen size, and aspect_ratio.
-   */
+  */
+  export const wpGetImage = (item, max_height = 1024, max_width = 2048) => {
 
     let dict, imgDict;
     const aspect_ratio = getAspectRatio(item);

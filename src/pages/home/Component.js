@@ -18,8 +18,9 @@ import './styles.css';
 import ImageBox from './ImageBox';
 import { wpGetExclusions, wpGetExclusionArray } from '../../shared/categories';
 import { mediaUrl } from '../../shared/urls';
-import { wpGetImage } from './wpImageLib';
+import { wpGetImage } from './wpImage';
 import Loading from '../../components/Loading';
+import { WPImages } from './wpImages';
 
 var local_dispatch;
 
@@ -42,12 +43,14 @@ class Home extends Component {
   isCategoryInitialized = false;
   fetcherDelay = null;
   queueDelay = null;
-  image_working_set = [];
+  masterContent = [];
   pages_returned = []   // integer page numbers of api page numbers returned so far
-  page_number = 1 + Math.floor(Math.random() * 40);
-  num_pages = 100;   // <---- start high and interpolate downwards based on success/failure
-  category_exclusions = [];
+  pageNumber = 1 + Math.floor(Math.random() * 40);
+  numPages = 100;   // <---- start high and interpolate downwards based on success/failure
+  categoryExclusions = [];
   media_query;
+
+  wpImages = null;
 
   constructor(props) {
     super(props);
@@ -76,7 +79,7 @@ class Home extends Component {
     this.requeueRange = this.requeueRange.bind(this);
 
     this.state = {
-      level: 4,
+      level: 0,
       queueing: false
     }
   }
@@ -91,12 +94,31 @@ class Home extends Component {
 
   }
 
+  handleChangeLevel() {
+
+    if (this.props.categories.isLoading && !this.isCategoryInitialized) {
+      // we're not ready, so wait 500ms and then try again.
+      const self = this;
+      setTimeout(function() {
+          self.handleChangeLevel();
+      }, 500);
+      return;
+    }
+
+    const cats = this.props.categories.items;
+    this.isCategoryInitialized = true;
+    this.categoryExclusions = wpGetExclusions(this.state.level, cats);
+    this.media_query = mediaUrl + "&" + this.categoryExclusions;
+    this.wpImages = new WPImages(this.level, this.queueImages);
+
+  }
   componentWillUnmount() {
     clearTimeout(this.fetcherDelay);
     clearTimeout(this.queueDelay);
   }
 
   render() {
+      console.log("render()", this.props.imageCarousel);
       const images = this.props.imageCarousel.present.items;
       return(
           <div key="home-page" id="home-page" className="home-page m-0 p-0" onScroll={this.handleScroll}>
@@ -142,10 +164,10 @@ class Home extends Component {
 
     // if we have images in our working set, and we need more images on screen
     while (
-           this.image_working_set.length > 0    // we have images
+           this.masterContent.length > 0    // we have images
         && !this.existsClass("hovering")        // user is not currently hovering over an image
         && this.props.imageCarousel.present.items.length < (CAROUSEL_SIZE + QUEUE_SIZE) // the carousel is not overloaded
-        && this.props.imageCarousel.present.items.length < this.image_working_set.length // we haven't exhausted our supply of available images
+        && this.props.imageCarousel.present.items.length < this.masterContent.length // we haven't exhausted our supply of available images
         && i < CAROUSEL_SIZE) {        // stop gap to avoid infinites loops
 
         const image = this.getNextImage();
@@ -190,17 +212,17 @@ class Home extends Component {
   }
 
   nextSerialNumber() {
-    return this.image_working_set.sort((a, b) =>  Number(b.viewing_sequence) - Number(a.viewing_sequence))[0].viewing_sequence + 1;
+    return this.masterContent.sort((a, b) =>  Number(b.viewing_sequence) - Number(a.viewing_sequence))[0].viewing_sequence + 1;
   }
 
   serializedImage(image) {
     var RetVal;
 
 
-    for (var i=0; i<this.image_working_set.length; i++) {
-      if (this.image_working_set[i].id === image.id) {
-        this.image_working_set[i].viewing_sequence = this.nextSerialNumber();
-        RetVal = this.image_working_set[i];
+    for (var i=0; i<this.masterContent.length; i++) {
+      if (this.masterContent[i].id === image.id) {
+        this.masterContent[i].viewing_sequence = this.nextSerialNumber();
+        RetVal = this.masterContent[i];
         break;
       }
     }
@@ -242,8 +264,8 @@ class Home extends Component {
     }
   }
     getNextImage() {
-    if (this.image_working_set === null || this.image_working_set.length === 0) return null;
-    var images = this.image_working_set;
+    if (this.masterContent === null || this.masterContent.length === 0) return null;
+    var images = this.masterContent;
 
     // filter images that were disliked or closed but are still pending analytics processing.
     const disliked = this.props.userSignals.items
@@ -298,29 +320,13 @@ class Home extends Component {
     return image;
   }
 
-  handleChangeLevel() {
 
-    if (this.props.categories.isLoading && !this.isCategoryInitialized) {
-      // we're not ready, so wait 500ms and then try again.
-      const self = this;
-      setTimeout(function() {
-          self.handleChangeLevel();
-      }, 500);
-      return;
-    }
-
-    const cats = this.props.categories.items;
-    this.isCategoryInitialized = true;
-    this.category_exclusions = wpGetExclusions(this.state.level, cats);
-    this.media_query = mediaUrl + "&" + this.category_exclusions;
-  
-  }
 
   // find the next random page number to query by choosing
   // a random page that has not already been queried.
   getNextPage() {
     var potential_pages = [];
-    for (var i=1; i<this.num_pages; i++) {
+    for (var i=1; i<this.numPages; i++) {
       if (! this.pages_returned.includes(i)) {
         potential_pages.push(i);
       }
@@ -330,8 +336,9 @@ class Home extends Component {
     return potential_pages[idx];
 
   }
+
   imageFetcher() {
-      const url = this.media_query + "&page=" + this.page_number;
+      const url = this.media_query + "&page=" + this.pageNumber;
       fetch(url)
       .then(response => {
             if (response.ok) {
@@ -343,8 +350,7 @@ class Home extends Component {
             }
         },
         error => {
-            var errmess = new Error(error.message);
-            throw errmess;
+            throw new Error(error.message);
       })
       .then(response => response.json())
       .then(images => {
@@ -352,7 +358,7 @@ class Home extends Component {
         var new_images = [];
         for (var i=0; i<images.length;  i++) {
           const candidate = images[i]
-          if (this.image_working_set.filter(image => candidate.id === image.id).length === 0) new_images.push(images[i]);
+          if (this.masterContent.filter(image => candidate.id === image.id).length === 0) new_images.push(images[i]);
         }
 
         new_images = new_images.map((image) => {
@@ -361,13 +367,13 @@ class Home extends Component {
           return image;
         })
 
-        const isWorkingSetInitialized = this.image_working_set.length > 0;
-        this.image_working_set = this.image_working_set.concat(new_images);
+        const isWorkingSetInitialized = this.masterContent.length > 0;
+        this.masterContent = this.masterContent.concat(new_images);
 
         if (!isWorkingSetInitialized) this.queueImages();
 
-        this.pages_returned.push(this.page_number);
-        this.page_number = this.getNextPage(); 
+        this.pages_returned.push(this.pageNumber);
+        this.pageNumber = this.getNextPage(); 
       })
       .catch(error => {
         /* most common error is when we query for non-existent page (we don't know how many pages there are) */
@@ -382,15 +388,15 @@ class Home extends Component {
         */
 
       // try to reverse engineer the total number of pages avaiable.
-        var num_pages = this.num_pages > this.page_number ? this.num_pages - Math.floor((this.num_pages - this.page_number)/2)  : this.num_pages;
-        num_pages = num_pages > Math.max( ...this.pages_returned ) ? num_pages - 1 : Math.max( ...this.pages_returned );
-        this.num_pages = num_pages;
-        this.page_number = this.getNextPage();
+        var numPages = this.numPages > this.pageNumber ? this.numPages - Math.floor((this.numPages - this.pageNumber)/2)  : this.numPages;
+        numPages = numPages > Math.max( ...this.pages_returned ) ? numPages - 1 : Math.max( ...this.pages_returned );
+        this.numPages = numPages;
+        this.pageNumber = this.getNextPage();
 
       });
   
 
-    if (this.page_number !== 0) {
+    if (this.pageNumber !== 0) {
       const delay = 1000;
       const self = this;
       this.fetcherDelay = setTimeout(function() {
@@ -438,22 +444,22 @@ class Home extends Component {
   }
 
   getRankPercentile(image) {
-    if (this.image_working_set.length > 0) {
-      const ranked = this.image_working_set.sort((a, b) => a.rank - b.rank);
+    if (this.masterContent.length > 0) {
+      const ranked = this.masterContent.sort((a, b) => a.rank - b.rank);
       var idx = ranked.findIndex((obj) => obj.id === image.id);
-      return idx / this.image_working_set.length;
+      return idx / this.masterContent.length;
     }
     return 0;
   }
   
   rankWorkingSet() {
     var rank = 1;
-    for (var i=0; i<this.image_working_set.length; i++) {
-        for (var j=0; j<this.image_working_set[i].categories.length; j++) {
-          rank += this.getCategoryScore(this.image_working_set[i].categories[j]);
+    for (var i=0; i<this.masterContent.length; i++) {
+        for (var j=0; j<this.masterContent[i].categories.length; j++) {
+          rank += this.getCategoryScore(this.masterContent[i].categories[j]);
         }
-        if (this.image_working_set[i].categories.length > 0) rank = rank / this.image_working_set[i].categories.length
-        this.image_working_set[i].rank = rank;
+        if (this.masterContent[i].categories.length > 0) rank = rank / this.masterContent[i].categories.length
+        this.masterContent[i].rank = rank;
     }
   }
 
