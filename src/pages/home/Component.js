@@ -76,6 +76,8 @@ class Home extends Component {
   addMasterContent(items) {
     this.masterContent = items;
     console.log("addMasterContent()", this.masterContent);
+    if (this.props.imageCarousel.present.items.length === 0) this.queueImages();
+
   }
 
   componentDidMount() {
@@ -106,7 +108,6 @@ class Home extends Component {
   }
 
   render() {
-      console.log("render()", this.props.imageCarousel);
       const images = this.props.imageCarousel.present.items;
       return(
           <div key="home-page" id="home-page" className="home-page m-0 p-0" onScroll={this.handleScroll}>
