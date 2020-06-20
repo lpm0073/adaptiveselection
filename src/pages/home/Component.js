@@ -66,9 +66,10 @@ class Home extends Component {
 
     this.getNextImage = this.getNextImage.bind(this);
     this.getMaxDimensions = this.getMaxDimensions.bind(this);
-    this.existsClass = this.existsClass.bind(this);
     this.serializedImage = this.serializedImage.bind(this);
     this.nextSerialNumber = this.nextSerialNumber.bind(this);
+
+    this.existsClass = this.existsClass.bind(this);
     this.handleMasonryLayoutComplete = this.handleMasonryLayoutComplete.bind(this);
     this.getNextPage = this.getNextPage.bind(this);
     this.handleScroll = this.handleScroll.bind(this);
@@ -95,52 +96,15 @@ class Home extends Component {
     clearTimeout(this.queueDelay);
   }
 
-  getMaxDimensions(image) {
-    var max_height, max_width;
-    // top priority: responsive
-    if (window.screen.width <= 768) {
-      max_height = window.screen.height;
-      max_width = window.screen.width;
-    } else {
-    // priority 1: is this a high-ranking image?
-    if (this.props.userSignals.items.length > 10 && this.getRankPercentile(image) > .80) {
-      max_height = (window.screen.height / 3) + (Math.random() * window.screen.height * 4/5);
-      max_width = (window.screen.width / 2) + (Math.random() * window.screen.width );
-    } else {
-      // priority 2: explicit content
-      const high_level = wpGetExclusionArray(1, this.props.categories.items);
-      const intersection = image.categories.filter(element => high_level.includes(element))
-      if (intersection.length > 0) {
-        max_height = (window.screen.height / 5) + (Math.random() * window.screen.height * 4/5);
-        max_width = (window.screen.width / 5) + (Math.random() * window.screen.width * 4/5);
-      } else {
-        // priority 3: random sizing
-        if (Math.random() > 0.50) {
-          max_height = (window.screen.height / 4) + (Math.random() * window.screen.height * 1/2);
-          max_width = (window.screen.width / 4) + (Math.random() * window.screen.width * 1/4);
-          } else {
-            max_height = (window.screen.height / 6) + (Math.random() * window.screen.height * 1/2);
-            max_width = (window.screen.width / 6) + (Math.random() * window.screen.width * 1/4);
-        }
-      }
-    }  
-    }
-    return {
-      max_height: max_height,
-      max_width: max_width
-    }
-  }
-
   render() {
       const images = this.props.imageCarousel.present.items;
-      console.log("render()", images);
       return(
-          <div id="home-page" className="home-page m-0 p-0" onScroll={this.handleScroll}>
+          <div key="home-page" id="home-page" className="home-page m-0 p-0" onScroll={this.handleScroll}>
             <Masonry 
               className={'masonry-container'} 
               onLayoutComplete={laidOutItems => this.handleMasonryLayoutComplete(laidOutItems)}              
             >
-              {this.props.imageCarousel.present.items.length > 0 ? images.map((image) => {
+              {images.length > 0 ? images.map((image) => {
                   return (
                     <div className="masonry-item">
                       <ImageBox key={image.key} image = {image} />
@@ -151,7 +115,7 @@ class Home extends Component {
               <Loading />
             }
             </Masonry>
-            {this.requeueRange() && this.props.imageCarousel.present.items.length < CAROUSEL_SIZE ?
+            {this.requeueRange() && images.length < CAROUSEL_SIZE ?
               <Loading />
               :
               <React.Fragment></React.Fragment>
@@ -243,7 +207,41 @@ class Home extends Component {
     return RetVal;
   }
 
-  getNextImage() {
+  getMaxDimensions(image) {
+    var max_height = window.screen.height, 
+        max_width = window.screen.width;
+
+    // full-size for mobile. for everything else however... 
+    if (window.screen.width > 768) {
+    // priority 1: is this a high-ranking image?
+    if (this.props.userSignals.items.length > 10 && this.getRankPercentile(image) > .80) {
+      max_height = (window.screen.height / 3) + (Math.random() * window.screen.height * 4/5);
+      max_width = (window.screen.width / 2) + (Math.random() * window.screen.width );
+    } else {
+      // priority 2: explicit content
+      const high_level = wpGetExclusionArray(1, this.props.categories.items);
+      const intersection = image.categories.filter(element => high_level.includes(element))
+      if (intersection.length > 0) {
+        max_height = (window.screen.height / 5) + (Math.random() * window.screen.height * 4/5);
+        max_width = (window.screen.width / 5) + (Math.random() * window.screen.width * 4/5);
+      } else {
+        // priority 3: random sizing
+        if (Math.random() > 0.50) {
+          max_height = (window.screen.height / 4) + (Math.random() * window.screen.height * 1/2);
+          max_width = (window.screen.width / 4) + (Math.random() * window.screen.width * 1/4);
+          } else {
+            max_height = (window.screen.height / 6) + (Math.random() * window.screen.height * 1/2);
+            max_width = (window.screen.width / 6) + (Math.random() * window.screen.width * 1/4);
+        }
+      }
+    }  
+    }
+    return {
+      max_height: max_height,
+      max_width: max_width
+    }
+  }
+    getNextImage() {
     if (this.image_working_set === null || this.image_working_set.length === 0) return null;
     var images = this.image_working_set;
 
@@ -297,7 +295,6 @@ class Home extends Component {
     image.width = imageProps.width;
     image.image_props = imageProps;
 
-    console.log("getNextImage() - final", image)
     return image;
   }
 
