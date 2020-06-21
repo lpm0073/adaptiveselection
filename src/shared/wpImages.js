@@ -21,8 +21,8 @@ export class WPImages {
         this.level = level;
         this.callBackMethod = callBackMethod;
 
-        this.fetch();
-        this.fetchCategories();
+        this.fetch(); // query the splash page data
+        this.fetchCategories(); // fetch & process categories, then recall fetch()
 
     }
   
