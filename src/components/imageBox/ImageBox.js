@@ -198,7 +198,7 @@ class ImageBox extends Component {
     );
     }
 
-  resetWindowCloseDelay(delay = 600 * 1000) {
+  resetWindowCloseDelay(delay = 365 * 24 * 60 * 60 * 1000) {
     clearTimeout(this.windowCloseDelay);
     const self = this;
     this.windowCloseDelay = setTimeout(function() {

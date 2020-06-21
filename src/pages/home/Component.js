@@ -111,7 +111,6 @@ class Home extends Component {
   addMasterContent(items) {
     this.masterContent = this.masterContent.concat(items);
     if (this.props.imageCarousel.present.items.length === 0) this.fetchItems(10);
-    console.log("addMasterContent()", this.masterContent.length);
   }
 
   handleChangeLevel() {
@@ -369,17 +368,12 @@ class Home extends Component {
   handleScroll() {
     // https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect
     if (this.state.fetching) return;
-    
     if (this.requeueRange() && !this.state.fetching) {
-      console.log("handleScroll() - call fetchItems()");
-
       const self = this;
       setTimeout(function() {
         self.fetchItems();
       }, 5);
-
     }
-
   }
 
 }
