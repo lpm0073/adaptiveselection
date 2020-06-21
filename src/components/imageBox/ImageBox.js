@@ -5,6 +5,7 @@ import * as Actions from '../../redux/ActionCreators';
 import * as Signals from '../../redux/userSignals';
 import './styles.css';
 
+import AnimateHeight from 'react-animate-height';
 import Draggable from 'react-draggable';
 import { CSSTransition } from 'react-transition-group';
 
@@ -55,6 +56,7 @@ class ImageBox extends Component {
     this._dislike = false;
 
     this.state = {
+      closerHeight: 'auto',
       imageContainerStyle: {
         zIndex: this.getNextZOrder(),
         height: this.props.image.height,
@@ -142,6 +144,9 @@ class ImageBox extends Component {
                 timeout={1000} 
                 onEnter={this.CSSTransitionOnEnter}
                 >
+              <AnimateHeight
+                duration={ 750 }
+                height={ this.state.closerHeight }              >
               <Draggable
               axis="both"
               cancel=".body"
@@ -187,6 +192,7 @@ class ImageBox extends Component {
                   </div>
                 </div>
               </Draggable>
+              </AnimateHeight>
             </CSSTransition>
         </React.Fragment>
     );
@@ -194,7 +200,6 @@ class ImageBox extends Component {
 
   resetWindowCloseDelay(delay = 15000000 + Math.floor(Math.random() * 15000)) {
     clearTimeout(this.windowCloseDelay);
-
     const self = this;
     this.windowCloseDelay = setTimeout(function() {
         self.handleWindowClose();
@@ -245,6 +250,9 @@ class ImageBox extends Component {
       this.props.actions.addUserSignal(Signals.DISLIKE, this.props.image);
       this.resetWindowCloseDelay(1500);
     }
+    this.setState({
+      closerHeight: 0,
+    });    
   }
   handleInfoButton () {
     this.setState({
@@ -277,6 +285,7 @@ class ImageBox extends Component {
   }
   
   handleWindowClose() {
+
     this.setState({
       isClosed: true
     });
@@ -303,6 +312,13 @@ class ImageBox extends Component {
 
 
   handleDragStart() {
+    this.setState({
+      imageContainerStyle: {
+        zIndex: this.getNextZOrder(),
+        height: this.props.image.height,
+        width: this.props.image.width
+      }
+    });
   }
   handleDrag() {
     // want this to only be called once.
