@@ -113,7 +113,6 @@ export class WPImages {
         this.pageNumber = this.getNextPage();
 
         const self = this;
-        console.log("fetch() - error", this.numPages, this.pagesReturned.length, this.pageNumber);
         if (this.pagesReturned.length < this.numPages) {
           this.fetchDelay = setTimeout(function() {
             self.fetch();      

@@ -72,7 +72,7 @@ class Home extends Component {
     this.state = {
       level: 0,
       fetching: false,
-      deleting: 0
+      deleting: []
     }
 
   }
@@ -85,7 +85,6 @@ class Home extends Component {
     clearTimeout(this.queueDelay);
   }
   render() {
-      if (this.props.imageCarousel.present == null) console.log("render()", this.props.imageCarousel);
       const images = this.props.imageCarousel.present.items;
       return(
           <div key="home-page" id="home-page" className="home-page m-0 p-0" onScroll={this.handleScroll}>
@@ -155,7 +154,7 @@ class Home extends Component {
     }
     function numItems(self) {
       if (self.masterContent.length < MAX_ITEMS) return MAX_ITEMS;
-      return (Math.random() * 10) % MAX_ITEMS;
+      return 1 + Math.floor((Math.random() * 10)) % MAX_ITEMS;
     }
     function isDuplicate(self,subject) {
       return self.props.imageCarousel.present.items.filter((item) => item.id === subject.id).length > 0;      
@@ -167,9 +166,8 @@ class Home extends Component {
 
     // if we have images in our working set, and we need more images on screen
     if (shouldFetch(this)) {
-      console.log("fetchRow() - imageCarousel:", this.props.imageCarousel.present.items.length);
       var n = numItems(this);
-      for (var i=0; i<n; i++) {
+      for (var i=1; i<=n; i++) {
         const item = this.getNextItem();
         var obj = {
           key: item.id,
@@ -183,9 +181,7 @@ class Home extends Component {
           timestamp: new Date()
         };
         this.props.actions.addImageCarousel(obj);
-
       }
-
     }
 
     if (this.props.imageCarousel.present.items.length < CAROUSEL_SIZE) {
@@ -331,17 +327,17 @@ class Home extends Component {
 
   handleScroll() {
 
-    var page = document.getElementById("home-page"); 
     const images = [].concat(this.props.imageCarousel.present.items);
 
+    function isAboveViewport (image) {
+      return document.getElementById(image.id).getBoundingClientRect().bottom < 0;
+    }
+
     for (var i=0; i<images.length; i++) {
-      const image = this.props.imageCarousel.present.items[i];
-      const element = document.getElementById(image.id);
-      var bottom = element.offsetTop + image.height; 
-      var hasPast = (page.scrollTop > bottom);
+      const image = images[i];
   
-      if (hasPast && image.id !== this.state.deleting) {
-        this.setState({deleting: image.id});
+      if (isAboveViewport(image) && !this.state.deleting.includes(image.id)) {
+        this.setState({deleting: this.state.deleting.concat(image.id)});
         this.props.actions.removeImageCarousel(image, "item");
         if (this.requeueRange() && !this.state.fetching) this.fetchRow();
         return;
