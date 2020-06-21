@@ -47,7 +47,7 @@ export class WPImages {
         this.gettingSplashData = true;
         url = wpSplashUrl;
       }
-      else url = wpMediaUrl + "&" + wpGetExclusions(this.level, this.categories);
+      else url = wpMediaUrl + "&page=" + this.pageNumber + "&" + wpGetExclusions(this.level, this.categories);
 
       fetch(url)
       .then(response => {

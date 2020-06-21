@@ -116,6 +116,7 @@ class Home extends Component {
   addMasterContent(items) {
     this.masterContent = this.masterContent.concat(items);
     if (this.props.imageCarousel.present.items.length === 0) this.fetchRow();
+    console.log("addMasterContent()", this.masterContent);
   }
 
   handleChangeLevel() {
