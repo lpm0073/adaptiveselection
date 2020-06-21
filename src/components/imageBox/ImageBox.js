@@ -161,7 +161,7 @@ class ImageBox extends Component {
               onStop={this.handleDragEnd}
               >
                 <div
-                key={key}
+                key={key + "-" + Math.floor(Math.random() * 1000)}
                 id={this.props.image.id}
                 className={containerClasses}
                 style={this.state.imageContainerStyle}
@@ -331,7 +331,6 @@ class ImageBox extends Component {
     this._move = false;
     this.setState({
       imageContainerStyle: {
-        zIndex: this.getNextZOrder(),
         height: this.props.image.height,
         width: this.props.image.width
       }
