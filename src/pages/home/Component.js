@@ -95,9 +95,9 @@ class Home extends Component {
        */
       return(
           <div key="home-page" id="home-page" className="home-page m-0 p-0" onScroll={this.handleScroll}>
-              {images.length > 0 ? images.map((image) => {
+              {images.length > 0 ? images.map((image, idx) => {
                   return (
-                    <ImageBox key={image.key} image = {image} />
+                    <ImageBox key={image.key + "-" + idx} image = {image} />
                   );
                 })
             :
