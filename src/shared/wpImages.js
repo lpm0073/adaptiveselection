@@ -345,7 +345,7 @@ export const wpGetExclusions = (level, categories) => {
     return a dict of image meta data based on available
     images, screen size, and aspect_ratio.
   */
- export const wpGetImage = (item, max_height = 1024, max_width = 2048) => {
+ export const wpGetImage = (item, max_height = window.screen.height, max_width = window.screen.width) => {
 
     let dict, imgDict;
     const aspect_ratio = getAspectRatio(item);

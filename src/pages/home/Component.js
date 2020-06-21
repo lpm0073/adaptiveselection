@@ -243,23 +243,16 @@ class Home extends Component {
     } else images = images.sort((a, b) => a.viewing_sequence - b.viewing_sequence);
 
     const imageIdx = Math.floor(Math.random() * images.length);
-    if (imageIdx >= 0) {
-      const image = this.serializedImage(images[imageIdx]);
-      var max_height, max_width, obj = this.getMaxDimensions(image);
-      max_height = obj.max_height;
-      max_width = obj.max_width;
-  
-      const imageProps = wpGetImage(image, max_height, max_width);
-  
-      image.source_url = imageProps.source_url;
-      image.height = imageProps.height;
-      image.width = imageProps.width;
-      image.image_props = imageProps;
-      
-      return image;
-        
-    } else console.log("getNextItem() internal error ", imageIdx, images);
-  }
+    const image = this.serializedImage(images[imageIdx]);
+    const imageProps = wpGetImage(image);
+
+    image.source_url = imageProps.source_url;
+    image.height = imageProps.height;
+    image.width = imageProps.width;
+    image.image_props = imageProps;
+    
+    return image;
+}
 
  
   handleMasonryLayoutComplete(laidOutItems) {
