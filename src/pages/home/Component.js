@@ -79,7 +79,7 @@ class Home extends Component {
 
 
   componentDidMount() {
-    this.wpImages = new WPImages(this.level, this.props.categories, this.addMasterContent);
+    this.wpImages = new WPImages(this.state.level, this.addMasterContent);
   }
   componentWillUnmount() {
     clearTimeout(this.queueDelay);
@@ -116,6 +116,7 @@ class Home extends Component {
   addMasterContent(items) {
     this.masterContent = this.masterContent.concat(items);
     if (this.props.imageCarousel.present.items.length === 0) this.fetchRow();
+    console.log("addMasterContent()", this.masterContent.length);
   }
 
   handleChangeLevel() {

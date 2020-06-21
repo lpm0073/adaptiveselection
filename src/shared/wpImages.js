@@ -17,12 +17,11 @@ export class WPImages {
     gettingSplashData = false;
     gotSplashData = false;
   
-    constructor(level, categories, callBackMethod) {
-        this.categories = categories;
+    constructor(level, callBackMethod) {
         this.level = level;
         this.callBackMethod = callBackMethod;
 
-        this.fetch();
+        this.fetchCategories();
 
     }
   
@@ -48,7 +47,6 @@ export class WPImages {
         url = wpSplashUrl;
       }
       else url = wpMediaUrl + "&page=" + this.pageNumber + "&" + wpGetExclusions(this.level, this.categories);
-      console.log("fetch - exclusions", wpGetExclusions(this.level, this.categories), this.level, this.categories);
 
       fetch(url)
       .then(response => {
@@ -119,12 +117,201 @@ export class WPImages {
             self.fetch();      
           }, 1000);
           }
-  
       });
-  
-  }
-}
+  } /* ----------------- fetch() ----------------------------- */
 
+  fetchCategories() {
+
+    return fetch(wpCategoriesUrl)
+    .then(
+        response => {
+            if (response.ok) {
+                return response;
+            } else {
+                var error = new Error('Error ' + response.status + ': ' + response.statusText);
+                error.response = response;
+                throw error;
+            }
+        },
+        error => {
+            var errmess = new Error(error.message);
+            throw errmess;
+        })
+    .then(response => response.json())
+    .then(categories => {
+        // Calculate category factor weights by level of explicitness (0 thru 4)
+        let i;
+        var explicitness = 0;
+        var factorweighted_categories = [],
+
+            level0_exclusions = [],
+            level1_exclusions = [],
+            level2_exclusions = [],
+            level3_exclusions = [],
+            level4_exclusions = [],
+
+            level0_cnt = 0,
+            level1_cnt = 0,
+            level2_cnt = 0,
+            level3_cnt = 0,
+            level4_cnt = 0,
+
+            level0_i = 0,
+            level1_i = 0,
+            level2_i = 0,
+            level3_i = 0,
+            level4_i = 0,
+
+            level0_normalization_factor = 0,
+            level1_normalization_factor = 0,
+            level2_normalization_factor = 0,
+            level3_normalization_factor = 0,
+            level4_normalization_factor = 0,
+
+            SumOfCountWeight_0 = 0,
+            SumOfCountWeight_1 = 0,
+            SumOfCountWeight_2 = 0,
+            SumOfCountWeight_3 = 0,
+            SumOfCountWeight_4 = 0;
+
+        
+
+        for (i=0; i < categories.length; i++) {
+            const x = categories[i]
+            explicitness = 0;
+            if (x.acf.explicitness) explicitness = x.acf.explicitness
+            explicitness = parseInt(explicitness, 10);
+            switch (explicitness) {
+                case 0:
+                    level0_cnt += x.count;
+                    level0_i += 1;
+                    break;
+                case 1:
+                    level1_cnt += x.count;
+                    level1_i += 1;
+                    level0_exclusions.push(x.id);
+                    break;
+                case 2:
+                    level2_cnt += x.count;
+                    level2_i += 1;
+                    level1_exclusions.push(x.id);
+                    break;
+                case 3:
+                    level3_cnt += x.count;
+                    level3_i += 1;
+                    level2_exclusions.push(x.id);
+                    break;
+                case 4:
+                    level4_cnt += x.count;
+                    level4_i += 1;
+                    level3_exclusions.push(x.id);
+                    break;
+                default:
+                    break;
+            }
+        }
+        level2_exclusions = level2_exclusions.concat(level3_exclusions);
+        level1_exclusions = level1_exclusions.concat(level2_exclusions);
+        level0_exclusions = level0_exclusions.concat(level1_exclusions);
+
+        level4_cnt += level3_cnt + level2_cnt + level1_cnt + level0_cnt;
+        level3_cnt += level2_cnt + level1_cnt + level0_cnt;
+        level2_cnt += level1_cnt + level0_cnt;
+        level1_cnt += level0_cnt;
+
+        level4_i += level3_i + level2_i + level1_i + level0_i;
+        level3_i += level2_i + level1_i + level0_i;
+        level2_i += level1_i + level0_i;
+        level1_i += level0_i;
+
+        // add percentage weights by level
+        for (i=0; i < categories.length; i++) {
+            
+            var x = categories[i];
+
+            // initialize analytics data
+            x.user_signals = {
+                like: 0,
+                unlike: 0,
+                dislike: 0,
+                info: 0,
+                close: 0,
+                click: 0,
+                move: 0,
+                resize: 0
+            }
+            explicitness = 0;
+            if (x.acf.explicitness) explicitness = x.acf.explicitness
+            explicitness = parseInt(explicitness, 10);
+
+            x.level = explicitness;
+            x.level0_item_pct = x.count / level0_cnt;
+            x.level1_item_pct = x.count / level1_cnt;
+            x.level2_item_pct = x.count / level2_cnt;
+            x.level3_item_pct = x.count / level3_cnt;
+            x.level4_item_pct = x.count / level4_cnt;
+
+            x.level0_count_weight = x.count / (level0_cnt / level0_i);
+            x.level1_count_weight = x.count / (level1_cnt / level1_i);
+            x.level2_count_weight = x.count / (level2_cnt / level2_i);
+            x.level3_count_weight = x.count / (level3_cnt / level3_i);
+            x.level4_count_weight = x.count / (level4_cnt / level4_i);
+
+            // initialize scoring metric
+            x.factor_score = 0;
+
+            delete x.acf;
+            factorweighted_categories.push(x);
+        }
+        // normalize factor results (step 1)
+        for (i=0; i < factorweighted_categories.length; i++) {
+            SumOfCountWeight_0 += factorweighted_categories[i].level0_count_weight;
+            SumOfCountWeight_1 += factorweighted_categories[i].level1_count_weight;
+            SumOfCountWeight_2 += factorweighted_categories[i].level2_count_weight;
+            SumOfCountWeight_3 += factorweighted_categories[i].level3_count_weight;
+            SumOfCountWeight_4 += factorweighted_categories[i].level4_count_weight;
+        }
+
+        level0_normalization_factor = SumOfCountWeight_0 / level0_i;
+        level1_normalization_factor = SumOfCountWeight_1 / level1_i;
+        level2_normalization_factor = SumOfCountWeight_2 / level2_i;
+        level3_normalization_factor = SumOfCountWeight_3 / level3_i;
+        level4_normalization_factor = SumOfCountWeight_4 / level4_i;
+
+
+        for (i=0; i < factorweighted_categories.length; i++) {
+            factorweighted_categories[i].level0_weight = factorweighted_categories[i].level0_count_weight / level0_normalization_factor;
+            factorweighted_categories[i].level1_weight = factorweighted_categories[i].level1_count_weight / level1_normalization_factor;
+            factorweighted_categories[i].level2_weight = factorweighted_categories[i].level2_count_weight / level2_normalization_factor;
+            factorweighted_categories[i].level3_weight = factorweighted_categories[i].level3_count_weight / level3_normalization_factor;
+            factorweighted_categories[i].level4_weight = factorweighted_categories[i].level4_count_weight / level4_normalization_factor;
+        }
+
+        this.categories = {
+            level0_exclusions: level0_exclusions,
+            level1_exclusions: level1_exclusions,
+            level2_exclusions: level2_exclusions,
+            level3_exclusions: level3_exclusions,
+            level4_exclusions: level4_exclusions,
+            level0_i: level0_i,
+            level1_i: level1_i,
+            level2_i: level2_i,
+            level3_i: level3_i,
+            level4_i: level4_i,
+            level0_normalization_factor: level0_normalization_factor,
+            level1_normalization_factor: level1_normalization_factor,
+            level2_normalization_factor: level2_normalization_factor,
+            level3_normalization_factor: level3_normalization_factor,
+            level4_normalization_factor: level4_normalization_factor,
+            categories: factorweighted_categories
+        }
+        this.fetch();
+    })
+    .catch(error => console.log("fetchCategories() failed.", error.message));
+
+} /* ------------------- fetchCategories)() ------------------- */
+
+}  /* ---------------------------------- WPImages --------------------------------------------------- */
 
 function array_to_csv(level, categories) {
 
@@ -158,13 +345,12 @@ export const wpGetExclusionArray = (level, categories) => {
 
 export const wpGetExclusions = (level, categories) => {
     // https://api.fotomashup.com/wp-json/wp/v2/media?categories=5,2&_fields=id,categories,acf,media_details&categories_exclude=3,10
-
-    if (!categories.isLoading !== null && !isNaN(level)) {
-        const exclusions = array_to_csv(level, categories.items);
-        if (exclusions.length > 0) {
-            return "categories_exclude=" + exclusions;
-        }
+    
+    const exclusions = array_to_csv(level, categories.categories);
+    if (exclusions.length > 0) {
+        return "categories_exclude=" + exclusions;
     }
+
     return "";
 }
   /*
