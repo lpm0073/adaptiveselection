@@ -30,7 +30,7 @@ const mapDispatchToProps = (dispatch) => {
   });
 };
 
-const CAROUSEL_SIZE = 6;      // # of images on screen
+const MAX_CAROUSEL_SIZE = 12;      // # of images on screen
 const RANKTILE = 3            // groupings between ranked image selection
 
 class Home extends Component {
@@ -103,7 +103,7 @@ class Home extends Component {
               <Loading />
             }
             </Masonry>
-            {this.requeueRange() && images.length < CAROUSEL_SIZE ?
+            {this.requeueRange() && images.length < MAX_CAROUSEL_SIZE ?
               <Loading />
               :
               <React.Fragment></React.Fragment>
@@ -116,7 +116,6 @@ class Home extends Component {
   addMasterContent(items) {
     this.masterContent = this.masterContent.concat(items);
     if (this.props.imageCarousel.present.items.length === 0) this.fetchRow();
-    console.log("addMasterContent()", this.masterContent);
   }
 
   handleChangeLevel() {
@@ -151,6 +150,7 @@ class Home extends Component {
     function shouldFetch(self) {
       if (!self.masterContent.length > 0) return false;
       if (self.existsClass("hovering")) return false ;
+      if (self.props.imageCarousel.present.items.length > MAX_CAROUSEL_SIZE) return false;
       return true;
     }
     function numItems(self) {
@@ -185,15 +185,17 @@ class Home extends Component {
       }
     }
 
-    if (this.props.imageCarousel.present.items.length < CAROUSEL_SIZE) {
+    // SWAG on what we need to fill the screen
+    if (this.props.imageCarousel.present.items.length < 5) {
 
       // keep calling ourselves until we have a full imageCarousel
       const self = this;
       this.queueDelay = setTimeout(function() {
         self.fetchRow();      
-      }, this.props.imageCarousel.present.items.length < CAROUSEL_SIZE ? 1000 : 20000);
+      }, 1000);
   
     }
+    console.log("fetchRow() - final", this.props.imageCarousel.present.items.length );
     this.setState({fetching: false});
   }
 
@@ -313,7 +315,6 @@ class Home extends Component {
     image.width = imageProps.width;
     image.image_props = imageProps;
 
-    console.log("getNextItem()", image);
     return image;
   }
 

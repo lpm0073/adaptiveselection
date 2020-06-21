@@ -17,7 +17,6 @@ export const ImageCarousel = (state = {
                 ]};
             if (action.action === "item") {
                 const idx = [...state.items].map(function(image) {return image.id;}).indexOf(action.payload.id);
-                console.log("ImageCarousel() - delete", idx, action.payload.id);
                 if (!idx > 0)  
                     return {...state, added: false, deleted: true, items: [
                         ...state.items.slice(0, idx),
