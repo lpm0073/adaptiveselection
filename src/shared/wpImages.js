@@ -50,6 +50,7 @@ export class WPImages {
       } else {
         if (this.categories) url = wpMediaUrl + "&page=" + this.pageNumber + "&" + wpGetExclusions(this.level, this.categories);
         else return;
+        if (this.pageNumber < 1) return;
       }
 
       fetch(url)
@@ -79,9 +80,11 @@ export class WPImages {
           if (this.items.filter(image => candidate.id === image.id).length === 0) new_images.push(images[i]);
         }
   
+        // attribute pre-initializations
         new_images = new_images.map((image) => {
+          image.type = "WPData";
           image.viewing_sequence = 0;
-          image.rank = 1;   // pre-initialize image rank based on user signals. 
+          image.rank = 1;   
           return image;
         })
         this.callBackMethod(new_images);
@@ -350,7 +353,8 @@ export const wpGetExclusionArray = (level, categories) => {
 export const wpGetExclusions = (level, categories) => {
     // https://api.fotomashup.com/wp-json/wp/v2/media?categories=5,2&_fields=id,categories,acf,media_details&categories_exclude=3,10
     
-    const exclusions = array_to_csv(level, categories.categories);
+    const exclusions = array_to_csv(level, categories);
+
     if (exclusions.length > 0) {
         return "categories_exclude=" + exclusions;
     }
