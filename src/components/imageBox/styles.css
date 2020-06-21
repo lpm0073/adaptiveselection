@@ -20,24 +20,22 @@
 }
 
 .image-container {
-  /* position: absolute; */
-  border-radius: 3px;
-
-  -webkit-box-shadow: 5px 5px 3px 3px rgba(0,0,0,0.5);
-  -moz-box-shadow: 5px 5px 3px 3px rgba(0,0,0,0.5);
-  box-shadow: 5px 5px 3px 3px rgba(0,0,0,0.5);
+  /* programmatic container for all JS / React stuff */
 }
-.image-container:hover {
-  border: 2px solid goldenrod;
-  border-radius: 3px;
-  transition-duration: 150ms;
 
+.image-frame:hover {
+  border: 3px solid goldenrod;
+  transition-duration: 150ms;
+  background-size: cover;
 }
 
 .image-frame {
   background-size: contain;
   background-repeat: no-repeat;
   border-radius: 3px;
+  -webkit-box-shadow: 5px 5px 3px 3px rgba(0,0,0,0.5);
+  -moz-box-shadow: 5px 5px 3px 3px rgba(0,0,0,0.5);
+  box-shadow: 5px 5px 3px 3px rgba(0,0,0,0.5);
 }
 
 .hidden {
@@ -164,27 +162,27 @@
 #button-bar {
   position: relative;
   width: 100%;
-
 }
 
 #button-bar {
   display: none;
 }
-.image-container:hover #button-bar {
+.image-frame:hover #button-bar {
   display: inherit;
   background-color: goldenrod;
   height: 25px;
   bottom: 25px;
+  border-bottom-right-radius: 3px;
+  border-bottom-left-radius: 3px;
   animation: button-bar-slide-up 1s ease-in-out 0ms;
   -webkit-animation: button-bar-slide-up 300ms ease-in-out 0ms;
-  animation-fill-mode: forwards;  
+  animation-fill-mode: forwards;
 
 }
 @keyframes button-bar-slide-up {
   from { bottom: 0px; }
-  100% { bottom: 25px; }
+  100% { bottom: 28px; }
 }
-
 
 #button-bar > div {
   position:absolute;
