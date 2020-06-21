@@ -11,7 +11,6 @@ import * as Actions from '../../redux/ActionCreators';
 import * as Signals from '../../redux/userSignals';
 
 // 3rd party stuff
-//import Masonry from 'react-masonry-component';
 
 // my stuff
 import './styles.css';
@@ -88,12 +87,6 @@ class Home extends Component {
   }
   render() {
       const images = this.props.imageCarousel.present.items;
-      /*
-          <Masonry 
-            className={'masonry-container'} 
-            onLayoutComplete={laidOutItems => this.handleMasonryLayoutComplete(laidOutItems)}              
-          >
-       */
       return(
           <div key="home-page" id="home-page" className="home-page m-0 p-0" onScroll={this.handleScroll}>
               {images.length > 0 ? images.map((image, idx) => {
