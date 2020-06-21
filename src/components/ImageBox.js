@@ -281,7 +281,7 @@ class ImageBox extends Component {
     this._close = true;
     this.props.actions.addUserSignal(Signals.CLOSE, this.props.image);
 
-    const idx = this.props.imageCarousel.items.findIndex((item) => item.id === this.props.image.id); 
+    const idx = this.props.imageCarousel.present.items.findIndex((item) => item.id === this.props.image.id); 
     this.props.actions.removeImageCarousel(idx, "item");
   }
 

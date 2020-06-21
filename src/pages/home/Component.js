@@ -30,7 +30,8 @@ const mapDispatchToProps = (dispatch) => {
   });
 };
 
-const MAX_CAROUSEL_SIZE = 12;      // # of images on screen
+const MAX_CAROUSEL_SIZE = 10000;
+const FETCH_SIZE = 10;
 const RANKTILE = 3            // groupings between ranked image selection
 
 class Home extends Component {
@@ -60,7 +61,7 @@ class Home extends Component {
     this.nextSerialNumber = this.nextSerialNumber.bind(this);
 
     // UI
-    this.fetchRow = this.fetchRow.bind(this);
+    this.fetchItems = this.fetchItems.bind(this);
     this.undoFetchRow = this.undoFetchRow.bind(this);
     this.redoFetchRow = this.redoFetchRow.bind(this);
     this.handleScroll = this.handleScroll.bind(this);
@@ -73,7 +74,8 @@ class Home extends Component {
       level: 0,
       fetching: false,
       restScroll: false,
-      lastScrollTop: 0
+      lastScrollTop: 0,
+      deleted: []
     }
 
   }
@@ -87,12 +89,14 @@ class Home extends Component {
   }
   render() {
       const images = this.props.imageCarousel.present.items;
+      /*
+          <Masonry 
+            className={'masonry-container'} 
+            onLayoutComplete={laidOutItems => this.handleMasonryLayoutComplete(laidOutItems)}              
+          >
+       */
       return(
           <div key="home-page" id="home-page" className="home-page m-0 p-0" onScroll={this.handleScroll}>
-            <Masonry 
-              className={'masonry-container'} 
-              onLayoutComplete={laidOutItems => this.handleMasonryLayoutComplete(laidOutItems)}              
-            >
               {images.length > 0 ? images.map((image) => {
                   return (
                     <div className="masonry-item">
@@ -103,20 +107,13 @@ class Home extends Component {
             :
               <Loading />
             }
-            </Masonry>
-            {this.requeueRange() && images.length < MAX_CAROUSEL_SIZE ?
-              <Loading />
-              :
-              <React.Fragment></React.Fragment>
-            }
           </div>
       );
-  
   }
   
   addMasterContent(items) {
     this.masterContent = this.masterContent.concat(items);
-    if (this.props.imageCarousel.present.items.length === 0) this.fetchRow();
+    if (this.props.imageCarousel.present.items.length === 0) this.fetchItems(10);
     console.log("addMasterContent()", this.masterContent.length);
   }
 
@@ -145,22 +142,13 @@ class Home extends Component {
     local_dispatch(Actions.undoImageCarousel(3));
   }
   
-  fetchRow() {
+  fetchItems(n = -1) {
     this.setState({fetching: true});
-    const MAX_ITEMS = 3;
 
     function shouldFetch(self) {
-      if (!self.masterContent.length > 0) return false;
-      if (self.existsClass("hovering")) return false ;
+      //if (self.existsClass("hovering")) return false ;
       if (self.props.imageCarousel.present.items.length > MAX_CAROUSEL_SIZE) return false;
       return true;
-    }
-    function numItems(self) {
-      if (self.masterContent.length < MAX_ITEMS) return MAX_ITEMS;
-      return 1 + Math.floor((Math.random() * 10)) % MAX_ITEMS;
-    }
-    function isDuplicate(self,subject) {
-      return self.props.imageCarousel.present.items.filter((item) => item.id === subject.id).length > 0;      
     }
     // do this first.
     // gather user analytics signals from class data embedded in the items in props.imageCarousel
@@ -169,21 +157,24 @@ class Home extends Component {
 
     // if we have images in our working set, and we need more images on screen
     if (shouldFetch(this)) {
-      var n = numItems(this);
+      if (n < 0) n = FETCH_SIZE;
+
       for (var i=1; i<=n; i++) {
         const item = this.getNextItem();
-        var obj = {
-          key: item.id,
-          id: item.id,
-          
-          source_url: item.source_url,
-          height: item.height,
-          width: item.width,
-      
-          api_props: item,
-          timestamp: new Date()
-        };
-        this.props.actions.addImageCarousel(obj);
+        if (item) {
+          var obj = {
+            key: item.id,
+            id: item.id,
+            
+            source_url: item.source_url,
+            height: item.height,
+            width: item.width,
+        
+            api_props: item,
+            timestamp: new Date()
+          };
+          this.props.actions.addImageCarousel(obj);
+        }
       }
     }
 
@@ -193,7 +184,7 @@ class Home extends Component {
       // keep calling ourselves until we have a full imageCarousel
       const self = this;
       this.queueDelay = setTimeout(function() {
-        self.fetchRow();      
+        self.fetchItems();      
       }, 1000);
   
     }
@@ -208,20 +199,6 @@ class Home extends Component {
 
   nextSerialNumber() {
     return this.masterContent.sort((a, b) =>  Number(b.viewing_sequence) - Number(a.viewing_sequence))[0].viewing_sequence + 1;
-  }
-
-  serializedImage(image) {
-    var RetVal;
-
-
-    for (var i=0; i<this.masterContent.length; i++) {
-      if (this.masterContent[i].id === image.id) {
-        this.masterContent[i].viewing_sequence = this.nextSerialNumber();
-        RetVal = this.masterContent[i];
-        break;
-      }
-    }
-    return RetVal;
   }
 
   getMaxDimensions(image) {
@@ -258,7 +235,19 @@ class Home extends Component {
       max_width: max_width
     }
   }
-    getNextItem() {
+
+
+  serializedImage(image) {
+    const idx = this.masterContent.map((item) => {return item.id}).indexOf(image.id);
+    if (idx >= 0) {
+      this.masterContent[idx].viewing_sequence = this.nextSerialNumber();
+      return this.masterContent[idx];
+    }
+    console.log("serializedImage() failed", idx, image, this.masterContent);
+  }
+
+
+  getNextItem() {
     if (this.masterContent === null || this.masterContent.length === 0) return null;
     var images = this.masterContent;
     // filter images that were disliked or closed but are still pending analytics processing.
@@ -266,53 +255,35 @@ class Home extends Component {
                       .filter((image) => (image.signal === 'DISLIKE' || image.signal === 'CLOSE'))
                       .map((image) => {return image.id;});
     
-    // negative category ranks
-    const bad_categories = this.props.categories.items.categories.filter((category) => category.factor_score < 0);
-    const good_categories = this.props.categories.items.categories
-                              .filter((category) => category.factor_score > 0)
-                              .sort((a, b) => b.factor_score - a.factor_score);
-    const on_screen = this.props.imageCarousel.present.items.map(item => {
-                                return(item.id);
-                              });
-
-    // exclude images that are currently on screen
-    images = images.filter((item) => { return on_screen.indexOf(item.id) === -1;});
 
     // sort the list based on what's been viewed so far -- put those at the end of the array to avoid dups.
     images = images.sort((a, b) => a.viewing_sequence - b.viewing_sequence);
 
-    // hive off recently viewed so that these cannot be reselected due to high rank.
-    if (images.length > 50) {
-      images = images
-                .sort((a, b) => a.viewing_sequence - b.viewing_sequence)
-                .splice(0, Math.floor(images.length * (3/4)));
-    }
-
     // if list contains not-yet seen images then prioritize these
-    const never_viewed = images.filter((image) => image.viewing_sequence === 0);
+    const never_viewed = [].concat(images.filter((image) => image.viewing_sequence === 0));
     if (never_viewed.length > 0) {
       images = never_viewed;
+      console.log("using never viewed")
     }
 
-    // optimize presentation order: either based on image rank
-    // or randomization.
-    //if (this.props.userSignals.items.length > 10 && Math.random() < (1 / RANKTILE)) {
-    //  images = images.sort((a, b) =>  b.rank - a.rank);
-    //} else images = images.sort((a, b) =>  Math.random());
-
-    const image = this.serializedImage(images[Math.floor(Math.random() * images.length)]);
-    var max_height, max_width, obj = this.getMaxDimensions(image);
-    max_height = obj.max_height;
-    max_width = obj.max_width;
-
-    const imageProps = wpGetImage(image, max_height, max_width);
-
-    image.source_url = imageProps.source_url;
-    image.height = imageProps.height;
-    image.width = imageProps.width;
-    image.image_props = imageProps;
-
-    return image;
+    const imageIdx = Math.floor(Math.random() * images.length);
+    if (imageIdx >= 0) {
+      const image = this.serializedImage(images[imageIdx]);
+      var max_height, max_width, obj = this.getMaxDimensions(image);
+      max_height = obj.max_height;
+      max_width = obj.max_width;
+  
+      const imageProps = wpGetImage(image, max_height, max_width);
+  
+      image.source_url = imageProps.source_url;
+      image.height = imageProps.height;
+      image.width = imageProps.width;
+      image.image_props = imageProps;
+      
+      console.log("getNextItem()", image.viewing_sequence, image.id);
+      return image;
+        
+    } else console.log("getNextItem() internal error ", imageIdx, images);
   }
 
  
@@ -406,7 +377,6 @@ class Home extends Component {
     if (page) {
       const scrollable_area = page.scrollHeight - page.offsetHeight;
       const scroll_position = scrollable_area > 0 ? page.scrollTop / scrollable_area : 0;
-      //console.log("requeueRange() scrollable_area, scrollHeight, offsetHeight, scrollTop, scroll_position", scrollable_area, page.scrollHeight, page.offsetHeight, page.scrollTop, scroll_position);
 
       if (scrollable_area === 0) return true; // not enough content on screen to need a scrollbar
       return (scroll_position > .80);         // we're near the bottom of a scrollable screen 
@@ -415,6 +385,7 @@ class Home extends Component {
   }
 
   handleScroll() {
+
     // https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect
     const page = document.getElementById("home-page");
     const scrollingDown = (this.state.lastScrollTop < page.scrollTop);
@@ -422,38 +393,10 @@ class Home extends Component {
     if (this.state.fetching) return;
     if (this.state.restScroll) return;
 
-    if (scrollingDown) {
-      const images = [].concat(this.props.imageCarousel.present.items);
-      for (var i=0; i<images.length; i++) {
-        if (i>3) return;
-        const image = images[i];
-        const element = document.getElementById(image.id).getBoundingClientRect();
-  
-        if (i===0) {
-          //console.log("handleScroll rect", element, page.scrollTop, page.scrollHeight, page.offsetHeight);
-  
-        }
-        if (element.bottom < 57) {
-          console.log("handleScroll rect, scrollTop, scrollHeight, offsetHeight", element, page.scrollTop, page.scrollHeight, page.offsetHeight);
-          if (this.props.imageCarousel.present.items.filter((item) => item.id === image.id).length > 0) {
-            this.setState({restScroll: true});
-            this.props.actions.removeImageCarousel(image, "item");
-            this.fetchRow();
-            const self = this;
-            setTimeout(function() {
-                self.setState({restScroll: false});
-            }, 100);
-      
-            return;
-          } 
-        }
-      }
-    }
-
     
-    if (this.requeueRange() && !this.state.fetching) {
-      console.log("handleScroll() - call fetchRow()");
-      this.fetchRow();
+    if (scrollingDown && this.requeueRange() && !this.state.fetching) {
+      console.log("handleScroll() - call fetchItems()");
+      this.fetchItems();
     }
 
   }

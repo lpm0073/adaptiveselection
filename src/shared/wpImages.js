@@ -8,7 +8,6 @@ export class WPImages {
 
     level = 0;
     pageNumber = 1;
-    numPages = 25;
     pagesReturned = [];
     items = [];
     callBackMethod = null;
@@ -29,6 +28,9 @@ export class WPImages {
     // find the next random page number to query by choosing
     // a random page that has not already been queried.
     getNextPage() {
+      
+      return this.pageNumber += 1;
+      /*
       var potentialPages = [];
       for (var i=1; i<this.numPages; i++) {
         if (! this.pagesReturned.includes(i)) {
@@ -38,6 +40,7 @@ export class WPImages {
       if (potentialPages.length === 0) return 1;
       var idx = Math.floor(Math.random() * potentialPages.length);
       return potentialPages[idx];
+       */
   
     }
   
@@ -51,6 +54,8 @@ export class WPImages {
         if (this.categories) url = wpMediaUrl + "&page=" + this.pageNumber + "&" + wpGetExclusions(this.level, this.categories);
         else return;
         if (this.pageNumber < 1) return;
+        this.pageNumber = this.getNextPage(); 
+
       }
 
       fetch(url)
@@ -90,40 +95,15 @@ export class WPImages {
         this.callBackMethod(new_images);
         this.items = this.items.concat(new_images);
         this.pagesReturned.push(this.pageNumber);
-        this.pageNumber = this.getNextPage(); 
 
-        if (this.pagesReturned.length < this.numPages) {
-          const self = this;
-          this.fetchDelay = setTimeout(function() {
-            self.fetch();      
-          }, 1000);
-        }
+        const self = this;
+        this.fetchDelay = setTimeout(function() {
+          self.fetch();      
+        }, 1000);
 
       })
       .catch(error => {
-        /* most common error is when we query for non-existent page (we don't know how many pages there are) */
-         /*
-            {
-              "code": "rest_post_invalid_page_number",
-              "message": "The page number requested is larger than the number of pages available.",
-              "data": {
-                "status": 400
-                }
-            }
-        */
-  
-      // try to reverse engineer the total number of pages available.
-        var numPages = this.numPages > this.pageNumber ? this.numPages - Math.floor((this.numPages - this.pageNumber)/2)  : this.numPages;
-        numPages = numPages > Math.max( ...this.pagesReturned ) ? numPages - 1 : Math.max( ...this.pagesReturned );
-        this.numPages = numPages;
-        this.pageNumber = this.getNextPage();
-
-        const self = this;
-        if (this.pagesReturned.length < this.numPages) {
-          this.fetchDelay = setTimeout(function() {
-            self.fetch();      
-          }, 1000);
-          }
+        // don't do anything
       });
   } /* ----------------- fetch() ----------------------------- */
 
