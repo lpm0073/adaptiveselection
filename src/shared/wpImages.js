@@ -21,6 +21,7 @@ export class WPImages {
         this.level = level;
         this.callBackMethod = callBackMethod;
 
+        this.fetch();
         this.fetchCategories();
 
     }
@@ -42,11 +43,14 @@ export class WPImages {
   
     fetch() {
       var url;
-      if (this.categories.isLoading && !this.gettingSplashData && !this.gotSplashData) {
+
+      if (this.categories !== null && !this.gettingSplashData && !this.gotSplashData) {
         this.gettingSplashData = true;
         url = wpSplashUrl;
+      } else {
+        if (this.categories) url = wpMediaUrl + "&page=" + this.pageNumber + "&" + wpGetExclusions(this.level, this.categories);
+        else return;
       }
-      else url = wpMediaUrl + "&page=" + this.pageNumber + "&" + wpGetExclusions(this.level, this.categories);
 
       fetch(url)
       .then(response => {
