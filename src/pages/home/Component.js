@@ -11,7 +11,7 @@ import * as Actions from '../../redux/ActionCreators';
 import * as Signals from '../../redux/userSignals';
 
 // 3rd party stuff
-import Masonry from 'react-masonry-component';
+//import Masonry from 'react-masonry-component';
 
 // my stuff
 import './styles.css';
@@ -114,21 +114,9 @@ class Home extends Component {
   }
 
   handleChangeLevel() {
-
-    if (this.props.categories.isLoading) {
-      // we're not ready, so wait 500ms and then try again.
-      const self = this;
-      setTimeout(function() {
-          self.handleChangeLevel();
-      }, 500);
-      return;
-    }
-    
-    // reset content data
     this.masterContent = [];
     this.props.actions.removeImageCarousel(this.props.imageCarousel.present.items.length, "quantity");
-    this.wpImages = new WPImages(this.level, this.props.categories, this.addMasterContent);
-
+    this.wpImages = new WPImages(this.level, this.addMasterContent);
   }  
   
   redoFetchRow() {
@@ -199,7 +187,8 @@ class Home extends Component {
 
   getMaxDimensions(image) {
     var max_height = window.screen.height, 
-        max_width = window.screen.width;
+        max_width = window.screen.width,
+        high_level = [].concat(wpGetExclusionArray(1, this.wpImages.categories));
 
     // full-size for mobile. for everything else however... 
     if (window.screen.width > 768) {
@@ -209,7 +198,6 @@ class Home extends Component {
       max_width = (window.screen.width / 2) + (Math.random() * window.screen.width );
     } else {
       // priority 2: explicit content
-      const high_level = wpGetExclusionArray(1, this.props.categories.items);
       const intersection = image.categories.filter(element => high_level.includes(element))
       if (intersection.length > 0) {
         max_height = (window.screen.height / 5) + (Math.random() * window.screen.height * 4/5);
@@ -244,6 +232,7 @@ class Home extends Component {
 
 
   getNextItem() {
+
     if (this.masterContent === null || this.masterContent.length === 0) return null;
     var images = this.masterContent;
     // filter images that were disliked or closed but are still pending analytics processing.
@@ -288,18 +277,19 @@ class Home extends Component {
 
 
   processAnalytics() {
-    if (!this.props.categories.isLoading) {
-      for (var i=0; i<this.props.categories.items.categories.length; i++) {
-        var category = this.props.categories.items.categories[i];
-        this.props.categories.items.categories[i].factor_score = this.weightCategory(category);
+
+    if (this.wpImages.categories) {
+      for (var i=0; i<this.wpImages.categories.categories.length; i++) {
+        var category = this.wpImages.categories.categories[i];
+        this.wpImages.categories.categories[i].factor_score = this.weightCategory(category);
       }  
     }
   }
 
   getCategoryScore(id) {
-    if (!this.props.categories.isLoading) {
-      for (var i=0; i<this.props.categories.items.categories.length; i++) {
-        if (this.props.categories.items.categories[i].id === id) return this.props.categories.items.categories[i].factor_score
+    if (this.wpImages.categories) {
+      for (var i=0; i<this.wpImages.categories.categories.length; i++) {
+        if (this.wpImages.categories.categories[i].id === id) return this.wpImages.categories.categories[i].factor_score
       }
     }
     return 1;
