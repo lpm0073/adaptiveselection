@@ -318,38 +318,6 @@ class Home extends Component {
   handleMasonryLayoutComplete(laidOutItems) {
   }
 
-  requeueRange() {
-    const page = document.getElementById("home-page");
-    if (page) {
-      const scrollable_area = page.scrollHeight - page.offsetHeight;
-      const scroll_position = scrollable_area > 0 ? page.scrollTop / scrollable_area : 0;
-      return (scroll_position > .80);
-    }
-    return false;
-  }
-
-  handleScroll() {
-
-    const images = [].concat(this.props.imageCarousel.present.items);
-
-    function isAboveViewport (image) {
-      return document.getElementById(image.id).getBoundingClientRect().bottom < 0;
-    }
-
-    for (var i=0; i<images.length; i++) {
-      const image = images[i];
-  
-      if (isAboveViewport(image) && !this.state.deleting.includes(image.id)) {
-        this.setState({deleting: this.state.deleting.concat(image.id)});
-        this.props.actions.removeImageCarousel(image, "item");
-        if (this.requeueRange() && !this.state.fetching) this.fetchRow();
-        return;
-      }
-
-    }
-    if (this.requeueRange() && !this.state.fetching) this.fetchRow();
-
-  }
 
   processAnalytics() {
     if (!this.props.categories.isLoading) {
@@ -431,6 +399,46 @@ class Home extends Component {
     weighted_signals = weighted_signals > 0 ? weighted_signals : 1;
     return weighted_signals * factor_weight;
   }  
+
+  requeueRange() {
+    const page = document.getElementById("home-page");
+    if (page) {
+      const scrollable_area = page.scrollHeight - page.offsetHeight;
+      const scroll_position = scrollable_area > 0 ? page.scrollTop / scrollable_area : 0;
+      //console.log("requeueRange() scrollable_area, scrollHeight, offsetHeight, scrollTop, scroll_position", scrollable_area, page.scrollHeight, page.offsetHeight, page.scrollTop, scroll_position);
+
+      if (scrollable_area === 0) return true; // not enough content on screen to need a scrollbar
+      return (scroll_position > .80);         // we're near the bottom of a scrollable screen 
+    }
+    return false;
+  }
+
+  handleScroll() {
+
+    const images = [].concat(this.props.imageCarousel.present.items);
+
+    function isAboveViewport (image) {
+      return document.getElementById(image.id).getBoundingClientRect().bottom < 0;
+    }
+
+    for (var i=0; i<images.length; i++) {
+      const image = images[i];
+  
+      if (isAboveViewport(image) && !this.state.deleting.includes(image.id)) {
+        this.setState({deleting: this.state.deleting.concat(image.id)});
+        this.props.actions.removeImageCarousel(image, "item");
+        if (this.requeueRange() && !this.state.fetching) this.fetchRow();
+        return;
+      }
+
+    }
+    if (this.requeueRange() && !this.state.fetching) {
+      console.log("handleScroll() - call fetchRow()");
+      this.fetchRow();
+    }
+
+  }
+
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);

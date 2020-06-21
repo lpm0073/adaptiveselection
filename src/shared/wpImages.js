@@ -35,7 +35,7 @@ export class WPImages {
           potentialPages.push(i);
         }
       }
-      if (potentialPages.length === 0) return 0;
+      if (potentialPages.length === 0) return 1;
       var idx = Math.floor(Math.random() * potentialPages.length);
       return potentialPages[idx];
   
