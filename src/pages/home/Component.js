@@ -31,7 +31,7 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 const MAX_CAROUSEL_SIZE = 10000;
-const FETCH_SIZE = 10;
+const FETCH_SIZE = 5;
 const RANKTILE = 3            // groupings between ranked image selection
 
 class Home extends Component {
@@ -73,7 +73,8 @@ class Home extends Component {
 
     this.state = {
       level: 3,
-      fetching: false
+      fetching: false,
+      nextSerialNumber: 0
     }
 
   }
@@ -128,6 +129,7 @@ class Home extends Component {
   
   fetchItems(n = -1) {
     this.setState({fetching: true});
+    var newItems = [];
 
     function shouldFetch(self) {
       //if (self.existsClass("hovering")) return false ;
@@ -145,6 +147,7 @@ class Home extends Component {
 
       for (var i=1; i<=n; i++) {
         const item = this.getNextItem();
+
         if (item) {
           var obj = {
             key: item.id,
@@ -157,10 +160,11 @@ class Home extends Component {
             api_props: item,
             timestamp: new Date()
           };
-          this.props.actions.addImageCarousel(obj);
+          newItems.push(obj);
         }
       }
-    }
+      this.props.actions.addImageCarousel(newItems);
+  }
 
     // SWAG on what we need to fill the screen
     if (this.props.imageCarousel.present.items.length < 5) {
@@ -182,7 +186,8 @@ class Home extends Component {
   }
 
   nextSerialNumber() {
-    return this.masterContent.sort((a, b) =>  Number(b.viewing_sequence) - Number(a.viewing_sequence))[0].viewing_sequence + 1;
+    this.setState({nextSerialNumber: this.state.nextSerialNumber + 1});
+    return this.state.nextSerialNumber;
   }
 
   getMaxDimensions(image) {
@@ -227,7 +232,6 @@ class Home extends Component {
       this.masterContent[idx].viewing_sequence = this.nextSerialNumber();
       return this.masterContent[idx];
     }
-    console.log("serializedImage() failed", idx, image, this.masterContent);
   }
 
 
@@ -240,16 +244,11 @@ class Home extends Component {
                       .filter((image) => (image.signal === 'DISLIKE' || image.signal === 'CLOSE'))
                       .map((image) => {return image.id;});
     
-
-    // sort the list based on what's been viewed so far -- put those at the end of the array to avoid dups.
-    images = images.sort((a, b) => a.viewing_sequence - b.viewing_sequence);
-
     // if list contains not-yet seen images then prioritize these
     const never_viewed = [].concat(images.filter((image) => image.viewing_sequence === 0));
     if (never_viewed.length > 0) {
       images = never_viewed;
-      console.log("using never viewed")
-    }
+    } else images = images.sort((a, b) => a.viewing_sequence - b.viewing_sequence);
 
     const imageIdx = Math.floor(Math.random() * images.length);
     if (imageIdx >= 0) {
@@ -265,7 +264,6 @@ class Home extends Component {
       image.width = imageProps.width;
       image.image_props = imageProps;
       
-      console.log("getNextItem()", image.viewing_sequence, image.id, images.length);
       return image;
         
     } else console.log("getNextItem() internal error ", imageIdx, images);
@@ -374,7 +372,12 @@ class Home extends Component {
     
     if (this.requeueRange() && !this.state.fetching) {
       console.log("handleScroll() - call fetchItems()");
-      this.fetchItems();
+
+      const self = this;
+      setTimeout(function() {
+        self.fetchItems();
+      }, 5);
+
     }
 
   }

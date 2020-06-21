@@ -8,6 +8,9 @@ export const ImageCarousel = (state = {
     }, action) => {
         switch(action.type) {
         case ActionTypes.ADD_IMAGE_CAROUSEL:
+            if (Array.isArray(action.payload)) {
+                return {...state, added: true, deleted: false, items: [...state.items].concat(action.payload)};
+            }
             return {...state, added: true, deleted: false, items: [...state.items, action.payload]};
 
         case ActionTypes.DELETE_IMAGE_CAROUSEL:
