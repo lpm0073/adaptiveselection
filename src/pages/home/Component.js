@@ -195,7 +195,6 @@ class Home extends Component {
       }, 1000);
   
     }
-    console.log("fetchRow() - final", this.props.imageCarousel.present.items.length );
     this.setState({fetching: false});
   }
 
@@ -260,7 +259,6 @@ class Home extends Component {
     getNextItem() {
     if (this.masterContent === null || this.masterContent.length === 0) return null;
     var images = this.masterContent;
-    console.log("getNextItem()", images.length);
     // filter images that were disliked or closed but are still pending analytics processing.
     const disliked = this.props.userSignals.items
                       .filter((image) => (image.signal === 'DISLIKE' || image.signal === 'CLOSE'))
@@ -277,7 +275,6 @@ class Home extends Component {
 
     // exclude images that are currently on screen
     images = images.filter((item) => { return on_screen.indexOf(item.id) === -1;});
-    console.log("getNextItem() - not on screen", images.length);
 
     // sort the list based on what's been viewed so far -- put those at the end of the array to avoid dups.
     images = images.sort((a, b) => a.viewing_sequence - b.viewing_sequence);
@@ -288,14 +285,12 @@ class Home extends Component {
                 .sort((a, b) => a.viewing_sequence - b.viewing_sequence)
                 .splice(0, Math.floor(images.length * (3/4)));
     }
-    console.log("getNextItem() - remove recently viewed", images.length);
 
     // if list contains not-yet seen images then prioritize these
     const never_viewed = images.filter((image) => image.viewing_sequence === 0);
     if (never_viewed.length > 0) {
       images = never_viewed;
     }
-    console.log("getNextItem() - never viewed", images.length);
 
     // optimize presentation order: either based on image rank
     // or randomization.

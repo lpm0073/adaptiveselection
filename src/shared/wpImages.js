@@ -48,6 +48,7 @@ export class WPImages {
         url = wpSplashUrl;
       }
       else url = wpMediaUrl + "&page=" + this.pageNumber + "&" + wpGetExclusions(this.level, this.categories);
+      console.log("fetch - exclusions", wpGetExclusions(this.level, this.categories), this.level, this.categories);
 
       fetch(url)
       .then(response => {
@@ -158,8 +159,8 @@ export const wpGetExclusionArray = (level, categories) => {
 export const wpGetExclusions = (level, categories) => {
     // https://api.fotomashup.com/wp-json/wp/v2/media?categories=5,2&_fields=id,categories,acf,media_details&categories_exclude=3,10
 
-    if (categories !== null && !isNaN(level)) {
-        const exclusions = array_to_csv(level, categories);
+    if (!categories.isLoading !== null && !isNaN(level)) {
+        const exclusions = array_to_csv(level, categories.items);
         if (exclusions.length > 0) {
             return "categories_exclude=" + exclusions;
         }

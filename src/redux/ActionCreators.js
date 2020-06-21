@@ -58,7 +58,6 @@ export const fetchCategories = () => (dispatch) => {
         })
     .then(response => response.json())
     .then(categories => {
-
         // Calculate category factor weights by level of explicitness (0 thru 4)
         let i;
         var explicitness = 0;
@@ -243,6 +242,7 @@ export const fetchCategories = () => (dispatch) => {
             level4_normalization_factor: level4_normalization_factor,
             categories: factorweighted_categories
         }
+
         dispatch(addCategories(retval));
     })
     .catch(error => dispatch(CategoriesFailed(error.message)));
