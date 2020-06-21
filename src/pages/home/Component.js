@@ -39,6 +39,7 @@ class Home extends Component {
   queueDelay = null;
   masterContent = [];
   wpImages = null;
+  page;
 
   constructor(props) {
     super(props);
@@ -71,11 +72,8 @@ class Home extends Component {
     this.handleMasonryLayoutComplete = this.handleMasonryLayoutComplete.bind(this);
 
     this.state = {
-      level: 0,
-      fetching: false,
-      restScroll: false,
-      lastScrollTop: 0,
-      deleted: []
+      level: 3,
+      fetching: false
     }
 
   }
@@ -280,7 +278,7 @@ class Home extends Component {
       image.width = imageProps.width;
       image.image_props = imageProps;
       
-      console.log("getNextItem()", image.viewing_sequence, image.id);
+      console.log("getNextItem()", image.viewing_sequence, image.id, images.length);
       return image;
         
     } else console.log("getNextItem() internal error ", imageIdx, images);
@@ -373,28 +371,20 @@ class Home extends Component {
   }  
 
   requeueRange() {
-    const page = document.getElementById("home-page");
-    if (page) {
-      const scrollable_area = page.scrollHeight - page.offsetHeight;
-      const scroll_position = scrollable_area > 0 ? page.scrollTop / scrollable_area : 0;
+    if (!this.page) this.page = document.getElementById("home-page");
 
-      if (scrollable_area === 0) return true; // not enough content on screen to need a scrollbar
-      return (scroll_position > .80);         // we're near the bottom of a scrollable screen 
-    }
-    return false;
+    const scrollable_area = this.page.scrollHeight - this.page.offsetHeight;
+    const scroll_position = scrollable_area > 0 ? this.page.scrollTop / scrollable_area : 0;
+
+    if (scrollable_area === 0) return true; // not enough content on screen to need a scrollbar
+    return (scroll_position > .80);         // we're near the bottom of a scrollable screen 
   }
 
   handleScroll() {
-
     // https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect
-    const page = document.getElementById("home-page");
-    const scrollingDown = (this.state.lastScrollTop < page.scrollTop);
-    this.setState({lastScrollTop: page.scrollTop});
     if (this.state.fetching) return;
-    if (this.state.restScroll) return;
-
     
-    if (scrollingDown && this.requeueRange() && !this.state.fetching) {
+    if (this.requeueRange() && !this.state.fetching) {
       console.log("handleScroll() - call fetchItems()");
       this.fetchItems();
     }
