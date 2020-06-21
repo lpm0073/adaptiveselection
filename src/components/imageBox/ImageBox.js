@@ -145,7 +145,7 @@ class ImageBox extends Component {
                 onEnter={this.CSSTransitionOnEnter}
                 >
               <AnimateHeight
-                duration={ 750 }
+                duration={ 1500 }
                 height={ this.state.closerHeight }              >
               <Draggable
               axis="both"
@@ -198,7 +198,7 @@ class ImageBox extends Component {
     );
     }
 
-  resetWindowCloseDelay(delay = 15000000 + Math.floor(Math.random() * 15000)) {
+  resetWindowCloseDelay(delay = 600 * 1000) {
     clearTimeout(this.windowCloseDelay);
     const self = this;
     this.windowCloseDelay = setTimeout(function() {
@@ -286,9 +286,11 @@ class ImageBox extends Component {
   
   handleWindowClose() {
 
+    this.resetWindowCloseDelay(1500);
     this.setState({
-      isClosed: true
-    });
+      closerHeight: 0,
+    });    
+  
     this._close = true;
     this.props.actions.addUserSignal(Signals.CLOSE, this.props.image);
 
