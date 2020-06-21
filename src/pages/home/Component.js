@@ -72,7 +72,8 @@ class Home extends Component {
     this.state = {
       level: 0,
       fetching: false,
-      deleting: []
+      restScroll: false,
+      lastScrollTop: 0
     }
 
   }
@@ -414,24 +415,42 @@ class Home extends Component {
   }
 
   handleScroll() {
+    // https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect
+    const page = document.getElementById("home-page");
+    const scrollingDown = (this.state.lastScrollTop < page.scrollTop);
+    this.setState({lastScrollTop: page.scrollTop});
+    if (this.state.fetching) return;
+    if (this.state.restScroll) return;
 
-    const images = [].concat(this.props.imageCarousel.present.items);
-
-    function isAboveViewport (image) {
-      return document.getElementById(image.id).getBoundingClientRect().bottom < 0;
-    }
-
-    for (var i=0; i<images.length; i++) {
-      const image = images[i];
+    if (scrollingDown) {
+      const images = [].concat(this.props.imageCarousel.present.items);
+      for (var i=0; i<images.length; i++) {
+        if (i>3) return;
+        const image = images[i];
+        const element = document.getElementById(image.id).getBoundingClientRect();
   
-      if (isAboveViewport(image) && !this.state.deleting.includes(image.id)) {
-        this.setState({deleting: this.state.deleting.concat(image.id)});
-        this.props.actions.removeImageCarousel(image, "item");
-        if (this.requeueRange() && !this.state.fetching) this.fetchRow();
-        return;
+        if (i===0) {
+          //console.log("handleScroll rect", element, page.scrollTop, page.scrollHeight, page.offsetHeight);
+  
+        }
+        if (element.bottom < 57) {
+          console.log("handleScroll rect, scrollTop, scrollHeight, offsetHeight", element, page.scrollTop, page.scrollHeight, page.offsetHeight);
+          if (this.props.imageCarousel.present.items.filter((item) => item.id === image.id).length > 0) {
+            this.setState({restScroll: true});
+            this.props.actions.removeImageCarousel(image, "item");
+            this.fetchRow();
+            const self = this;
+            setTimeout(function() {
+                self.setState({restScroll: false});
+            }, 100);
+      
+            return;
+          } 
+        }
       }
-
     }
+
+    
     if (this.requeueRange() && !this.state.fetching) {
       console.log("handleScroll() - call fetchRow()");
       this.fetchRow();
