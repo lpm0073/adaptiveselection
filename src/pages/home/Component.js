@@ -15,7 +15,7 @@ import Masonry from 'react-masonry-component';
 
 // my stuff
 import './styles.css';
-import ImageBox from '../../components/ImageBox';
+import ImageBox from '../../components/imageBox/ImageBox';
 import { WPImages, wpGetImage, wpGetExclusionArray } from '../../shared/wpImages';
 import Loading from '../../components/Loading';
 
@@ -97,9 +97,7 @@ class Home extends Component {
           <div key="home-page" id="home-page" className="home-page m-0 p-0" onScroll={this.handleScroll}>
               {images.length > 0 ? images.map((image) => {
                   return (
-                    <div className="masonry-item">
-                      <ImageBox key={image.key} image = {image} />
-                    </div>
+                    <ImageBox key={image.key} image = {image} />
                   );
                 })
             :

@@ -1,9 +1,9 @@
 import React, {Component}  from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import * as Actions from '../redux/ActionCreators';
-import * as Signals from '../redux/userSignals';
-
+import * as Actions from '../../redux/ActionCreators';
+import * as Signals from '../../redux/userSignals';
+import './styles.css';
 
 import Draggable from 'react-draggable';
 import { CSSTransition } from 'react-transition-group';
@@ -56,7 +56,9 @@ class ImageBox extends Component {
 
     this.state = {
       imageContainerStyle: {
-        zIndex: this.getNextZOrder()
+        zIndex: this.getNextZOrder(),
+        height: this.props.image.height,
+        width: this.props.image.width
       },
       imageFrameStyle: {
         backgroundImage: "url('" + this.props.image.source_url + "')",
@@ -309,6 +311,13 @@ class ImageBox extends Component {
   }
   handleDragEnd() {
     this._move = false;
+    this.setState({
+      imageContainerStyle: {
+        zIndex: this.getNextZOrder(),
+        height: this.props.image.height,
+        width: this.props.image.width
+      }
+    });
   }
 
   CSSTransitionOnEnter() {
