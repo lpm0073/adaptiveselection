@@ -125,6 +125,7 @@ class Home extends Component {
     }
     this.props.actions.addImageCarousel(row);
     this.rows.push(row);
+    console.log(row);
     this.setState({fetching: false});
   }
 
@@ -215,6 +216,8 @@ class Home extends Component {
       source_url: image.source_url,
       height: image.height,
       width: image.width,
+      orientation: image.width > image.height ? 'landscape' : 'portrait',
+      aspect_ratio: image.width > 0 ? image.height / image.width : 0,
   
       api_props: image,
       timestamp: new Date()
