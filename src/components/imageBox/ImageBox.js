@@ -1,14 +1,21 @@
 import React, {Component}  from 'react';
+
+// redux stuff
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as Actions from '../../redux/ActionCreators';
 import * as Signals from '../../redux/userSignals';
 import './styles.css';
 
+// 3rd party stuff
 import AnimateHeight from 'react-animate-height';
 import Draggable from 'react-draggable';
 import { CSSTransition } from 'react-transition-group';
 
+// my stuff
+import { wpGetImage } from '../../shared/wpImages';
+
+// more redux stuff
 const mapStateToProps = state => ({
   ...state
 });
@@ -58,19 +65,10 @@ class ImageBox extends Component {
     this.state = {
       closerHeight: 'auto',
       imageContainerStyle: {
-        zIndex: this.getNextZOrder(),
-        height: this.props.image.height,
-        width: this.props.image.width
+        zIndex: this.getNextZOrder()
       },
-      imageFrameStyle: {
-        backgroundImage: "url('" + this.props.image.source_url + "')",
-        height: this.props.image.height,
-        width: this.props.image.width
-      },
-      grabberStyle: {
-        height: this.props.image.height,
-        width: this.props.image.width
-      },
+      imageFrameStyle: null,
+      grabberStyle: null,
       isClosed: false,
       isHovering: false,
       showInfoPanel: false,
@@ -89,6 +87,33 @@ class ImageBox extends Component {
                   image.id === this.props.image.id && 
                   image.signal === 'LIKE'
                 )).length > 0;
+
+    const imageProps = wpGetImage(this.props.image.api_props);
+
+    this.props.image.source_url = imageProps.source_url;
+    this.props.image.height = imageProps.height;
+    this.props.image.width = imageProps.width;
+    this.props.image.image_props = imageProps;
+
+    this.setState({
+      imageContainerStyle: {
+        height: this.props.image.height / 3,
+        width: this.props.image.width / 3
+      },
+      imageFrameStyle: {
+        backgroundImage: "url('" + this.props.image.source_url + "')",
+        height: this.props.image.height /3,
+        width: this.props.image.width /3
+      },
+      grabberStyle: {
+        height: this.props.image.height / 3,
+        width: this.props.image.width / 3
+      },
+
+    });    
+  }
+
+  componentWillUpdate() {
 
   }
 

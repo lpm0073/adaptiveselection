@@ -15,7 +15,7 @@ import * as Signals from '../../redux/userSignals';
 // my stuff
 import './styles.css';
 import ContentRow from '../../components/contentRow/ContentRow'
-import { WPImages, wpGetImage, wpGetExclusionArray } from '../../shared/wpImages';
+import { WPImages, wpGetExclusionArray } from '../../shared/wpImages';
 import Loading from '../../components/Loading';
 
 var local_dispatch;
@@ -99,7 +99,7 @@ class Home extends Component {
   
   addMasterContent(items) {
     this.masterContent = this.masterContent.concat(items);
-    if (this.props.imageCarousel.present.items.length === 0) this.fetchRow(10);
+    if (this.props.imageCarousel.present.items.length === 0) this.fetchRow(3);
   }
 
   handleChangeLevel() {
@@ -122,10 +122,10 @@ class Home extends Component {
       for (var k=0; k<=j; k++) {
         row.push(this.getNextItem());
       }
-    }
-    this.props.actions.addImageCarousel(row);
-    this.rows.push(row);
-    this.setState({fetching: false});
+      this.props.actions.addImageCarousel(row);
+      this.rows.push(row);
+      this.setState({fetching: false});
+      }
   }
 
   // returns true if there is an element in the DOM containing this class
@@ -201,12 +201,6 @@ class Home extends Component {
 
     const imageIdx = Math.floor(Math.random() * images.length);
     const image = this.serializedImage(images[imageIdx]);
-    const imageProps = wpGetImage(image);
-
-    image.source_url = imageProps.source_url;
-    image.height = imageProps.height;
-    image.width = imageProps.width;
-    image.image_props = imageProps;
     
     return {
       key: image.id,
