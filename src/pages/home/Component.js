@@ -30,7 +30,6 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 const MAX_CAROUSEL_SIZE = 10000;
-const FETCH_SIZE = 5;
 const RANKTILE = 3            // groupings between ranked image selection
 
 class Home extends Component {
@@ -39,6 +38,7 @@ class Home extends Component {
   masterContent = [];
   wpImages = null;
   page;
+  rows = [];
 
   constructor(props) {
     super(props);
@@ -61,9 +61,7 @@ class Home extends Component {
     this.nextSerialNumber = this.nextSerialNumber.bind(this);
 
     // UI
-    this.fetchItems = this.fetchItems.bind(this);
-    this.undoFetchRow = this.undoFetchRow.bind(this);
-    this.redoFetchRow = this.redoFetchRow.bind(this);
+    this.fetchRow = this.fetchRow.bind(this);
     this.handleScroll = this.handleScroll.bind(this);
     this.requeueRange = this.requeueRange.bind(this);
 
@@ -78,7 +76,6 @@ class Home extends Component {
 
   }
 
-
   componentDidMount() {
     this.wpImages = new WPImages(this.state.level, this.addMasterContent);
   }
@@ -86,40 +83,23 @@ class Home extends Component {
     clearTimeout(this.queueDelay);
   }
   render() {
-      const images = this.props.imageCarousel.present.items;
-      const MAX_ITEMS = 3;
-      var i=0, j=0;
-      var rows=[];
-
-      while (i<images.length) {
-          if (images.length - i < MAX_ITEMS) j = images.length - i - 1;
-          else j = Math.floor(Math.random() * 10) % 3;
-          var row = [];
-          for (var k=0; k<=j; k++) {
-            const obj = images[i + k];
-            row.push(obj);
+    return(
+        <div key="home-page" id="home-page" className="home-page m-0 p-0" onScroll={this.handleScroll}>
+            {this.rows.length > 0 ? this.rows.map((row, idx) => {
+                return (
+                  <ContentRow key={idx} row = {row} />
+                );
+              })
+          :
+            <Loading />
           }
-          rows.push(row);
-          i += j + 1;
-      }
-
-      return(
-          <div key="home-page" id="home-page" className="home-page m-0 p-0" onScroll={this.handleScroll}>
-              {rows.length > 0 ? rows.map((row, idx) => {
-                  return (
-                    <ContentRow key={idx} row = {row} />
-                  );
-                })
-            :
-              <Loading />
-            }
-          </div>
-      );
+        </div>
+    );
   }
   
   addMasterContent(items) {
     this.masterContent = this.masterContent.concat(items);
-    if (this.props.imageCarousel.present.items.length === 0) this.fetchItems(10);
+    if (this.props.imageCarousel.present.items.length === 0) this.fetchRow(10);
   }
 
   handleChangeLevel() {
@@ -128,62 +108,23 @@ class Home extends Component {
     this.wpImages = new WPImages(this.level, this.addMasterContent);
   }  
   
-  redoFetchRow() {
-    local_dispatch(Actions.redoImageCarousel(3));
-  }
-  undoFetchRow() {
-    local_dispatch(Actions.undoImageCarousel(3));
-  }
-  
-  fetchItems(n = -1) {
+  fetchRow(n = 1) {
     this.setState({fetching: true});
-    var newItems = [];
+    const MAX_ITEMS = 3;
+    var i;
 
-    function shouldFetch(self) {
-      //if (self.existsClass("hovering")) return false ;
-      if (self.props.imageCarousel.present.items.length > MAX_CAROUSEL_SIZE) return false;
-      return true;
-    }
-    // do this first.
-    // gather user analytics signals from class data embedded in the items in props.imageCarousel
     //this.processAnalytics();
     //this.rankWorkingSet();
 
-    // if we have images in our working set, and we need more images on screen
-    if (shouldFetch(this)) {
-      if (n < 0) n = FETCH_SIZE;
-
-      for (var i=1; i<=n; i++) {
-        const item = this.getNextItem();
-
-        if (item) {
-          var obj = {
-            key: item.id,
-            id: item.id,
-            
-            source_url: item.source_url,
-            height: item.height,
-            width: item.width,
-        
-            api_props: item,
-            timestamp: new Date()
-          };
-          newItems.push(obj);
-        }
+    for (i = 0; i<n; i++) {
+      const j = Math.floor(Math.random() * 10) % MAX_ITEMS;
+      var row = [];
+      for (var k=0; k<=j; k++) {
+        row.push(this.getNextItem());
       }
-      this.props.actions.addImageCarousel(newItems);
-  }
-
-    // SWAG on what we need to fill the screen
-    if (this.props.imageCarousel.present.items.length < 5) {
-
-      // keep calling ourselves until we have a full imageCarousel
-      const self = this;
-      this.queueDelay = setTimeout(function() {
-        self.fetchItems();      
-      }, 1000);
-  
     }
+    this.props.actions.addImageCarousel(row);
+    this.rows.push(row);
     this.setState({fetching: false});
   }
 
@@ -267,7 +208,17 @@ class Home extends Component {
     image.width = imageProps.width;
     image.image_props = imageProps;
     
-    return image;
+    return {
+      key: image.id,
+      id: image.id,
+      
+      source_url: image.source_url,
+      height: image.height,
+      width: image.width,
+  
+      api_props: image,
+      timestamp: new Date()
+    };
 }
 
  
@@ -373,7 +324,7 @@ class Home extends Component {
     if (this.requeueRange() && !this.state.fetching) {
       const self = this;
       setTimeout(function() {
-        self.fetchItems();
+        self.fetchRow();
       }, 5);
     }
   }

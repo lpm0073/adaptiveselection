@@ -23,7 +23,7 @@ const mapStateToProps = state => ({
         //console.log("render()", this.props);
         return(
             <React.Fragment>
-                <div className="row">
+                <div className="row content-row">
                     {this.props.row.map((item, idx) => {
                         return(
                             <ImageBox key={item.key + "-" + idx} image = {item} />
