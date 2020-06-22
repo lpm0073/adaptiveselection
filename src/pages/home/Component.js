@@ -14,7 +14,7 @@ import * as Signals from '../../redux/userSignals';
 
 // my stuff
 import './styles.css';
-import ImageBox from '../../components/imageBox/ImageBox';
+import ContentRow from '../../components/contentRow/ContentRow'
 import { WPImages, wpGetImage, wpGetExclusionArray } from '../../shared/wpImages';
 import Loading from '../../components/Loading';
 
@@ -87,11 +87,27 @@ class Home extends Component {
   }
   render() {
       const images = this.props.imageCarousel.present.items;
+      const MAX_ITEMS = 3;
+      var i=0, j=0;
+      var rows=[];
+
+      while (i<images.length) {
+          if (images.length - i < MAX_ITEMS) j = images.length - i - 1;
+          else j = Math.floor(Math.random() * 10) % 3;
+          var row = [];
+          for (var k=0; k<=j; k++) {
+            const obj = images[i + k];
+            row.push(obj);
+          }
+          rows.push(row);
+          i += j + 1;
+      }
+
       return(
           <div key="home-page" id="home-page" className="home-page m-0 p-0" onScroll={this.handleScroll}>
-              {images.length > 0 ? images.map((image, idx) => {
+              {rows.length > 0 ? rows.map((row, idx) => {
                   return (
-                    <ImageBox key={image.key + "-" + idx} image = {image} />
+                    <ContentRow key={idx} row = {row} />
                   );
                 })
             :
