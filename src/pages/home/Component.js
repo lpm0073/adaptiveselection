@@ -69,7 +69,7 @@ class Home extends Component {
     this.handleMasonryLayoutComplete = this.handleMasonryLayoutComplete.bind(this);
 
     this.state = {
-      level: 3,
+      level: 4,
       fetching: false,
       nextSerialNumber: 0
     }
@@ -125,7 +125,6 @@ class Home extends Component {
     }
     this.props.actions.addImageCarousel(row);
     this.rows.push(row);
-    console.log(row);
     this.setState({fetching: false});
   }
 

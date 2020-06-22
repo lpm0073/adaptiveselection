@@ -31,7 +31,6 @@ const mapStateToProps = state => ({
         var portrait = 0,
             landscape = 0;
             
-        console.log("componentDidMount()", this.props);
         const numItems = this.props.row.length;
 
 
@@ -68,7 +67,6 @@ const mapStateToProps = state => ({
     }
 
     render() {
-        //console.log("render()", this.props);
         return(
             <React.Fragment>
                 <div className="row content-row">
@@ -86,7 +84,6 @@ const mapStateToProps = state => ({
         );        
     }
     layout_1(self) {
-        console.log("layout_1()", self.props);
         const item = self.props.row[0];
         return(
             <div className="col-12">
@@ -181,7 +178,7 @@ const mapStateToProps = state => ({
             if (i===1) portrait2 = portraits[i];
         }
         
-        if (this.state.landscape === 2) 
+        if (self.state.landscape === 2) 
             return(
                 <React.Fragment>
                     <div className="col-3">
@@ -235,7 +232,7 @@ const mapStateToProps = state => ({
             if (i===1) portrait2 = portraits[i];
         }
         
-        if (this.state.landscape === 2) 
+        if (self.state.landscape === 2) 
             return(
                 <React.Fragment>
                     <div className="col-9">
