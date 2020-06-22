@@ -86,7 +86,6 @@ const mapStateToProps = state => ({
         );        
     }
     layout_1(self) {
-        if (!self.props) return(<React.Fragment></React.Fragment>);
         console.log("layout_1()", self.props);
         const item = self.props.row[0];
         return(
@@ -97,7 +96,6 @@ const mapStateToProps = state => ({
     }
 
     layout_2_1(self) {
-        console.log("layout_2_1()", self.props);
         if (!self.props) return(<React.Fragment></React.Fragment>);
 
         const item1 = self.props.row[0];
@@ -115,7 +113,6 @@ const mapStateToProps = state => ({
     }
 
     layout_2_2(self) {
-        if (!self.props) return(<React.Fragment></React.Fragment>);
         const item1 = self.props.row[0];
         const item2 = self.props.row[1];
         return(
@@ -131,7 +128,6 @@ const mapStateToProps = state => ({
     }
 
     layout_2_3(self) {
-        if (!self.props) return(<React.Fragment></React.Fragment>);
         const item1 = self.props.row[0];
         const item2 = self.props.row[1];
 
@@ -151,7 +147,6 @@ const mapStateToProps = state => ({
     }
 
     layout_3_1(self) {
-        if (!self.props) return(<React.Fragment></React.Fragment>);
         const item1 = self.props.row[0];
         const item2 = self.props.row[1];
         const item3 = self.props.row[2];
@@ -172,70 +167,110 @@ const mapStateToProps = state => ({
     }
 
     layout_3_2(self) {
-        if (!self.props) return(<React.Fragment></React.Fragment>);
-        const items = self.props.row[0];
-        const portrait = items.filter((item) => item.orientation === 'portrait')[0];
-        var landscape1;
-        var landscape2;
-
+        var portrait1, portrait2, landscape1, landscape2;
+        const items = self.props.row;
+        const portraits = items.filter((item) => item.orientation === 'portrait');
         const landscapes = items.filter((item) => item.orientation === 'landscape');
 
         for (var i=0; i<landscapes.length; i++) {
             if (i===0) landscape1 = landscapes[i];
             if (i===1) landscape2 = landscapes[i];
         }
-    
-        return(
-            <React.Fragment>
-                <div className="col-3">
-                    <ImageBox key={portrait.key + "-1"} image = {portrait} />
-                </div>
-                <div className="col-9">
-                    <div className="row">
-                        <div className="col-6">
-                            <ImageBox key={landscape1.key + "-1"} image = {landscape1} />
-                        </div>
-                        <div className="col-6">
-                            <ImageBox key={landscape2.key + "-1"} image = {landscape2} />
+        for (var i=0; i<portraits.length; i++) {
+            if (i===0) portrait1 = portraits[i];
+            if (i===1) portrait2 = portraits[i];
+        }
+        
+        if (this.state.landscape === 2) 
+            return(
+                <React.Fragment>
+                    <div className="col-3">
+                        <ImageBox key={portrait1.key + "-1"} image = {portrait1} />
+                    </div>
+                    <div className="col-9">
+                        <div className="row">
+                            <div className="col-6">
+                                <ImageBox key={landscape1.key + "-1"} image = {landscape1} />
+                            </div>
+                            <div className="col-6">
+                                <ImageBox key={landscape2.key + "-1"} image = {landscape2} />
+                            </div>
                         </div>
                     </div>
-                </div>
-            </React.Fragment>
-        );        
-    }
+                </React.Fragment>
+            );
+        else
+            return(
+                <React.Fragment>
+                    <div className="col-3">
+                        <ImageBox key={landscape1.key + "-1"} image = {landscape1} />
+                    </div>
+                    <div className="col-9">
+                        <div className="row">
+                            <div className="col-6">
+                                <ImageBox key={portrait1.key + "-1"} image = {portrait1} />
+                            </div>
+                            <div className="col-6">
+                                <ImageBox key={portrait2.key + "-1"} image = {portrait2} />
+                            </div>
+                        </div>
+                    </div>
+                </React.Fragment>
+            );
+}
 
     layout_3_3(self) {
         if (!self.props) return(<React.Fragment></React.Fragment>);
-        const items = self.props.row[0];
-        const portrait = items.filter((item) => item.orientation === 'portrait')[0];
-        var landscape1;
-        var landscape2;
-
+        var portrait1, portrait2, landscape1, landscape2;
+        const items = self.props.row;
+        const portraits = items.filter((item) => item.orientation === 'portrait');
         const landscapes = items.filter((item) => item.orientation === 'landscape');
 
         for (var i=0; i<landscapes.length; i++) {
             if (i===0) landscape1 = landscapes[i];
             if (i===1) landscape2 = landscapes[i];
         }
-    
-        return(
-            <React.Fragment>
-                <div className="col-9">
-                    <div className="row">
-                        <div className="col-6">
-                            <ImageBox key={landscape1.key + "-1"} image = {landscape1} />
-                        </div>
-                        <div className="col-6">
-                            <ImageBox key={landscape2.key + "-1"} image = {landscape2} />
+        for (var i=0; i<portraits.length; i++) {
+            if (i===0) portrait1 = portraits[i];
+            if (i===1) portrait2 = portraits[i];
+        }
+        
+        if (this.state.landscape === 2) 
+            return(
+                <React.Fragment>
+                    <div className="col-9">
+                        <div className="row">
+                            <div className="col-6">
+                                <ImageBox key={landscape1.key + "-1"} image = {landscape1} />
+                            </div>
+                            <div className="col-6">
+                                <ImageBox key={landscape2.key + "-1"} image = {landscape2} />
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div className="col-3">
-                    <ImageBox key={portrait.key + "-1"} image = {portrait} />
-                </div>
-            </React.Fragment>
-        );        
+                    <div className="col-3">
+                        <ImageBox key={portrait1.key + "-1"} image = {portrait1} />
+                    </div>
+                </React.Fragment>
+            );
+        else
+            return(
+                <React.Fragment>
+                    <div className="col-9">
+                        <div className="row">
+                            <div className="col-6">
+                                <ImageBox key={portrait1.key + "-1"} image = {portrait1} />
+                            </div>
+                            <div className="col-6">
+                                <ImageBox key={portrait2.key + "-1"} image = {portrait2} />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-3">
+                        <ImageBox key={landscape1.key + "-1"} image = {landscape1} />
+                    </div>
+                </React.Fragment>
+            );
     }
 }
-  
   export default connect(mapStateToProps, mapDispatchToProps)(ContentRow);
