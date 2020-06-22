@@ -21,16 +21,18 @@
 
 .image-container {
   /* programmatic container for all JS / React stuff */
+  width: 100%;
+  border: 1px solid green;
 }
 
 .image-frame:hover {
   border: 3px solid goldenrod;
   transition-duration: 150ms;
-  background-size: cover;
 }
 
 .image-frame {
-  background-size: contain;
+  height: 300px;
+  background-size: cover;
   background-repeat: no-repeat;
   border-radius: 3px;
   -webkit-box-shadow: 5px 5px 3px 3px rgba(0,0,0,0.5);

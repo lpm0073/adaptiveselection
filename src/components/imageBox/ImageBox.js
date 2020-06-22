@@ -91,23 +91,16 @@ class ImageBox extends Component {
     const imageProps = wpGetImage(this.props.image.api_props);
 
     this.props.image.source_url = imageProps.source_url;
-    this.props.image.height = imageProps.height;
-    this.props.image.width = imageProps.width;
     this.props.image.image_props = imageProps;
 
     this.setState({
       imageContainerStyle: {
-        height: this.props.image.height / 3,
-        width: this.props.image.width / 3
+
       },
       imageFrameStyle: {
         backgroundImage: "url('" + this.props.image.source_url + "')",
-        height: this.props.image.height /3,
-        width: this.props.image.width /3
       },
       grabberStyle: {
-        height: this.props.image.height / 3,
-        width: this.props.image.width / 3
       },
 
     });    
@@ -127,7 +120,7 @@ class ImageBox extends Component {
     const key = "image-box-" + this.props.image.id;
     var likeStyles = null;
     var dislikeStyles = null;
-    var containerClasses = "image-container m-2 p-0 handle";
+    var containerClasses = "image-container m-2 p-0 handle " + this.props.containerClasses;
     var infoPanelClasses = "info-panel m-0 p-5 text-center";
 
     if (this.state.isClosed) containerClasses += " window-closer window-closing";
@@ -158,10 +151,10 @@ class ImageBox extends Component {
       exitActive: 'CSSTransition-exit-active',
       exitDone: 'CSSTransition-exit-done',
      }  
-    // See: https://github.com/STRML/react-draggable
 
-    return(
-        <React.Fragment >
+    // See: https://github.com/STRML/react-draggable
+              /*defaultPosition={{x: this.props.image.position_props.left, y: this.props.image.position_props.top}}*/
+     /*
             <CSSTransition 
                 key={key + '-css-transition'} 
                 in={this.state.isMounted}
@@ -175,7 +168,6 @@ class ImageBox extends Component {
               <Draggable
               axis="both"
               cancel=".body"
-              /*defaultPosition={{x: this.props.image.position_props.left, y: this.props.image.position_props.top}}*/
               defaultClassName="react-draggable"
               defaultClassNameDragging="react-draggable-dragging"
               defaultClassNameDragged="react-draggable-dragged"
@@ -185,6 +177,10 @@ class ImageBox extends Component {
               onDrag={this.handleDrag}
               onStop={this.handleDragEnd}
               >
+     
+     */
+    return(
+        <React.Fragment >
                 <div
                 key={key + "-" + Math.floor(Math.random() * 1000)}
                 id={this.props.image.id}
@@ -194,7 +190,7 @@ class ImageBox extends Component {
                 onMouseEnter={this.handleMouseEnter}
                 onMouseLeave={this.handleMouseLeave}
                 >
-                  <div className="image-frame m-0 p-0" 
+                  <div className={"image-frame m-0 p-0 "} 
                     style={this.state.imageFrameStyle}>
                     <div id="info-panel" className={infoPanelClasses} onMouseLeave={this.handleInfoPanelLeave} >
                       I am the info panel.
@@ -216,9 +212,6 @@ class ImageBox extends Component {
                     </div>
                   </div>
                 </div>
-              </Draggable>
-              </AnimateHeight>
-            </CSSTransition>
         </React.Fragment>
     );
     }
@@ -341,9 +334,7 @@ class ImageBox extends Component {
   handleDragStart() {
     this.setState({
       imageContainerStyle: {
-        zIndex: this.getNextZOrder(),
-        height: this.props.image.height,
-        width: this.props.image.width
+        zIndex: this.getNextZOrder()
       }
     });
   }
@@ -356,8 +347,6 @@ class ImageBox extends Component {
     this._move = false;
     this.setState({
       imageContainerStyle: {
-        height: this.props.image.height,
-        width: this.props.image.width
       }
     });
   }
