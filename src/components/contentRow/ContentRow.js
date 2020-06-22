@@ -91,7 +91,7 @@ const mapStateToProps = state => ({
     layout_1(self) {
         const item = self.props.row[0];
         return(
-            <ImageBox containerClasses={classCol12} key={item.key + "-1"} image = {item} />
+            <ImageBox layout="layout_1" containerClasses={classCol12} key={item.key + "-1"} image = {item} />
         );        
     }
 
@@ -102,8 +102,8 @@ const mapStateToProps = state => ({
         const item2 = self.props.row[1];
         return(
             <React.Fragment>
-                <ImageBox containerClasses={classCol6} key={item1.key + "-1"} image = {item1} />
-                <ImageBox containerClasses={classCol6} key={item2.key + "-1"} image = {item2} />
+                <ImageBox layout="layout_2_1" containerClasses={classCol6} key={item1.key + "-1"} image = {item1} />
+                <ImageBox layout="layout_2_1" containerClasses={classCol6} key={item2.key + "-1"} image = {item2} />
             </React.Fragment>
     );        
     }
@@ -113,8 +113,8 @@ const mapStateToProps = state => ({
         const item2 = self.props.row[1];
         return(
             <React.Fragment>
-                <ImageBox containerClasses={classCol6} key={item1.key + "-1"} image = {item1} />
-                <ImageBox containerClasses={classCol6} key={item2.key + "-1"} image = {item2} />
+                <ImageBox layout="layout_2_2" containerClasses={classCol6} key={item1.key + "-1"} image = {item1} />
+                <ImageBox layout="layout_2_2" containerClasses={classCol6} key={item2.key + "-1"} image = {item2} />
             </React.Fragment>
         );
     }
@@ -128,8 +128,8 @@ const mapStateToProps = state => ({
 
         return(
             <React.Fragment>
-                <ImageBox containerClasses={classCol9} key={landscape.key + "-1"} image = {landscape} />
-                <ImageBox containerClasses={classCol3} key={portrait.key + "-1"} image = {portrait} />
+                <ImageBox layout="layout_2_3" containerClasses={classCol9} key={landscape.key + "-1"} image = {landscape} />
+                <ImageBox layout="layout_2_3" containerClasses={classCol3} key={portrait.key + "-1"} image = {portrait} />
             </React.Fragment>
         );
     }
@@ -141,9 +141,9 @@ const mapStateToProps = state => ({
 
         return(
             <React.Fragment>
-                <ImageBox containerClasses={classCol4} key={item1.key + "-1"} image = {item1} />
-                <ImageBox containerClasses={classCol4} key={item2.key + "-1"} image = {item2} />
-                <ImageBox containerClasses={classCol4} key={item3.key + "-1"} image = {item3} />
+                <ImageBox layout="layout_3_1" containerClasses={classCol4} key={item1.key + "-1"} image = {item1} />
+                <ImageBox layout="layout_3_1" containerClasses={classCol4} key={item2.key + "-1"} image = {item2} />
+                <ImageBox layout="layout_3_1" containerClasses={classCol4} key={item3.key + "-1"} image = {item3} />
             </React.Fragment>
         );        
     }
@@ -169,8 +169,8 @@ const mapStateToProps = state => ({
                     <ImageBox containerClasses={classCol3} key={portrait1.key + "-1"} image = {portrait1} />
                     <div className="col-9">
                         <div className="row">
-                            <ImageBox containerClasses={classCol6} key={landscape1.key + "-1"} image = {landscape1} />
-                            <ImageBox containerClasses={classCol6} key={landscape2.key + "-1"} image = {landscape2} />
+                            <ImageBox layout="layout_3_2" containerClasses={classCol6} key={landscape1.key + "-1"} image = {landscape1} />
+                            <ImageBox layout="layout_3_2" containerClasses={classCol6} key={landscape2.key + "-1"} image = {landscape2} />
                         </div>
                     </div>
                 </React.Fragment>
@@ -181,8 +181,8 @@ const mapStateToProps = state => ({
                     <ImageBox containerClasses={classCol3} key={landscape1.key + "-1"} image = {landscape1} />
                     <div className="col-9">
                         <div className="row">
-                            <ImageBox containerClasses={classCol6} key={portrait1.key + "-1"} image = {portrait1} />
-                            <ImageBox containerClasses={classCol6} key={portrait2.key + "-1"} image = {portrait2} />
+                            <ImageBox layout="layout_3_2"containerClasses={classCol6} key={portrait1.key + "-1"} image = {portrait1} />
+                            <ImageBox layout="layout_3_2"containerClasses={classCol6} key={portrait2.key + "-1"} image = {portrait2} />
                         </div>
                     </div>
                 </React.Fragment>
@@ -210,8 +210,8 @@ const mapStateToProps = state => ({
                 <React.Fragment>
                     <div className="col-9">
                         <div className="row">
-                            <ImageBox containerClasses={classCol9} key={landscape1.key + "-1"} image = {landscape1} />
-                            <ImageBox containerClasses={classCol9} key={landscape2.key + "-1"} image = {landscape2} />
+                            <ImageBox layout="layout_3_3" containerClasses={classCol9} key={landscape1.key + "-1"} image = {landscape1} />
+                            <ImageBox layout="layout_3_3" containerClasses={classCol9} key={landscape2.key + "-1"} image = {landscape2} />
                         </div>
                     </div>
                     <ImageBox containerClasses={classCol3} key={portrait1.key + "-1"} image = {portrait1} />
@@ -222,8 +222,8 @@ const mapStateToProps = state => ({
                 <React.Fragment>
                     <div className="col-9">
                         <div className="row">
-                            <ImageBox containerClasses={classCol9} key={portrait1.key + "-1"} image = {portrait1} />
-                            <ImageBox containerClasses={classCol9} key={portrait2.key + "-1"} image = {portrait2} />
+                            <ImageBox layout="layout_3_3" containerClasses={classCol9} key={portrait1.key + "-1"} image = {portrait1} />
+                            <ImageBox layout="layout_3_3" containerClasses={classCol9} key={portrait2.key + "-1"} image = {portrait2} />
                         </div>
                     </div>
                     <ImageBox containerClasses={classCol3} key={landscape1.key + "-1"} image = {landscape1} />

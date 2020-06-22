@@ -89,21 +89,29 @@ class ImageBox extends Component {
                 )).length > 0;
 
     const imageProps = wpGetImage(this.props.image.api_props);
-
     this.props.image.source_url = imageProps.source_url;
+    this.props.image.width = imageProps.width;
+    this.props.image.height = imageProps.height;
     this.props.image.image_props = imageProps;
 
+    if (this.props.layout === "layout_1") {
+      this.setState({
+        imageFrameStyle: {
+          backgroundImage: "url('" + this.props.image.source_url + "')",
+          height: this.props.image.height
+        }
+      });
+    }
+    else
     this.setState({
-      imageContainerStyle: {
-
-      },
+      imageContainerStyle: null,
       imageFrameStyle: {
         backgroundImage: "url('" + this.props.image.source_url + "')",
       },
-      grabberStyle: {
-      },
+      grabberStyle: null
+    });
 
-    });    
+
   }
 
   componentWillUpdate() {
