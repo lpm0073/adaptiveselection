@@ -94,22 +94,19 @@ class ImageBox extends Component {
     this.props.image.height = imageProps.height;
     this.props.image.image_props = imageProps;
 
+    var imageFrameStyle = {
+      backgroundImage: "url('" + this.props.image.source_url + "')",
+    };
+
     if (this.props.layout === "layout_1") {
-      this.setState({
-        imageFrameStyle: {
-          backgroundImage: "url('" + this.props.image.source_url + "')",
-          height: this.props.image.height
-        }
-      });
+      if (this.props.image.orientation === "portrait") imageFrameStyle.height = 500;
+      else imageFrameStyle.height = 400;
     }
-    else
-    this.setState({
-      imageContainerStyle: null,
-      imageFrameStyle: {
-        backgroundImage: "url('" + this.props.image.source_url + "')",
-      },
-      grabberStyle: null
-    });
+    if (["layout_2_1", "layout_2_2", "layout_2_3"].includes(this.props.layout)) {
+      imageFrameStyle.height = 500;
+    }
+
+    this.setState({imageFrameStyle: imageFrameStyle});
 
 
   }

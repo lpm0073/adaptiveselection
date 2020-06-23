@@ -64,6 +64,7 @@ const mapStateToProps = state => ({
         if (numItems === 3) {
             if (portrait === 0 || landscape === 0) this.setState({layoutMethod: this.layout_3_1});
             else {
+                console.log("3 image, other");
                 if (Math.random() > 0.5) this.setState({layoutMethod: this.layout_3_2});
                 else this.setState({layoutMethod: this.layout_3_3});
             }
@@ -90,8 +91,13 @@ const mapStateToProps = state => ({
     }
     layout_1(self) {
         const item = self.props.row[0];
+        const colClass = item.orientation === "landscape" ? "col-2" : "col-3";
         return(
-            <ImageBox layout="layout_1" containerClasses={classCol12} key={item.key + "-1"} image = {item} />
+            <React.Fragment>
+                <div className={colClass}></div>
+                <ImageBox layout="layout_1" containerClasses={classCol12} key={item.key + "-1"} image = {item} />
+                <div className={colClass}></div>
+            </React.Fragment>
         );        
     }
 
