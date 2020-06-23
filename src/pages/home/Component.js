@@ -87,12 +87,16 @@ class Home extends Component {
   }
 
   render() {
-    if (this.state.rows.length === 0) return(<Loading />);
+    if (this.state.rows.length === 0) return(
+      <div key="home-page" id="home-page" className="home-page m-0 p-0 row" onScroll={this.handleScroll}>
+        <Loading />
+      </div>
+    );
     return(
         <div key="home-page" id="home-page" className="home-page m-0 p-0 row" onScroll={this.handleScroll}>
           <div className="col-1"></div>
           <div className="col-10">
-          {this.state.rows.map((row, idx) => {return (<ContentRow key={Math.floor(Math.random() * 100000).toString()} row = {row} />);})}
+          {this.state.rows.map((row, idx) => {return (<ContentRow key={row.id} row = {row.row} />);})}
           </div>
           <div className="col-1"></div>
         </div>
@@ -142,7 +146,10 @@ class Home extends Component {
         this.props.actions.addImageCarousel(item);
         row.push(item.id);
       }
-      this.addRow(row);
+      this.addRow({
+        id: Math.floor(Math.random() * 100000).toString(), 
+        row: row
+      });
 
       const l = this.state.rows.length - MAX_ROWS;
       if (l > 0) {
