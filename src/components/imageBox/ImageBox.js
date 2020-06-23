@@ -65,7 +65,7 @@ class ImageBox extends Component {
     this.state = {
       closerHeight: 'auto',
       imageContainerStyle: {
-        zIndex: this.getNextZOrder()
+        zIndex: this.getNextZOrder(),
       },
       imageFrameStyle: null,
       grabberStyle: null,
@@ -92,11 +92,14 @@ class ImageBox extends Component {
     this.props.image.source_url = imageProps.source_url;
     this.props.image.width = imageProps.width;
     this.props.image.height = imageProps.height;
+    this.props.image.orientation = imageProps.width > imageProps.height ? 'landscape' : 'portrait';
+    this.props.image.aspect_ratio = imageProps.height > 0 ? imageProps.width / imageProps.height : 0;
     this.props.image.image_props = imageProps;
 
     var imageFrameStyle = {
       backgroundImage: "url('" + this.props.image.source_url + "')",
-      height: 300
+      height: 300,
+      border: this.props.image.orientation === "portrait" ? "1px solid green;" : ""
     };
 
     if (this.props.layout === "layout_1") {
@@ -106,8 +109,8 @@ class ImageBox extends Component {
     if (["layout_2_1", "layout_2_2", "layout_2_3"].includes(this.props.layout)) {
       imageFrameStyle.height = 500;
     }
-
     const grabberStyle = {height: imageFrameStyle.height};
+
     this.setState({
       imageFrameStyle: imageFrameStyle,
       grabberStyle: grabberStyle
@@ -147,6 +150,8 @@ class ImageBox extends Component {
     if (this._like) containerClasses += " analytics_like";
     if (this._dislike) containerClasses += " analytics_dislike window-closing";
     if (this._close) containerClasses += " analytics_close";
+
+    if (this.props.image.orientation === "portrait") containerClasses += " green-border"
     
     // CSSTransition
     // https://reactcommunity.org/react-transition-group/css-transition

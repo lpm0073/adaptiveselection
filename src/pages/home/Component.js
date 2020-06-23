@@ -15,7 +15,7 @@ import * as Signals from '../../redux/userSignals';
 // my stuff
 import './styles.css';
 import ContentRow from '../../components/contentRow/ContentRow'
-import { WPImages, wpGetExclusionArray } from '../../shared/wpImages';
+import { WPImages, wpGetImage, wpGetExclusionArray } from '../../shared/wpImages';
 import Loading from '../../components/Loading';
 
 var local_dispatch;
@@ -69,7 +69,7 @@ class Home extends Component {
     this.handleMasonryLayoutComplete = this.handleMasonryLayoutComplete.bind(this);
 
     this.state = {
-      level: 4,
+      level: 0,
       fetching: false,
       nextSerialNumber: 0
     }
@@ -83,16 +83,14 @@ class Home extends Component {
     clearTimeout(this.queueDelay);
   }
   render() {
+    if (this.rows.length === 0) return(<Loading />);
     return(
-        <div key="home-page" id="home-page" className="home-page m-0 p-0" onScroll={this.handleScroll}>
-            {this.rows.length > 0 ? this.rows.map((row, idx) => {
-                return (
-                  <ContentRow key={idx} row = {row} />
-                );
-              })
-          :
-            <Loading />
-          }
+        <div key="home-page" id="home-page" className="home-page m-0 p-0 row" onScroll={this.handleScroll}>
+          <div className="col-1"></div>
+          <div className="col-10">
+          {this.rows.map((row, idx) => {return (<ContentRow key={idx} row = {row} />);})}
+          </div>
+          <div className="col-1"></div>
         </div>
     );
   }
@@ -201,21 +199,21 @@ class Home extends Component {
 
     const imageIdx = Math.floor(Math.random() * images.length);
     const image = this.serializedImage(images[imageIdx]);
-    
-    return {
+    const imageProps = wpGetImage(image);
+    const obj = {
       key: image.id,
       id: image.id,
-      
-      source_url: image.source_url,
-      height: image.height,
-      width: image.width,
-      orientation: image.width > image.height ? 'landscape' : 'portrait',
-      aspect_ratio: image.width > 0 ? image.height / image.width : 0,
-  
       api_props: image,
-      timestamp: new Date()
+      timestamp: new Date(),
+      source_url: imageProps.source_url,
+      width: imageProps.width,
+      height: imageProps.height,
+      orientation: imageProps.width > imageProps.height ? 'landscape' : 'portrait',
+      aspect_ratio: imageProps.height > 0 ? imageProps.width / imageProps.height : 0,
+      image_props: imageProps
     };
-}
+    return(obj);
+  }
 
  
   handleMasonryLayoutComplete(laidOutItems) {

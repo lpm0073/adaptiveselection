@@ -64,7 +64,6 @@ const mapStateToProps = state => ({
         if (numItems === 3) {
             if (portrait === 0 || landscape === 0) this.setState({layoutMethod: this.layout_3_1});
             else {
-                console.log("3 image, other");
                 if (Math.random() > 0.5) this.setState({layoutMethod: this.layout_3_2});
                 else this.setState({layoutMethod: this.layout_3_3});
             }
@@ -117,12 +116,22 @@ const mapStateToProps = state => ({
     layout_2_2(self) {
         const item1 = self.props.row[0];
         const item2 = self.props.row[1];
+        if (item1.orientation === item2.orientation === "portrait") 
+        return(
+            <React.Fragment>
+                <div className="col-2"></div>
+                <ImageBox layout="layout_2_2" containerClasses={classCol4} key={item1.key + "-1"} image = {item1} />
+                <ImageBox layout="layout_2_2" containerClasses={classCol4} key={item2.key + "-1"} image = {item2} />
+                <div className="col-2"></div>
+            </React.Fragment>
+        ); 
+        else
         return(
             <React.Fragment>
                 <ImageBox layout="layout_2_2" containerClasses={classCol6} key={item1.key + "-1"} image = {item1} />
                 <ImageBox layout="layout_2_2" containerClasses={classCol6} key={item2.key + "-1"} image = {item2} />
             </React.Fragment>
-        );
+        ); 
     }
 
     layout_2_3(self) {
@@ -164,7 +173,7 @@ const mapStateToProps = state => ({
             if (i===0) landscape1 = landscapes[i];
             if (i===1) landscape2 = landscapes[i];
         }
-        for (var i=0; i<portraits.length; i++) {
+        for (i=0; i<portraits.length; i++) {
             if (i===0) portrait1 = portraits[i];
             if (i===1) portrait2 = portraits[i];
         }
@@ -206,7 +215,7 @@ const mapStateToProps = state => ({
             if (i===0) landscape1 = landscapes[i];
             if (i===1) landscape2 = landscapes[i];
         }
-        for (var i=0; i<portraits.length; i++) {
+        for (i=0; i<portraits.length; i++) {
             if (i===0) portrait1 = portraits[i];
             if (i===1) portrait2 = portraits[i];
         }
