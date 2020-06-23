@@ -30,7 +30,8 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 const RANKTILE = 3            // groupings between ranked image selection
-const MAX_ROW = 6;
+const MAX_ITEMS_PER_ROW = 3;
+const MAX_ROWS = 4;
 
 class Home extends Component {
 
@@ -110,22 +111,23 @@ class Home extends Component {
   }  
   
   addRow(row) {
+    console.log("addRow()", row, this.rows.length);
     this.rows.push(row);
   }
   removeRow() {
+    console.log("removeRow()");
     this.rows.shift()
   }
   fetchRow(n = 1) {
     if (this.fetching) return;
     this.fetching = true;
-    const MAX_ITEMS = 3;
     var i;
 
     //this.processAnalytics();
     //this.rankWorkingSet();
 
     for (i = 0; i<n; i++) {
-      const j = Math.floor(Math.random() * 10) % MAX_ITEMS;
+      const j = Math.floor(Math.random() * 10) % MAX_ITEMS_PER_ROW;
       var row = [];
       for (var k=0; k<=j; k++) {
         const item = this.getNextItem();
@@ -134,12 +136,13 @@ class Home extends Component {
       }
       this.addRow(row);
 
-      const l = this.rows.length - MAX_ROW;
+      const l = this.rows.length - MAX_ROWS;
       if (l > 0) {
-        for (i =0; i<l; i++) {
+        for (i=0; i<l; i++) {
           this.removeRow();
         }
       }
+
       this.fetching = false;
     }  
   }
@@ -327,6 +330,7 @@ class Home extends Component {
     const scroll_position = scrollable_area > 0 ? this.page.scrollTop / scrollable_area : 0;
 
     if (scrollable_area === 0) return true; // not enough content on screen to need a scrollbar
+    console.log("scroll_position", scroll_position);
     return (scroll_position > .80);         // we're near the bottom of a scrollable screen 
   }
 

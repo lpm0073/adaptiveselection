@@ -50,7 +50,7 @@ const mapStateToProps = state => ({
         var portrait = 0,
             landscape = 0;
 
-        for (var i=0; i<numItems; i++) {
+        for (i=0; i<numItems; i++) {
             if (row[i].orientation === 'landscape') landscape += 1;
             else portrait += 1;
         }
