@@ -12,11 +12,14 @@ import Loading from '../Loading';
 
 
 // module stuff
-const classCol12 = "col-sm";
-const classCol9 = "col-sm";
-const classCol6 = "col-sm";
-const classCol4 = "col-sm";
-const classCol3 = "col-sm";
+const classCol12 = "col-12";
+const classCol9 = "col-9";
+const classCol8 = "col-8";
+const classCol7 = "col-7";
+const classCol6 = "col-6";
+const classCol5 = "col-5";
+const classCol4 = "col-4";
+const classCol3 = "col-3";
 
 const mapStateToProps = state => ({
     ...state
@@ -130,22 +133,16 @@ const mapStateToProps = state => ({
     layout_2_2(self) {
         const item1 = self.state.row[0];
         const item2 = self.state.row[1];
-        if (item1.orientation === item2.orientation === "portrait") 
+
+        const landscape = item1.orientation === 'landscape' ? item1 : item2;
+        const portrait = item1.orientation === 'portrait' ? item1 : item2;
+
         return(
             <React.Fragment>
-                <div className="col-2"></div>
-                <ImageBox parent={self.state.componentKey} layout="layout_2_2" containerClasses={classCol4} key={item1.key} image = {item1} />
-                <ImageBox parent={self.state.componentKey} layout="layout_2_2" containerClasses={classCol4} key={item2.key} image = {item2} />
-                <div className="col-2"></div>
+                <ImageBox parent={self.state.componentKey} layout="layout_2_3" containerClasses={classCol5} key={portrait.key} image = {portrait} />
+                <ImageBox parent={self.state.componentKey} layout="layout_2_3" containerClasses={classCol7} key={landscape.key} image = {landscape} />
             </React.Fragment>
-        ); 
-        else
-        return(
-            <React.Fragment>
-                <ImageBox parent={self.state.componentKey} layout="layout_2_2" containerClasses={classCol6} key={item1.key} image = {item1} />
-                <ImageBox parent={self.state.componentKey} layout="layout_2_2" containerClasses={classCol6} key={item2.key} image = {item2} />
-            </React.Fragment>
-        ); 
+        );
     }
 
     layout_2_3(self) {
@@ -157,8 +154,8 @@ const mapStateToProps = state => ({
 
         return(
             <React.Fragment>
-                <ImageBox parent={self.state.componentKey} layout="layout_2_3" containerClasses={classCol9} key={landscape.key} image = {landscape} />
-                <ImageBox parent={self.state.componentKey} layout="layout_2_3" containerClasses={classCol3} key={portrait.key} image = {portrait} />
+                <ImageBox parent={self.state.componentKey} layout="layout_2_3" containerClasses={classCol7} key={landscape.key} image = {landscape} />
+                <ImageBox parent={self.state.componentKey} layout="layout_2_3" containerClasses={classCol5} key={portrait.key} image = {portrait} />
             </React.Fragment>
         );
     }
@@ -178,6 +175,7 @@ const mapStateToProps = state => ({
     }
 
     layout_3_2(self) {
+        console.log("layout_3_2");
         var portrait1, portrait2, landscape1, landscape2;
         const items = self.state.row;
         const portraits = items.filter((item) => item.orientation === 'portrait');
@@ -195,11 +193,11 @@ const mapStateToProps = state => ({
         if (self.state.landscape === 2) 
             return(
                 <React.Fragment>
-                    <ImageBox containerClasses={classCol3} key={portrait1.key} image = {portrait1} />
-                    <div className="col-9">
+                    <ImageBox containerClasses={classCol4} key={portrait1.key} image = {portrait1} />
+                    <div className="col-8">
                         <div className="row">
-                            <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={classCol6} key={landscape1.key} image = {landscape1} />
-                            <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={classCol6} key={landscape2.key} image = {landscape2} />
+                            <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={classCol12} key={landscape1.key} image = {landscape1} />
+                            <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={classCol12} key={landscape2.key} image = {landscape2} />
                         </div>
                     </div>
                 </React.Fragment>
@@ -207,11 +205,11 @@ const mapStateToProps = state => ({
         else
             return(
                 <React.Fragment>
-                    <ImageBox containerClasses={classCol3} key={landscape1.key} image = {landscape1} />
-                    <div className="col-9">
+                    <ImageBox containerClasses={classCol4} key={landscape1.key} image = {landscape1} />
+                    <div className="col-8">
                         <div className="row">
-                            <ImageBox parent={self.state.componentKey} layout="layout_3_2"containerClasses={classCol6} key={portrait1.key} image = {portrait1} />
-                            <ImageBox parent={self.state.componentKey} layout="layout_3_2"containerClasses={classCol6} key={portrait2.key} image = {portrait2} />
+                            <ImageBox parent={self.state.componentKey} layout="layout_3_2"containerClasses={classCol12} key={portrait1.key} image = {portrait1} />
+                            <ImageBox parent={self.state.componentKey} layout="layout_3_2"containerClasses={classCol12} key={portrait2.key} image = {portrait2} />
                         </div>
                     </div>
                 </React.Fragment>
@@ -219,6 +217,7 @@ const mapStateToProps = state => ({
 }
 
     layout_3_3(self) {
+        console.log("layout_3_2");
         if (!self.props) return(<React.Fragment></React.Fragment>);
         var portrait1, portrait2, landscape1, landscape2;
         const items = self.state.row;
@@ -237,25 +236,25 @@ const mapStateToProps = state => ({
         if (self.state.landscape === 2) 
             return(
                 <React.Fragment>
-                    <div className="col-9">
+                    <div className="col-8">
                         <div className="row">
                             <ImageBox parent={self.state.componentKey} layout="layout_3_3" containerClasses={classCol9} key={landscape1.key} image = {landscape1} />
                             <ImageBox parent={self.state.componentKey} layout="layout_3_3" containerClasses={classCol9} key={landscape2.key} image = {landscape2} />
                         </div>
                     </div>
-                    <ImageBox containerClasses={classCol3} key={portrait1.key} image = {portrait1} />
+                    <ImageBox containerClasses={classCol4} key={portrait1.key} image = {portrait1} />
                 </React.Fragment>
             );
         else
             return(
                 <React.Fragment>
-                    <div className="col-9">
+                    <div className="col-8">
                         <div className="row">
                             <ImageBox parent={self.state.componentKey} layout="layout_3_3" containerClasses={classCol9} key={portrait1.key} image = {portrait1} />
                             <ImageBox parent={self.state.componentKey} layout="layout_3_3" containerClasses={classCol9} key={portrait2.key} image = {portrait2} />
                         </div>
                     </div>
-                    <ImageBox containerClasses={classCol3} key={landscape1.key} image = {landscape1} />
+                    <ImageBox containerClasses={classCol4} key={landscape1.key} image = {landscape1} />
                 </React.Fragment>
             );
     }

@@ -84,7 +84,7 @@ class Home extends Component {
   }
 
   render() {
-    console.log("Home.render()");
+    //console.log("Home.render()");
     if (this.state.rows.length === 0) return(
       <div key="home-page" id="home-page" className="home-page m-0 p-0 row" onScroll={this.handleScroll}>
         <Loading />
@@ -113,7 +113,7 @@ class Home extends Component {
   }  
   
   addRow(row) {
-    console.log("addRow()", row, this.state.rows.length);
+    //console.log("addRow()", row, this.state.rows.length);
     const rows = [].concat(this.state.rows);
     rows.push(row);
     this.setState({
@@ -126,7 +126,7 @@ class Home extends Component {
     this.setState({
       rows: rows
     });
-    console.log("removeRow()", rows);
+    //console.log("removeRow()", rows);
   }
   fetchRow(n = 1) {
     if (this.fetching) return;
@@ -152,7 +152,7 @@ class Home extends Component {
       const l = this.state.rows.length - MAX_ROWS;
       if (l > 0) {
         for (i=0; i<l; i++) {
-          //this.removeRow();
+          this.removeRow();
         }
       }
 
@@ -346,8 +346,8 @@ class Home extends Component {
 
     if (scrollable_area === 0) return true; // not enough content on screen to need a scrollbar
     if (scroll_position > .50) {
-      console.log("requeue", this.page.scrollHeight, this.page.offsetHeight, this.page.scrollTop);
-      //this.page.scrollTop = 0;
+      //console.log("requeue", this.page.scrollHeight, this.page.offsetHeight, this.page.scrollTop);
+      this.page.scrollTop = 0;
       return true;
     }
   }

@@ -106,13 +106,21 @@ class ImageBox extends Component {
       if (this.props.image.orientation === "portrait") imageFrameStyle.height = 500;
       else imageFrameStyle.height = 400;
     }
-    if (["layout_2_1", "layout_2_2", "layout_2_3"].includes(this.props.layout)) {
+    if (["layout_2_1"].includes(this.props.layout)) {
+      if (this.props.image.orientation === "portrait") imageFrameStyle.height = 750;
+      else imageFrameStyle.height = 300;
+    }
+    if (["layout_2_2", "layout_2_3"].includes(this.props.layout)) {
       if (this.props.image.orientation === "portrait") imageFrameStyle.height = 500;
       else imageFrameStyle.height = 300;
     }
-    if (["layout_3_1", "layout_3_2", "layout_3_3"].includes(this.props.layout)) {
+    if (["layout_3_1"].includes(this.props.layout)) {
       if (this.props.image.orientation === "portrait") imageFrameStyle.height = 300;
       else imageFrameStyle.height = 200;
+    }
+    if (["layout_3_2", "layout_3_3"].includes(this.props.layout)) {
+      if (this.props.image.orientation === "portrait") imageFrameStyle.height = 750;
+      else imageFrameStyle.height = 300;
     }
     const grabberStyle = {height: imageFrameStyle.height};
 
@@ -138,7 +146,7 @@ class ImageBox extends Component {
     const key = "image-box-" + this.props.image.key;
     var likeStyles = null;
     var dislikeStyles = null;
-    var containerClasses = "image-container m-2 p-0 handle " + this.props.containerClasses;
+    var containerClasses = "image-container m-0 p-2 handle " + this.props.containerClasses;
     var infoPanelClasses = "info-panel m-0 p-5 text-center";
 
     if (this.state.isClosed) containerClasses += " window-closer window-closing";
