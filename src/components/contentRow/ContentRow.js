@@ -39,7 +39,6 @@ const mapStateToProps = state => ({
 
     componentDidMount() {
         var row = [];
-
         for (var i=0; i<this.props.row.length; i++) {
             const carousel = this.props.imageCarousel.present.items;
             const id = this.props.row[i];
@@ -47,13 +46,9 @@ const mapStateToProps = state => ({
             row.push(item);
         }
         this.setState({row: row});
-        console.log("componentDidMount()", row, this.state.row, this.props.row, this.props.imageCarousel.present.items);
-
+        const numItems = row.length;
         var portrait = 0,
             landscape = 0;
-            
-        const numItems = row.length;
-
 
         for (var i=0; i<numItems; i++) {
             if (row[i].orientation === 'landscape') landscape += 1;
@@ -92,7 +87,6 @@ const mapStateToProps = state => ({
     }
 
     render() {
-
         return(
             <React.Fragment>
                 <div className="row content-row">

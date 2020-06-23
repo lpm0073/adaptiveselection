@@ -30,7 +30,7 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 const RANKTILE = 3            // groupings between ranked image selection
-const MAX_ROW = 20;
+const MAX_ROW = 6;
 
 class Home extends Component {
 
@@ -39,6 +39,7 @@ class Home extends Component {
   wpImages = null;
   page;
   rows = [];
+  fetching = false;
 
   constructor(props) {
     super(props);
@@ -62,6 +63,8 @@ class Home extends Component {
 
     // UI
     this.fetchRow = this.fetchRow.bind(this);
+    this.removeRow = this.removeRow.bind(this);
+    this.addRow = this.addRow.bind(this);
     this.handleScroll = this.handleScroll.bind(this);
     this.requeueRange = this.requeueRange.bind(this);
 
@@ -70,7 +73,6 @@ class Home extends Component {
 
     this.state = {
       level: 0,
-      fetching: false,
       nextSerialNumber: 0
     }
 
@@ -107,8 +109,15 @@ class Home extends Component {
     this.wpImages = new WPImages(this.level, this.addMasterContent);
   }  
   
+  addRow(row) {
+    this.rows.push(row);
+  }
+  removeRow() {
+    this.rows.shift()
+  }
   fetchRow(n = 1) {
-    this.setState({fetching: true});
+    if (this.fetching) return;
+    this.fetching = true;
     const MAX_ITEMS = 3;
     var i;
 
@@ -123,11 +132,15 @@ class Home extends Component {
         this.props.actions.addImageCarousel(item);
         row.push(item.id);
       }
-      this.rows.push(row);
-      if (this.rows.length > MAX_ROW) {
-        this.rows = this.rows.slice(this.rows.length - MAX_ROW);
+      this.addRow(row);
+
+      const l = this.rows.length - MAX_ROW;
+      if (l > 0) {
+        for (i =0; i<l; i++) {
+          this.removeRow();
+        }
       }
-      this.setState({fetching: false});
+      this.fetching = false;
     }  
   }
 
