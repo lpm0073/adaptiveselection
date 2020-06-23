@@ -8,6 +8,7 @@ import * as Actions from '../../redux/ActionCreators';
 // my stuff
 import './styles.css';
 import ImageBox from '../imageBox/ImageBox';
+import Loading from '../Loading';
 
 
 // module stuff
@@ -29,6 +30,7 @@ const mapStateToProps = state => ({
         super(props);
 
         this.state = {
+            row: [],
             portrait: 0,
             landscape: 0,
             layoutMethod: this.layout_null
@@ -36,14 +38,25 @@ const mapStateToProps = state => ({
     }
 
     componentDidMount() {
+        var row = [];
+
+        for (var i=0; i<this.props.row.length; i++) {
+            const carousel = this.props.imageCarousel.present.items;
+            const id = this.props.row[i];
+            const item = carousel.filter((n) => n.id === id)[0];
+            row.push(item);
+        }
+        this.setState({row: row});
+        console.log("componentDidMount()", row, this.state.row, this.props.row, this.props.imageCarousel.present.items);
+
         var portrait = 0,
             landscape = 0;
             
-        const numItems = this.props.row.length;
+        const numItems = row.length;
 
 
         for (var i=0; i<numItems; i++) {
-            if (this.props.row[i].orientation === 'landscape') landscape += 1;
+            if (row[i].orientation === 'landscape') landscape += 1;
             else portrait += 1;
         }
         this.setState({
@@ -51,6 +64,10 @@ const mapStateToProps = state => ({
             landscape: landscape
         });
 
+        if (numItems === 0) {
+            this.setState({layoutMethod: this.layout_null});
+            return;
+        }
         if (numItems === 1) {
             this.setState({layoutMethod: this.layout_1});
             return;
@@ -75,6 +92,7 @@ const mapStateToProps = state => ({
     }
 
     render() {
+
         return(
             <React.Fragment>
                 <div className="row content-row">
@@ -86,13 +104,11 @@ const mapStateToProps = state => ({
 
     layout_null() {
         return(
-            <React.Fragment>
-
-            </React.Fragment>
+            <Loading />
         );        
     }
     layout_1(self) {
-        const item = self.props.row[0];
+        const item = self.state.row[0];
         const colClass = item.orientation === "landscape" ? "col-2" : "col-3";
         return(
             <React.Fragment>
@@ -106,8 +122,8 @@ const mapStateToProps = state => ({
     layout_2_1(self) {
         if (!self.props) return(<React.Fragment></React.Fragment>);
 
-        const item1 = self.props.row[0];
-        const item2 = self.props.row[1];
+        const item1 = self.state.row[0];
+        const item2 = self.state.row[1];
         return(
             <React.Fragment>
                 <ImageBox layout="layout_2_1" containerClasses={classCol6} key={item1.key + "-1"} image = {item1} />
@@ -117,8 +133,8 @@ const mapStateToProps = state => ({
     }
 
     layout_2_2(self) {
-        const item1 = self.props.row[0];
-        const item2 = self.props.row[1];
+        const item1 = self.state.row[0];
+        const item2 = self.state.row[1];
         if (item1.orientation === item2.orientation === "portrait") 
         return(
             <React.Fragment>
@@ -138,8 +154,8 @@ const mapStateToProps = state => ({
     }
 
     layout_2_3(self) {
-        const item1 = self.props.row[0];
-        const item2 = self.props.row[1];
+        const item1 = self.state.row[0];
+        const item2 = self.state.row[1];
 
         const landscape = item1.orientation === 'landscape' ? item1 : item2;
         const portrait = item1.orientation === 'portrait' ? item1 : item2;
@@ -153,9 +169,9 @@ const mapStateToProps = state => ({
     }
 
     layout_3_1(self) {
-        const item1 = self.props.row[0];
-        const item2 = self.props.row[1];
-        const item3 = self.props.row[2];
+        const item1 = self.state.row[0];
+        const item2 = self.state.row[1];
+        const item3 = self.state.row[2];
 
         return(
             <React.Fragment>
@@ -168,7 +184,7 @@ const mapStateToProps = state => ({
 
     layout_3_2(self) {
         var portrait1, portrait2, landscape1, landscape2;
-        const items = self.props.row;
+        const items = self.state.row;
         const portraits = items.filter((item) => item.orientation === 'portrait');
         const landscapes = items.filter((item) => item.orientation === 'landscape');
 
@@ -210,7 +226,7 @@ const mapStateToProps = state => ({
     layout_3_3(self) {
         if (!self.props) return(<React.Fragment></React.Fragment>);
         var portrait1, portrait2, landscape1, landscape2;
-        const items = self.props.row;
+        const items = self.state.row;
         const portraits = items.filter((item) => item.orientation === 'portrait');
         const landscapes = items.filter((item) => item.orientation === 'landscape');
 

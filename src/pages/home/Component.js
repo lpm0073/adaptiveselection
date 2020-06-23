@@ -30,6 +30,7 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 const RANKTILE = 3            // groupings between ranked image selection
+const MAX_ROW = 20;
 
 class Home extends Component {
 
@@ -118,10 +119,14 @@ class Home extends Component {
       const j = Math.floor(Math.random() * 10) % MAX_ITEMS;
       var row = [];
       for (var k=0; k<=j; k++) {
-        row.push(this.getNextItem());
+        const item = this.getNextItem();
+        this.props.actions.addImageCarousel(item);
+        row.push(item.id);
       }
-      this.props.actions.addImageCarousel(row);
       this.rows.push(row);
+      if (this.rows.length > MAX_ROW) {
+        this.rows = this.rows.slice(this.rows.length - MAX_ROW);
+      }
       this.setState({fetching: false});
     }  
   }
