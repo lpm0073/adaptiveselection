@@ -18,18 +18,15 @@ import ContentRow from '../../components/contentRow/ContentRow'
 import { WPImages, wpGetImage, wpGetExclusionArray } from '../../shared/wpImages';
 import Loading from '../../components/Loading';
 
-var local_dispatch;
 const mapStateToProps = state => ({
     ...state
 });
 const mapDispatchToProps = (dispatch) => {
-  local_dispatch = dispatch;
   return({
     actions: bindActionCreators(Actions, dispatch)
   });
 };
 
-const RANKTILE = 3            // groupings between ranked image selection
 const MAX_ITEMS_PER_ROW = 3;
 const MAX_ROWS = 4;
 
@@ -72,7 +69,7 @@ class Home extends Component {
     this.handleMasonryLayoutComplete = this.handleMasonryLayoutComplete.bind(this);
 
     this.state = {
-      level: 0,
+      level: 4,
       nextSerialNumber: 0,
       rows: []
     }
@@ -87,6 +84,7 @@ class Home extends Component {
   }
 
   render() {
+    console.log("Home.render()");
     if (this.state.rows.length === 0) return(
       <div key="home-page" id="home-page" className="home-page m-0 p-0 row" onScroll={this.handleScroll}>
         <Loading />
@@ -115,7 +113,7 @@ class Home extends Component {
   }  
   
   addRow(row) {
-    //console.log("addRow()", row, this.state.rows.length);
+    console.log("addRow()", row, this.state.rows.length);
     const rows = [].concat(this.state.rows);
     rows.push(row);
     this.setState({
@@ -128,7 +126,7 @@ class Home extends Component {
     this.setState({
       rows: rows
     });
-    //console.log("removeRow()", rows);
+    console.log("removeRow()", rows);
   }
   fetchRow(n = 1) {
     if (this.fetching) return;
@@ -154,7 +152,7 @@ class Home extends Component {
       const l = this.state.rows.length - MAX_ROWS;
       if (l > 0) {
         for (i=0; i<l; i++) {
-          this.removeRow();
+          //this.removeRow();
         }
       }
 
@@ -237,7 +235,7 @@ class Home extends Component {
     const image = this.serializedImage(images[imageIdx]);
     const imageProps = wpGetImage(image);
     const obj = {
-      key: image.id,
+      key: Math.floor(Math.random() * 100000).toString(),
       id: image.id,
       api_props: image,
       timestamp: new Date(),
@@ -344,13 +342,19 @@ class Home extends Component {
     const scrollable_area = this.page.scrollHeight - this.page.offsetHeight;
     const scroll_position = scrollable_area > 0 ? this.page.scrollTop / scrollable_area : 0;
 
+    //console.log("requeueRange()", scroll_position);
+
     if (scrollable_area === 0) return true; // not enough content on screen to need a scrollbar
-    return (scroll_position > .50);         // we're near the bottom of a scrollable screen 
+    if (scroll_position > .50) {
+      console.log("requeue", this.page.scrollHeight, this.page.offsetHeight, this.page.scrollTop);
+      //this.page.scrollTop = 0;
+      return true;
+    }
   }
 
   handleScroll() {
     // https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect
-    if (this.state.fetching) return;
+
     if (this.requeueRange() && !this.fetching) {
       const self = this;
       setTimeout(function() {

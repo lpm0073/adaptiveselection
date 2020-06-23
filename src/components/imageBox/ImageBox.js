@@ -99,7 +99,7 @@ class ImageBox extends Component {
     var imageFrameStyle = {
       backgroundImage: "url('" + this.props.image.source_url + "')",
       height: 300,
-      border: this.props.image.orientation === "portrait" ? "1px solid green;" : ""
+      border: this.props.image.orientation === "portrait" ? "1px solid green" : ""
     };
 
     if (this.props.layout === "layout_1") {
@@ -130,7 +130,7 @@ class ImageBox extends Component {
   render() {
     // React key
 
-    const key = "image-box-" + this.props.image.id;
+    const key = "image-box-" + this.props.image.key;
     var likeStyles = null;
     var dislikeStyles = null;
     var containerClasses = "image-container m-2 p-0 handle " + this.props.containerClasses;
@@ -197,7 +197,7 @@ class ImageBox extends Component {
     return(
         <React.Fragment >
                 <div
-                key={key + "-" + Math.floor(Math.random() * 1000)}
+                key={key}
                 id={this.props.image.id}
                 className={containerClasses}
                 style={this.state.imageContainerStyle}
