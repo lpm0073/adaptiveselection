@@ -107,7 +107,12 @@ class ImageBox extends Component {
       else imageFrameStyle.height = 400;
     }
     if (["layout_2_1", "layout_2_2", "layout_2_3"].includes(this.props.layout)) {
-      imageFrameStyle.height = 500;
+      if (this.props.image.orientation === "portrait") imageFrameStyle.height = 500;
+      else imageFrameStyle.height = 300;
+    }
+    if (["layout_3_1", "layout_3_2", "layout_3_3"].includes(this.props.layout)) {
+      if (this.props.image.orientation === "portrait") imageFrameStyle.height = 300;
+      else imageFrameStyle.height = 200;
     }
     const grabberStyle = {height: imageFrameStyle.height};
 
@@ -196,15 +201,17 @@ class ImageBox extends Component {
      */
     return(
         <React.Fragment >
-                <div
-                key={key}
-                id={this.props.image.id}
-                className={containerClasses}
-                style={this.state.imageContainerStyle}
-                onMouseUp={this.handleMouseUp}
-                onMouseEnter={this.handleMouseEnter}
-                onMouseLeave={this.handleMouseLeave}
-                >
+
+            <div
+            key={key}
+            id={this.props.image.id}
+            className={containerClasses}
+            style={this.state.imageContainerStyle}
+            onMouseUp={this.handleMouseUp}
+            onMouseEnter={this.handleMouseEnter}
+            onMouseLeave={this.handleMouseLeave}
+            >
+              <AnimateHeight duration={ 1500 } height={ this.state.closerHeight }>
                   <div className={"image-frame m-0 p-0 "} 
                     style={this.state.imageFrameStyle}>
                     <div id="info-panel" className={infoPanelClasses} onMouseLeave={this.handleInfoPanelLeave} >
@@ -226,7 +233,8 @@ class ImageBox extends Component {
                       <div className="dislike" style={dislikeStyles} onMouseDown={this.handleDislike}><i className="fa fa-thumbs-down"></i></div>
                     </div>
                   </div>
-                </div>
+              </AnimateHeight>
+            </div>
         </React.Fragment>
     );
     }
