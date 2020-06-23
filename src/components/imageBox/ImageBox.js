@@ -96,6 +96,7 @@ class ImageBox extends Component {
 
     var imageFrameStyle = {
       backgroundImage: "url('" + this.props.image.source_url + "')",
+      height: 300
     };
 
     if (this.props.layout === "layout_1") {
@@ -106,7 +107,11 @@ class ImageBox extends Component {
       imageFrameStyle.height = 500;
     }
 
-    this.setState({imageFrameStyle: imageFrameStyle});
+    const grabberStyle = {height: imageFrameStyle.height};
+    this.setState({
+      imageFrameStyle: imageFrameStyle,
+      grabberStyle: grabberStyle
+    });
 
 
   }

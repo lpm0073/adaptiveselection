@@ -26,7 +26,6 @@
 
 
 .image-frame {
-  height: 300px;
   max-width: 800px;
   background-size: cover;
   background-position: center;
@@ -116,6 +115,7 @@
 /* --------------------- corner grabbers --------------------- */
 #grabbers {
   position: relative;
+  width: 100%;
 }
 #grabbers > div {
   position:absolute;
@@ -143,6 +143,7 @@
 .top-right {
   top: 0;
   right: 0;
+  background-color: gray;
   cursor: ne-resize;
 }
 .top-right:hover {border-right: 2px solid black; border-top: 2px solid black;}
@@ -150,6 +151,7 @@
 .bottom-left {
   bottom: 0;
   left: 0;
+  background-color: hotpink;
   cursor: sw-resize;
 }
 .bottom-left:hover {border-left: 2px solid black; border-bottom: 2px solid black;}
@@ -157,13 +159,15 @@
 .bottom-right {
   bottom: 0;
   right: 0;
+  background-color: khaki;
   cursor: se-resize;
 }
 .bottom-right:hover {border-right: 2px solid black; border-bottom: 2px solid black;}
 
 /* ------------------- like buttons */
 #button-bar {
-  position: relative;
+  position: absolute;
+  bottom: 0;
   width: 100%;
 }
 
@@ -174,7 +178,7 @@
   display: inherit;
   background-color: goldenrod;
   height: 25px;
-  bottom: 25px;
+  bottom: 0;
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
   animation: button-bar-slide-up 1s ease-in-out 0ms;
@@ -183,8 +187,8 @@
 
 }
 @keyframes button-bar-slide-up {
-  from { bottom: 0px; }
-  100% { bottom: 28px; }
+  from { bottom: -28px; }
+  100% { bottom: 0px; }
 }
 
 #button-bar > div {
