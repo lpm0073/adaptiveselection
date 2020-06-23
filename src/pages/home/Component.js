@@ -29,7 +29,6 @@ const mapDispatchToProps = (dispatch) => {
   });
 };
 
-const MAX_CAROUSEL_SIZE = 10000;
 const RANKTILE = 3            // groupings between ranked image selection
 
 class Home extends Component {
@@ -82,6 +81,7 @@ class Home extends Component {
   componentWillUnmount() {
     clearTimeout(this.queueDelay);
   }
+
   render() {
     if (this.rows.length === 0) return(<Loading />);
     return(
@@ -123,7 +123,7 @@ class Home extends Component {
       this.props.actions.addImageCarousel(row);
       this.rows.push(row);
       this.setState({fetching: false});
-      }
+    }  
   }
 
   // returns true if there is an element in the DOM containing this class

@@ -1,13 +1,16 @@
 import React, {Component}  from 'react';
 
-
+// redux stuff
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import * as Actions from '../../redux/ActionCreators';
 
+// my stuff
 import './styles.css';
 import ImageBox from '../imageBox/ImageBox';
 
+
+// module stuff
 const classCol12 = "col-sm";
 const classCol9 = "col-sm";
 const classCol6 = "col-sm";
