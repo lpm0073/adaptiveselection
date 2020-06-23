@@ -12,6 +12,7 @@ import Loading from '../Loading';
 
 
 // module stuff
+const classColSM = "col-sm";
 const classCol12 = "col-12";
 const classCol9 = "col-9";
 const classCol8 = "col-8";
@@ -111,7 +112,7 @@ const mapStateToProps = state => ({
         return(
             <React.Fragment>
                 <div className={colClass}></div>
-                <ImageBox parent={self.state.componentKey} layout="layout_1" containerClasses={classCol12} key={item.key} image = {item} />
+                <ImageBox parent={self.state.componentKey} layout="layout_1" containerClasses={classColSM} key={item.key} image = {item} />
                 <div className={colClass}></div>
             </React.Fragment>
         );        
