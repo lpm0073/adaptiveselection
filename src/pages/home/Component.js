@@ -92,7 +92,7 @@ class Home extends Component {
         <div key="home-page" id="home-page" className="home-page m-0 p-0 row" onScroll={this.handleScroll}>
           <div className="col-1"></div>
           <div className="col-10">
-          {this.state.rows.map((row, idx) => {return (<ContentRow key={idx} row = {row} />);})}
+          {this.state.rows.map((row, idx) => {return (<ContentRow key={Math.floor(Math.random() * 100000).toString()} row = {row} />);})}
           </div>
           <div className="col-1"></div>
         </div>
@@ -111,7 +111,7 @@ class Home extends Component {
   }  
   
   addRow(row) {
-    console.log("addRow()", row, this.state.rows.length);
+    //console.log("addRow()", row, this.state.rows.length);
     const rows = [].concat(this.state.rows);
     rows.push(row);
     this.setState({
@@ -119,12 +119,12 @@ class Home extends Component {
     });
   }
   removeRow() {
-    console.log("removeRow()");
     const rows = [].concat(this.state.rows);
     rows.shift();
     this.setState({
       rows: rows
     });
+    //console.log("removeRow()", rows);
   }
   fetchRow(n = 1) {
     if (this.fetching) return;
@@ -338,7 +338,6 @@ class Home extends Component {
     const scroll_position = scrollable_area > 0 ? this.page.scrollTop / scrollable_area : 0;
 
     if (scrollable_area === 0) return true; // not enough content on screen to need a scrollbar
-    console.log("scroll_position", scroll_position);
     return (scroll_position > .50);         // we're near the bottom of a scrollable screen 
   }
 
