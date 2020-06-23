@@ -74,6 +74,7 @@ class ImageBox extends Component {
       showInfoPanel: false,
       isMounted: false
     }
+
   }
 
   componentDidMount() {
@@ -96,39 +97,15 @@ class ImageBox extends Component {
     this.props.image.aspect_ratio = imageProps.height > 0 ? imageProps.width / imageProps.height : 0;
     this.props.image.image_props = imageProps;
 
-    var imageFrameStyle = {
+    const imageFrameStyle = {
       backgroundImage: "url('" + this.props.image.source_url + "')",
-      height: 300,
-      border: this.props.image.orientation === "portrait" ? "1px solid green" : ""
+      height: Number(this.props.height)
     };
-
-    if (this.props.layout === "layout_1") {
-      if (this.props.image.orientation === "portrait") imageFrameStyle.height = 500;
-      else imageFrameStyle.height = 400;
-    }
-    if (["layout_2_1"].includes(this.props.layout)) {
-      if (this.props.image.orientation === "portrait") imageFrameStyle.height = 750;
-      else imageFrameStyle.height = 300;
-    }
-    if (["layout_2_2", "layout_2_3"].includes(this.props.layout)) {
-      if (this.props.image.orientation === "portrait") imageFrameStyle.height = 500;
-      else imageFrameStyle.height = 300;
-    }
-    if (["layout_3_1"].includes(this.props.layout)) {
-      if (this.props.image.orientation === "portrait") imageFrameStyle.height = 300;
-      else imageFrameStyle.height = 200;
-    }
-    if (["layout_3_2", "layout_3_3"].includes(this.props.layout)) {
-      if (this.props.image.orientation === "portrait") imageFrameStyle.height = 750;
-      else imageFrameStyle.height = 300;
-    }
     const grabberStyle = {height: imageFrameStyle.height};
-
     this.setState({
       imageFrameStyle: imageFrameStyle,
       grabberStyle: grabberStyle
     });
-
 
   }
 
