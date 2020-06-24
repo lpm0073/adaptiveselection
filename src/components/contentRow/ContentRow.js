@@ -271,10 +271,10 @@ const mapStateToProps = state => ({
             }
             return retval < max ? retval : max;
         }
-        function groupWidth(self) {
+        function groupWidth(group) {
             var width = 0;
-            for (var i=0; i<rows.length; i++) {
-                width += rows[i].height;
+            for (var i=0; i<group.length; i++) {
+                width += group[i].height;
             }
             return width;
         }
@@ -282,20 +282,15 @@ const mapStateToProps = state => ({
             if (window.screen.height === 0) return 0;
             return groupWidth(self) / window.screen.height;
         }
-        function rect(item) {
-            return {
-                height: item.height,
-                aspect_ratio: item.aspect_ratio,
-                width: item.height * item.aspect_ratio
-            }
-        }
         function pairRectangles(rect1, rect2) {
             const rect1Area = rect1.width * rect1.height;
             const rect2Area = rect2.width * rect2.height;
-            const height = groupHeight(this);
+            var height = groupHeight(this);
+            var retval;
+            if (rect1.orientation === rect2.orientation === "landscape") height /= 2;
 
             if (rect1Area < rect2Area) {
-                return {
+                retval = {
                     rect1: height,
                     rect2: {
                         height: height ,
@@ -305,7 +300,7 @@ const mapStateToProps = state => ({
                 }
             }
             else {
-                return {
+                retval = {
                     rect2: rect2,
                     rect1: {
                         height: height,
@@ -314,11 +309,12 @@ const mapStateToProps = state => ({
                     }
                 }
             }
+            return retval;
         }
 
         console.log("portfolio, landscape", this.state.portrait, this.state.landscape);
         console.log("height: ", groupHeight(this));
-        console.log("width: ", groupWidth(this));
+        console.log("width: ", groupWidth(rows));
 
         // easiest possible situation: only 1 item on the row
         if (this.state.row.length <= 1) {
@@ -341,7 +337,7 @@ const mapStateToProps = state => ({
                 rows.width = height * rows[i].aspect_ratio * compression;
             }
             // calc Bootstrap 12ths per item
-            const totWidth = groupWidth(this);
+            var totWidth = groupWidth(rows);
             var totCols = 0;
             for (i=0; i<rows.length; i++) {
                 rows[i].columns = Math.floor(12 * (rows[i].width / totWidth));
@@ -381,6 +377,22 @@ const mapStateToProps = state => ({
                 pairedRects = pairRectangles(landscape1, portrait);
                 portrait.height = pairedRects.rect2.height;
                 portrait.width = pairedRects.rect2.width;
+
+                // calc Bootstrap 12ths per item
+                var landscapeRows = [landscape1, landscape2];
+                totWidth = groupWidth(landscapeRows);
+                totCols = 0;
+                for (i=0; i<landscapeRows.length; i++) {
+                    landscapeRows[i].columns = Math.floor(12 * (landscapeRows[i].width / totWidth));
+                    totCols += landscapeRows[i].columns;
+                    console.log("column calc:", landscapeRows[i].width, totWidth);
+                }
+                landscapeRows[landscapeRows.length - 1].columns += (12 - totCols);    // in case we're over/under
+                for (i=0; i<landscapeRows.length; i++) {
+                    landscapeRows[i].bootstrapClass = "col-" + landscapeRows[i].columns;
+                    console.log("bootstrap class:", landscapeRows[i].bootstrapClass, landscapeRows[i].columns);
+                }
+
 
                 rows = [landscape1, landscape2, portrait];
 
