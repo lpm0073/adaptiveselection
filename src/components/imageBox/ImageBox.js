@@ -70,11 +70,6 @@ class ImageBox extends Component {
 
     const imageProps = wpGetImage(this.props.image.api_props);
     this.props.image.source_url = imageProps.source_url;
-    this.props.image.width = imageProps.width;
-    this.props.image.height = imageProps.height;
-    this.props.image.orientation = imageProps.width > imageProps.height ? 'landscape' : 'portrait';
-    this.props.image.aspect_ratio = imageProps.height > 0 ? imageProps.width / imageProps.height : 0;
-    this.props.image.image_props = imageProps;
 
     const imageFrameStyle = {
     backgroundImage: "url('" + this.props.image.source_url + "')",
