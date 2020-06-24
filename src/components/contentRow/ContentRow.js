@@ -219,7 +219,6 @@ const mapStateToProps = state => ({
 }
 
     layout_3_3(self) {
-        console.log("layout_3_3()", this.state.landscape, this.state.portrait);
         if (!self.props) return(<React.Fragment></React.Fragment>);
         var portrait1 = null, portrait2 = null, landscape1 = null, landscape2 = null;
         const items = self.state.row;
@@ -266,18 +265,22 @@ const mapStateToProps = state => ({
     }
 
     calculateItemDimensions() {
-        // window.screen.height
+        // we only need to do this if there are multiple items on the row
+        if (this.state.row.length <= 1) return;
+        const rows = [].concat(this.state.row);
+
+
         function groupHeight(self) {
             var height = 999999;
-            for (var i=0; i<self.state.row.length; i++) {
-                if (self.state.row[i].height < height) height = self.state.row[i].height;
+            for (var i=0; i<rows.length; i++) {
+                if (rows[i].height < height) height = rows[i].height;
             }
             return height;
         }
         function groupWidth(self) {
             var width = 0;
-            for (var i=0; i<self.state.row.length; i++) {
-                width += self.state.row[i].height;
+            for (var i=0; i<rows.length; i++) {
+                width += rows[i].height;
             }
             return width;
         }
@@ -285,21 +288,60 @@ const mapStateToProps = state => ({
             if (window.screen.height === 0) return 0;
             return groupWidth(self) / window.screen.height;
         }
+        function rect(item) {
+            return {
+                height: item.height,
+                aspect_ratio: item.aspect_ratio,
+                width: item.height * item.aspect_ratio
+            }
+        }
+        function pairRectangles(rect1, rect2) {
+            const rect1Area = rect1.width * rect1.height;
+            const rect2Area = rect2.width * rect2.height;
+
+            if (rect1Area > rect2Area) {
+                return {
+                    rect1: rect1,
+                    rect2: {
+                        height: rect1.height,
+                        aspect_ratio: rect2.aspect_ratio,
+                        width: rect1.height * rect2.aspect_ratio
+                    }
+                }
+            }
+            else {
+                return {
+                    rect2: rect2,
+                    rect1: {
+                        height: rect2.height,
+                        aspect_ratio: rect1.aspect_ratio,
+                        width: rect2.height * rect1.aspect_ratio
+                    }
+                }
+            }
+        }
+
         console.log("portfolio, landscape", this.state.portrait, this.state.landscape);
         console.log("height: ", groupHeight(this));
         console.log("width: ", groupWidth(this));
-        if (this.state.portrait.length === 0 || this.state.landscape.length === 0) {
-            console.log("all are same orentation");
-        } else {
-            if (this.state.portrait.length > this.state.landscape.length) {
-                console.log("1 or more portraits");
-            } else {
-                console.log("1 or more landscapes");
-            }
-        }
-        for (var i=0; i<this.state.row.length; i++) {
 
+        if (this.state.portrait.length === 0 || 
+            this.state.landscape.length === 0 ||
+            this.state.portrait.length === this.state.landscape.length) {
+            console.log("all are same orientation and/or there are only two items");
+            const height = groupHeight(this);
+            for (var i=0; i<rows.length; i++) {
+                rows.height = height;
+                rows.width = height * rows.aspect_ratio;
+            }
+        } else 
+        if (this.state.row.length === 2) {
+            console.log("we shouldn't be here.");
         }
+        if (this.state.row.length === 3) {
+            console.log("there are three items.");
+        }
+
     }
 }
 
