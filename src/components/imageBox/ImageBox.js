@@ -62,13 +62,33 @@ class ImageBox extends Component {
     this._like = false;
     this._dislike = false;
 
+    // if the user has already seen this image, and liked it.
+    this._like = this.props.userSignals.items.filter((image) => (
+      image.id === this.props.image.id && 
+      image.signal === 'LIKE'
+    )).length > 0;
+
+    const imageProps = wpGetImage(this.props.image.api_props);
+    this.props.image.source_url = imageProps.source_url;
+    this.props.image.width = imageProps.width;
+    this.props.image.height = imageProps.height;
+    this.props.image.orientation = imageProps.width > imageProps.height ? 'landscape' : 'portrait';
+    this.props.image.aspect_ratio = imageProps.height > 0 ? imageProps.width / imageProps.height : 0;
+    this.props.image.image_props = imageProps;
+
+    const imageFrameStyle = {
+    backgroundImage: "url('" + this.props.image.source_url + "')",
+    height: Number(this.props.height)
+    };
+    const grabberStyle = {height: imageFrameStyle.height};
+
     this.state = {
       closerHeight: 'auto',
       imageContainerStyle: {
         zIndex: this.getNextZOrder(),
       },
-      imageFrameStyle: null,
-      grabberStyle: null,
+      imageFrameStyle: imageFrameStyle,
+      grabberStyle: grabberStyle,
       isClosed: false,
       isHovering: false,
       showInfoPanel: false,
@@ -83,29 +103,6 @@ class ImageBox extends Component {
       isMounted: true
     });
 
-    // if the user has already seen this image, and liked it.
-    this._like = this.props.userSignals.items.filter((image) => (
-                  image.id === this.props.image.id && 
-                  image.signal === 'LIKE'
-                )).length > 0;
-
-    const imageProps = wpGetImage(this.props.image.api_props);
-    this.props.image.source_url = imageProps.source_url;
-    this.props.image.width = imageProps.width;
-    this.props.image.height = imageProps.height;
-    this.props.image.orientation = imageProps.width > imageProps.height ? 'landscape' : 'portrait';
-    this.props.image.aspect_ratio = imageProps.height > 0 ? imageProps.width / imageProps.height : 0;
-    this.props.image.image_props = imageProps;
-
-    const imageFrameStyle = {
-      backgroundImage: "url('" + this.props.image.source_url + "')",
-      height: Number(this.props.height)
-    };
-    const grabberStyle = {height: imageFrameStyle.height};
-    this.setState({
-      imageFrameStyle: imageFrameStyle,
-      grabberStyle: grabberStyle
-    });
 
   }
 
