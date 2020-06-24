@@ -261,22 +261,15 @@ const mapStateToProps = state => ({
 
     calculateItemDimensions() {
         // we only need to do this if there are multiple items on the row
-        const rows = [].concat(this.state.row);
+        var rows = [].concat(this.state.row);
 
-        function maxHeight(self) {
+        function groupHeight(self) {
             const max = .80 * window.screen.height;
             var retval = 999999;
             for (var i=0; i<rows.length; i++) {
                 if (rows[i].height < retval) retval = rows[i].height;
             }
             return retval < max ? retval : max;
-        }
-        function groupHeight(self) {
-            var height = 999999;
-            for (var i=0; i<rows.length; i++) {
-                if (rows[i].height < height) height = rows[i].height;
-            }
-            return height;
         }
         function groupWidth(self) {
             var width = 0;
@@ -299,7 +292,7 @@ const mapStateToProps = state => ({
         function pairRectangles(rect1, rect2) {
             const rect1Area = rect1.width * rect1.height;
             const rect2Area = rect2.width * rect2.height;
-            const height = maxHeight(this);
+            const height = groupHeight(this);
 
             if (rect1Area < rect2Area) {
                 return {
@@ -327,13 +320,15 @@ const mapStateToProps = state => ({
         console.log("height: ", groupHeight(this));
         console.log("width: ", groupWidth(this));
 
+        // easiest possible situation: only 1 item on the row
         if (this.state.row.length <= 1) {
             rows[0].columns = 8;
             rows[0].bootstrapClass = "col-8";
-            rows[0].height = maxHeight(this);
+            rows[0].height = groupHeight(this);
             rows[0].width = rows[0].height * rows[0].aspect_ratio;
         }
         else 
+        // common orientations, or, only two items on the row
         if (this.state.portrait.length === 0 || 
             this.state.landscape.length === 0 ||
             this.state.portrait.length === this.state.landscape.length) {
@@ -360,12 +355,42 @@ const mapStateToProps = state => ({
             }
 
         } else 
+        // this would be an internal error
         if (this.state.row.length === 2) {
             console.log("we shouldn't be here.");
-        }
+        } else
         if (this.state.row.length === 3) {
             console.log("there are three items.");
+            if (this.state.landscape.length > 1) {
+                console.log("a pair of landscapes");
+                var portrait, landscape1, landscape2;
+                for (i=0; i<this.state.landscape.length; i++) {
+                    const id = this.state.landscape[i];
+                    if (i===0) landscape1 = rows.filter((n) => n.id === id)[0];
+                    if (i===1) landscape2 = rows.filter((n) => n.id === id)[0];
+                }
+
+                var pairedRects = pairRectangles(landscape1, landscape2);
+                landscape1.height = pairedRects.rect1.height;
+                landscape1.width = pairedRects.rect1.width;
+                landscape2.height = pairedRects.rect2.height;
+                landscape2.width = pairedRects.rect2.width;
+
+                const id = this.state.portrait[0];
+                portrait = rows.filter((n) => n.id === id)[0];
+                pairedRects = pairRectangles(landscape1, portrait);
+                portrait.height = pairedRects.rect2.height;
+                portrait.width = pairedRects.rect2.width;
+
+                rows = [landscape1, landscape2, portrait];
+
+            } else {
+                console.log("a pair of portraits");
+
+            }
         }
+
+        // set our results
         this.setState({
             row: rows
         });
