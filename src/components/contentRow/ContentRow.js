@@ -53,6 +53,7 @@ const mapStateToProps = state => ({
             const item = carousel.filter((n) => n.id === id)[0];
             row.push(item);
         }
+
         const numItems = row.length;
         var portrait = [],
             landscape = [];
@@ -114,7 +115,7 @@ const mapStateToProps = state => ({
         return(
             <React.Fragment>
                 <div className={colClass}></div>
-                <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_1" containerClasses={classColSM} key={item.key} image = {item} />
+                <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_1" containerClasses={item.bootstrapClass} key={item.key} image = {item} />
                 <div className={colClass}></div>
             </React.Fragment>
         );        
@@ -127,8 +128,8 @@ const mapStateToProps = state => ({
         const item2 = self.state.row[1];
         return(
             <React.Fragment>
-                <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_2_1" containerClasses={classCol6} key={item1.key} image = {item1} />
-                <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_2_1" containerClasses={classCol6} key={item2.key} image = {item2} />
+                <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_2_1" containerClasses={item1.bootstrapClass} key={item1.key} image = {item1} />
+                <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_2_1" containerClasses={item2.bootstrapClass} key={item2.key} image = {item2} />
             </React.Fragment>
     );        
     }
@@ -142,8 +143,8 @@ const mapStateToProps = state => ({
 
         return(
             <React.Fragment>
-                <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_2_3" containerClasses={classCol5} key={portrait.key} image = {portrait} />
-                <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_2_3" containerClasses={classCol7} key={landscape.key} image = {landscape} />
+                <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_2_3" containerClasses={portrait.bootstrapClass} key={portrait.key} image = {portrait} />
+                <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_2_3" containerClasses={landscape.bootstrapClass} key={landscape.key} image = {landscape} />
             </React.Fragment>
         );
     }
@@ -157,8 +158,8 @@ const mapStateToProps = state => ({
 
         return(
             <React.Fragment>
-                <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_2_3" containerClasses={classCol7} key={landscape.key} image = {landscape} />
-                <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_2_3" containerClasses={classCol5} key={portrait.key} image = {portrait} />
+                <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_2_3" containerClasses={landscape.bootstrapClass} key={landscape.key} image = {landscape} />
+                <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_2_3" containerClasses={portrait.bootstrapClass} key={portrait.key} image = {portrait} />
             </React.Fragment>
         );
     }
@@ -170,53 +171,56 @@ const mapStateToProps = state => ({
 
         return(
             <React.Fragment>
-                <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_3_1" containerClasses={classCol4} key={item1.key} image = {item1} />
-                <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_3_1" containerClasses={classCol4} key={item2.key} image = {item2} />
-                <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_3_1" containerClasses={classCol4} key={item3.key} image = {item3} />
+                <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_3_1" containerClasses={item1.bootstrapClass} key={item1.key} image = {item1} />
+                <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_3_1" containerClasses={item2.bootstrapClass} key={item2.key} image = {item2} />
+                <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_3_1" containerClasses={item3.bootstrapClass} key={item3.key} image = {item3} />
             </React.Fragment>
         );        
     }
 
     layout_3_2(self) {
-        var portrait1, portrait2, landscape1, landscape2;
+        if (!self.props) return(<React.Fragment></React.Fragment>);
+        var portrait1 = null, portrait2 = null, landscape1 = null, landscape2 = null;
         const items = self.state.row;
-        const portraits = items.filter((item) => item.orientation === 'portrait');
-        const landscapes = items.filter((item) => item.orientation === 'landscape');
+        const portraits = this.state.portrait;
+        const landscapes = this.state.landscape;
 
         for (var i=0; i<landscapes.length; i++) {
-            if (i===0) landscape1 = landscapes[i];
-            if (i===1) landscape2 = landscapes[i];
+            const id = landscapes[i];
+            if (i===0) landscape1 = items.filter((item) => item.id === id)[0];
+            if (i===1) landscape2 = items.filter((item) => item.id === id)[0];
         }
         for (i=0; i<portraits.length; i++) {
-            if (i===0) portrait1 = portraits[i];
-            if (i===1) portrait2 = portraits[i];
+            const id = portraits[i];
+            if (i===0) portrait1 = items.filter((item) => item.id === id)[0];
+            if (i===1) portrait2 = items.filter((item) => item.id === id)[0];
         }
-        
-        if (self.state.landscape === 2) 
+
+        if (self.state.landscape.length === 2) 
             return(
                 <React.Fragment>
-                    <ImageBox containerClasses={classCol4} key={portrait1.key} image = {portrait1} />
                     <div className="col-8">
                         <div className="row">
-                            <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_3_2" containerClasses={classCol12} key={landscape1.key} image = {landscape1} />
-                            <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_3_2" containerClasses={classCol12} key={landscape2.key} image = {landscape2} />
+                            <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_3_3" containerClasses={classCol9} key={landscape1.key} image = {landscape1} />
+                            <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_3_3" containerClasses={classCol9} key={landscape2.key} image = {landscape2} />
                         </div>
                     </div>
+                    <ImageBox height={DEFAULT_HEIGHT} containerClasses={classCol4} key={portrait1.key} image = {portrait1} />
                 </React.Fragment>
             );
         else
             return(
                 <React.Fragment>
-                    <ImageBox containerClasses={classCol4} key={landscape1.key} image = {landscape1} />
                     <div className="col-8">
                         <div className="row">
-                            <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_3_2"containerClasses={classCol12} key={portrait1.key} image = {portrait1} />
-                            <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_3_2"containerClasses={classCol12} key={portrait2.key} image = {portrait2} />
+                            <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_3_3" containerClasses={classCol9} key={portrait1.key} image = {portrait1} />
+                            <ImageBox height={DEFAULT_HEIGHT} parent={self.state.componentKey} layout="layout_3_3" containerClasses={classCol9} key={portrait2.key} image = {portrait2} />
                         </div>
                     </div>
+                    <ImageBox containerClasses={classCol4} key={landscape1.key} image = {landscape1} />
                 </React.Fragment>
             );
-}
+    }
 
     layout_3_3(self) {
         if (!self.props) return(<React.Fragment></React.Fragment>);
@@ -235,8 +239,6 @@ const mapStateToProps = state => ({
             if (i===0) portrait1 = items.filter((item) => item.id === id)[0];
             if (i===1) portrait2 = items.filter((item) => item.id === id)[0];
         }
-
-        console.log(landscape1, landscape2, portrait1, portrait2);
 
         if (self.state.landscape.length === 2) 
             return(
@@ -266,7 +268,6 @@ const mapStateToProps = state => ({
 
     calculateItemDimensions() {
         // we only need to do this if there are multiple items on the row
-        if (this.state.row.length <= 1) return;
         const rows = [].concat(this.state.row);
 
 
@@ -325,15 +326,35 @@ const mapStateToProps = state => ({
         console.log("height: ", groupHeight(this));
         console.log("width: ", groupWidth(this));
 
+        if (this.state.row.length <= 1) {
+            rows[0].columns = 8;
+            rows[0].bootstrapClass = "col-8";
+        }
+        else 
         if (this.state.portrait.length === 0 || 
             this.state.landscape.length === 0 ||
             this.state.portrait.length === this.state.landscape.length) {
             console.log("all are same orientation and/or there are only two items");
             const height = groupHeight(this);
+            // set item dimensions
             for (var i=0; i<rows.length; i++) {
                 rows.height = height;
-                rows.width = height * rows.aspect_ratio;
+                rows.width = height * rows[i].aspect_ratio;
             }
+            // calc Bootstrap 12ths per item
+            const totWidth = groupWidth(this);
+            var totCols = 0;
+            for (i=0; i<rows.length; i++) {
+                rows[i].columns = Math.floor(12 * (rows[i].width / totWidth));
+                totCols += rows[i].columns;
+                console.log("column calc:", rows[i].width, totWidth);
+            }
+            rows[rows.length - 1].columns += (12 - totCols);    // in case we're over/under
+            for (i=0; i<rows.length; i++) {
+                rows[i].bootstrapClass = "col-" + rows[i].columns;
+                console.log("bootstrap class:", rows[i].bootstrapClass, rows[i].columns);
+            }
+
         } else 
         if (this.state.row.length === 2) {
             console.log("we shouldn't be here.");
@@ -341,7 +362,9 @@ const mapStateToProps = state => ({
         if (this.state.row.length === 3) {
             console.log("there are three items.");
         }
-
+        this.setState({
+            row: rows
+        });
     }
 }
 
