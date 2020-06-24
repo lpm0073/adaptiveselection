@@ -45,16 +45,6 @@ const mapStateToProps = state => ({
         this.layout_3_3 = this.layout_3_3.bind(this);
         this.calculateItemDimensions = this.calculateItemDimensions.bind(this);
 
-        this.state = {
-            row: [],
-            portrait: 0,
-            landscape: 0,
-            layoutMethod: this.layout_null,
-            componentKey: Math.floor(Math.random() * 100000).toString()
-        }
-    }
-
-    componentDidMount() {
         // build the item object array from the ID values in this.props.row
         var row = [];
         for (var i=0; i<this.props.row.length; i++) {
@@ -64,40 +54,42 @@ const mapStateToProps = state => ({
             row.push(item);
         }
         const numItems = row.length;
-        var portrait = 0,
-            landscape = 0;
+        var portrait = [],
+            landscape = [];
 
         for (i=0; i<numItems; i++) {
-            if (row[i].orientation === 'landscape') landscape += 1;
-            else portrait += 1;
+            if (row[i].orientation === 'landscape') landscape.push(row[i].id);
+            else portrait.push(row[i].id);
         }
-        this.setState({
-            row: row,
-            portrait: portrait,
-            landscape: landscape
-        });
 
-        if (numItems === 0) {
-            this.setState({layoutMethod: this.layout_null});
-        } else
-        if (numItems === 1) {
-            this.setState({layoutMethod: this.layout_1});
-        } else
-        if (numItems === 2) {
-            if (landscape === 2 || portrait === 2) {
-                this.setState({layoutMethod: this.layout_2_1});
-            } else {
-                if (Math.random() > 0.5) this.setState({layoutMethod: this.layout_2_2});
-                else this.setState({layoutMethod: this.layout_2_3});
-            }
-        } else
-        if (numItems === 3) {
-            if (portrait === 0 || landscape === 0) this.setState({layoutMethod: this.layout_3_1});
+        var layoutMethod;
+        if (numItems === 0) layoutMethod = this.layout_null;
+        else if (numItems === 1) layoutMethod = this.layout_1
+        else if (numItems === 2) {
+            if (landscape.length === 2 || portrait.length === 2) layoutMethod = this.layout_2_1;
             else {
-                if (Math.random() > 0.5) this.setState({layoutMethod: this.layout_3_2});
-                else this.setState({layoutMethod: this.layout_3_3});
+                if (Math.random() > 0.5) layoutMethod = this.layout_2_2;
+                else layoutMethod = this.layout_2_3;
+            }
+        }
+        else if (numItems === 3) {
+            if (portrait.length === 0 || landscape.length === 0) layoutMethod = this.layout_3_1;
+            else {
+                if (Math.random() > 0.5) layoutMethod = this.layout_3_2;
+                else layoutMethod = this.layout_3_3;
             }
         } 
+
+        this.state = {
+            row: row,
+            portrait: portrait,
+            landscape: landscape,
+            layoutMethod: layoutMethod,
+            componentKey: Math.floor(Math.random() * 100000).toString()
+        }
+    }
+
+    componentDidMount() {
         this.calculateItemDimensions();
     }
 
@@ -227,22 +219,27 @@ const mapStateToProps = state => ({
 }
 
     layout_3_3(self) {
+        console.log("layout_3_3()", this.state.landscape, this.state.portrait);
         if (!self.props) return(<React.Fragment></React.Fragment>);
-        var portrait1, portrait2, landscape1, landscape2;
+        var portrait1 = null, portrait2 = null, landscape1 = null, landscape2 = null;
         const items = self.state.row;
-        const portraits = items.filter((item) => item.orientation === 'portrait');
-        const landscapes = items.filter((item) => item.orientation === 'landscape');
+        const portraits = this.state.portrait;
+        const landscapes = this.state.landscape;
 
         for (var i=0; i<landscapes.length; i++) {
-            if (i===0) landscape1 = landscapes[i];
-            if (i===1) landscape2 = landscapes[i];
+            const id = landscapes[i];
+            if (i===0) landscape1 = items.filter((item) => item.id === id)[0];
+            if (i===1) landscape2 = items.filter((item) => item.id === id)[0];
         }
         for (i=0; i<portraits.length; i++) {
-            if (i===0) portrait1 = portraits[i];
-            if (i===1) portrait2 = portraits[i];
+            const id = portraits[i];
+            if (i===0) portrait1 = items.filter((item) => item.id === id)[0];
+            if (i===1) portrait2 = items.filter((item) => item.id === id)[0];
         }
-        
-        if (self.state.landscape === 2) 
+
+        console.log(landscape1, landscape2, portrait1, portrait2);
+
+        if (self.state.landscape.length === 2) 
             return(
                 <React.Fragment>
                     <div className="col-8">
@@ -269,10 +266,41 @@ const mapStateToProps = state => ({
     }
 
     calculateItemDimensions() {
-        console.log("calculateItemDimensions()", this.state.row.length);
+        // window.screen.height
+        function groupHeight(self) {
+            var height = 999999;
+            for (var i=0; i<self.state.row.length; i++) {
+                if (self.state.row[i].height < height) height = self.state.row[i].height;
+            }
+            return height;
+        }
+        function groupWidth(self) {
+            var width = 0;
+            for (var i=0; i<self.state.row.length; i++) {
+                width += self.state.row[i].height;
+            }
+            return width;
+        }
+        function compressionRatio(self) {
+            if (window.screen.height === 0) return 0;
+            return groupWidth(self) / window.screen.height;
+        }
+        console.log("portfolio, landscape", this.state.portrait, this.state.landscape);
+        console.log("height: ", groupHeight(this));
+        console.log("width: ", groupWidth(this));
+        if (this.state.portrait.length === 0 || this.state.landscape.length === 0) {
+            console.log("all are same orentation");
+        } else {
+            if (this.state.portrait.length > this.state.landscape.length) {
+                console.log("1 or more portraits");
+            } else {
+                console.log("1 or more landscapes");
+            }
+        }
         for (var i=0; i<this.state.row.length; i++) {
-            console.log("calculateItemDimensions() - ", this.state.row[i]);
+
         }
     }
 }
-  export default connect(mapStateToProps, mapDispatchToProps)(ContentRow);
+
+export default connect(mapStateToProps, mapDispatchToProps)(ContentRow);
