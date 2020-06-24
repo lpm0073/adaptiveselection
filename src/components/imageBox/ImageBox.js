@@ -73,7 +73,7 @@ class ImageBox extends Component {
 
     const imageFrameStyle = {
     backgroundImage: "url('" + this.props.image.source_url + "')",
-    height: Number(this.props.height)
+    height: Number(this.props.image.height)
     };
     const grabberStyle = {height: imageFrameStyle.height};
 

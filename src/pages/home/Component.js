@@ -54,7 +54,6 @@ class Home extends Component {
 
     // content selection
     this.getNextItem = this.getNextItem.bind(this);
-    this.getMaxDimensions = this.getMaxDimensions.bind(this);
     this.serializedImage = this.serializedImage.bind(this);
     this.nextSerialNumber = this.nextSerialNumber.bind(this);
 
@@ -170,42 +169,6 @@ class Home extends Component {
     this.setState({nextSerialNumber: this.state.nextSerialNumber + 1});
     return this.state.nextSerialNumber;
   }
-
-  getMaxDimensions(image) {
-    var max_height = window.screen.height, 
-        max_width = window.screen.width,
-        high_level = [].concat(wpGetExclusionArray(1, this.wpImages.categories));
-
-    // full-size for mobile. for everything else however... 
-    if (window.screen.width > 768) {
-    // priority 1: is this a high-ranking image?
-    if (this.props.userSignals.items.length > 10 && this.getRankPercentile(image) > .80) {
-      max_height = (window.screen.height / 3) + (Math.random() * window.screen.height * 4/5);
-      max_width = (window.screen.width / 2) + (Math.random() * window.screen.width );
-    } else {
-      // priority 2: explicit content
-      const intersection = image.categories.filter(element => high_level.includes(element))
-      if (intersection.length > 0) {
-        max_height = (window.screen.height / 5) + (Math.random() * window.screen.height * 4/5);
-        max_width = (window.screen.width / 5) + (Math.random() * window.screen.width * 4/5);
-      } else {
-        // priority 3: random sizing
-        if (Math.random() > 0.50) {
-          max_height = (window.screen.height / 4) + (Math.random() * window.screen.height * 1/2);
-          max_width = (window.screen.width / 4) + (Math.random() * window.screen.width * 1/4);
-          } else {
-            max_height = (window.screen.height / 6) + (Math.random() * window.screen.height * 1/2);
-            max_width = (window.screen.width / 6) + (Math.random() * window.screen.width * 1/4);
-        }
-      }
-    }  
-    }
-    return {
-      max_height: max_height,
-      max_width: max_width
-    }
-  }
-
 
   serializedImage(image) {
     const idx = this.masterContent.map((item) => {return item.id}).indexOf(image.id);
