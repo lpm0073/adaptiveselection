@@ -206,7 +206,7 @@ class Home extends Component {
       width: imageProps.width,
       height: imageProps.height,
       orientation: imageProps.width > imageProps.height ? 'landscape' : 'portrait',
-      aspect_ratio: imageProps.height > 0 ? imageProps.width / imageProps.height : 0,
+      aspect_ratio: imageProps.aspect_ratio,
       image_props: imageProps
     };
     return(obj);
