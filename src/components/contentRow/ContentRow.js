@@ -323,7 +323,7 @@ const mapStateToProps = state => ({
                 rowItems[i].height = rowItems[i].width * rowItems[i].aspect_ratio;
             }
             height = groupHeight(rowItems);
-            for (var i=0; i<rowItems.length; i++) {
+            for (i=0; i<rowItems.length; i++) {
                 rowItems[i].height = height;
                 rowItems[i].width = rowItems[i].height / rowItems[i].aspect_ratio;
             }
@@ -349,7 +349,7 @@ const mapStateToProps = state => ({
             console.log("there are three items.");
             if (landscape.length > 1) {
                 // a pair of rectangles
-                var portrait, landscape1, landscape2;
+                var landscape1, landscape2;
                 for (i=0; i<landscape.length; i++) {
                     const id = landscape[i];
                     if (i===0) landscape1 = rowItems.filter((n) => n.id === id)[0];
