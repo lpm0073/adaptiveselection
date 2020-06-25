@@ -69,8 +69,7 @@ class Home extends Component {
 
     this.state = {
       level: 4,
-      nextSerialNumber: 0,
-      rows: []
+      nextSerialNumber: 0
     }
 
   }
@@ -83,8 +82,8 @@ class Home extends Component {
   }
 
   render() {
-    //console.log("Home.render()");
-    if (this.state.rows.length === 0) return(
+    console.log("Home.render()", this.props);
+    if (this.props.itemRow.items.length === 0) return(
       <div key="home-page" id="home-page" className="home-page m-0 p-0 row" onScroll={this.handleScroll}>
         <Loading />
       </div>
@@ -93,7 +92,7 @@ class Home extends Component {
         <div key="home-page" id="home-page" className="home-page m-0 p-0 row" onScroll={this.handleScroll}>
           <div className="col-1"></div>
           <div className="col-10">
-          {this.state.rows.map((row, idx) => {return (<ContentRow key={row.id} row = {row.row} />);})}
+          {this.props.itemRow.items.map((row, idx) => {return (<ContentRow key={row.id} row = {row.row} />);})}
           </div>
           <div className="col-1"></div>
         </div>
@@ -112,23 +111,12 @@ class Home extends Component {
   }  
   
   addRow(row) {
-    //console.log("addRow()", row, this.state.rows.length);
-    const rows = [].concat(this.state.rows);
-    rows.push(row);
-    this.setState({
-      rows: rows
-    });
-    this.props.actions.addItemRow(rows);
-
+    this.props.actions.addItemRow(row);
   }
   removeRow() {
-    const rows = [].concat(this.state.rows);
-    rows.shift();
-    this.setState({
-      rows: rows
-    });
-    //console.log("removeRow()", rows);
+    this.props.actions.removeItemRow(1);
   }
+
   fetchRow(n = 1) {
     if (this.fetching) return;
     this.fetching = true;
@@ -150,7 +138,7 @@ class Home extends Component {
         row: row
       });
 
-      const l = this.state.rows.length - MAX_ROWS;
+      const l = this.props.itemRow.items.length - MAX_ROWS;
       if (l > 0) {
         for (i=0; i<l; i++) {
           this.removeRow();

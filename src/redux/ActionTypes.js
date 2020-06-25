@@ -10,7 +10,7 @@ export const UNDO_ITEM_CAROUSEL = 'UNDO_ITEM_CAROUSEL';
 export const REDO_ITEM_CAROUSEL = 'REDO_ITEM_CAROUSEL';
 
 export const ADD_ITEMROW = 'ADD_ITEMROW';
-export const DELETE_ROW = 'DELETE_ROW';
+export const DELETE_ITEMROW = 'DELETE_ITEMROW';
 export const UNDO_ITEMROW = 'UNDO_ITEMROW';
 export const REDO_ITEMROW = 'REDO_ITEMROW';
 

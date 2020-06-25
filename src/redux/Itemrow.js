@@ -13,7 +13,7 @@ export const ItemRow = (state = {
             }
             return {...state, added: true, deleted: false, items: [...state.items, action.payload]};
 
-        case ActionTypes.DELETE_ROW:
+        case ActionTypes.DELETE_ITEMROW:
             console.log("Row() - delete", action.payload.id);
             const idx = [...state.items].map(function(image) {return image.id;}).indexOf(action.payload.id);
             if (!idx > 0)  
