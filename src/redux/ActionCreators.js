@@ -23,10 +23,10 @@ export const redoItemRow = (i) => {
         payload: i
         };
 }
-export const removeItemRow = (cnt, action) => ({
+export const removeItemRow = (action) => ({
     type: ActionTypes.DELETE_ITEMROW,
     action: action,
-    payload: cnt
+    payload: null
 });
 
 export const addItemRow = (inserted) => {

@@ -28,7 +28,7 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 const MAX_ITEMS_PER_ROW = 3;
-const MAX_ROWS = 4;
+const MAX_ROWS = 10;
 
 class Home extends Component {
 
@@ -82,7 +82,7 @@ class Home extends Component {
   }
 
   render() {
-    console.log("Home.render()", this.props);
+    //console.log("Home.render()", this.props);
     if (this.props.itemRow.items.length === 0) return(
       <div key="home-page" id="home-page" className="home-page m-0 p-0 row" onScroll={this.handleScroll}>
         <Loading />
@@ -114,7 +114,7 @@ class Home extends Component {
     this.props.actions.addItemRow(row);
   }
   removeRow() {
-    this.props.actions.removeItemRow(1);
+    this.props.actions.removeItemRow();
   }
 
   fetchRow(n = 1) {
@@ -299,8 +299,8 @@ class Home extends Component {
 
     if (scrollable_area === 0) return true; // not enough content on screen to need a scrollbar
     if (scroll_position > .50) {
-      //console.log("requeue", this.page.scrollHeight, this.page.offsetHeight, this.page.scrollTop);
-      this.page.scrollTop = 0;
+      console.log("requeue", this.page.scrollHeight, this.page.offsetHeight, this.page.scrollTop);
+      //this.page.scrollTop = 0;
       return true;
     }
   }

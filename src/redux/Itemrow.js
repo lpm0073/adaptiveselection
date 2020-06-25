@@ -14,14 +14,10 @@ export const ItemRow = (state = {
             return {...state, added: true, deleted: false, items: [...state.items, action.payload]};
 
         case ActionTypes.DELETE_ITEMROW:
-            console.log("Row() - delete", action.payload.id);
-            const idx = [...state.items].map(function(image) {return image.id;}).indexOf(action.payload.id);
-            if (!idx > 0)  
-                return {...state, added: false, deleted: true, items: [
-                    ...state.items.slice(0, idx),
-                    ...state.items.slice(idx + 1),
-                ]};
-            else return {...state, added: false, deleted: true, items: [...state.items]};
+            console.log("Row() - delete");
+            return {...state, added: false, deleted: true, items: [
+                ...state.items.slice(1),
+            ]};
         
         case ActionTypes.UNDO_ITEMROW:
             return {...state, added: false, deleted: true, items: [
