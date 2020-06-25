@@ -13,7 +13,7 @@ import Draggable from 'react-draggable';
 import { CSSTransition } from 'react-transition-group';
 
 // my stuff
-import { wpGetImage } from '../../shared/wpImages';
+//import { wpGetImage } from '../../shared/wpImages';
 
 // more redux stuff
 const mapStateToProps = state => ({
@@ -68,8 +68,8 @@ class ImageBox extends Component {
       image.signal === 'LIKE'
     )).length > 0;
 
-    const imageProps = wpGetImage(this.props.image.api_props);
-    this.props.image.source_url = imageProps.source_url;
+    //const imageProps = wpGetImage(this.props.image.api_props);
+    //this.props.image.source_url = imageProps.source_url;
 
     const imageFrameStyle = {
     backgroundImage: "url('" + this.props.image.source_url + "')",
@@ -137,6 +137,7 @@ class ImageBox extends Component {
     
     // CSSTransition
     // https://reactcommunity.org/react-transition-group/css-transition
+    /*
     const CSSTransitionClassNames={
       appear: 'CSSTransition-appear',
       appearActive: 'CSSTransition-appear-active',
@@ -148,6 +149,7 @@ class ImageBox extends Component {
       exitActive: 'CSSTransition-exit-active',
       exitDone: 'CSSTransition-exit-done',
      }  
+     */
 
     // See: https://github.com/STRML/react-draggable
               /*defaultPosition={{x: this.props.image.position_props.left, y: this.props.image.position_props.top}}*/

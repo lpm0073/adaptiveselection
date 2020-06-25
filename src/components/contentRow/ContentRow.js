@@ -10,13 +10,6 @@ import './styles.css';
 import ImageBox from '../imageBox/ImageBox';
 import Loading from '../Loading';
 
-
-// module stuff
-const classCol9 = "col-9";
-const classCol4 = "col-4";
-const classCol3 = "col-3";
-
-
 const mapStateToProps = state => ({
     ...state
   });
@@ -198,7 +191,7 @@ const mapStateToProps = state => ({
                             <ImageBox parent={self.state.componentKey} layout="layout_3_3" containerClasses={landscape2.bootstrapClass} key={landscape2.key} image = {landscape2} />
                         </div>
                     </div>
-                    <ImageBox containerClasses={classCol4} key={portrait1.key} image = {portrait1} />
+                    <ImageBox containerClasses={portrait1.bootstrapClass} key={portrait1.key} image = {portrait1} />
                 </React.Fragment>
             );
         else
@@ -210,7 +203,7 @@ const mapStateToProps = state => ({
                             <ImageBox parent={self.state.componentKey} layout="layout_3_3" containerClasses={portrait2.bootstrapClass} key={portrait2.key} image = {portrait2} />
                         </div>
                     </div>
-                    <ImageBox containerClasses={classCol4} key={landscape1.key} image = {landscape1} />
+                    <ImageBox containerClasses={landscape1.bootstrapClass} key={landscape1.key} image = {landscape1} />
                 </React.Fragment>
             );
     }
@@ -242,7 +235,7 @@ const mapStateToProps = state => ({
                             <ImageBox parent={self.state.componentKey} layout="layout_3_3" containerClasses={landscape2.bootstrapClass} key={landscape2.key} image = {landscape2} />
                         </div>
                     </div>
-                    <ImageBox containerClasses={classCol4} key={portrait1.key} image = {portrait1} />
+                    <ImageBox containerClasses={portrait1.bootstrapClass} key={portrait1.key} image = {portrait1} />
                 </React.Fragment>
             );
         else
@@ -254,7 +247,7 @@ const mapStateToProps = state => ({
                             <ImageBox parent={self.state.componentKey} layout="layout_3_3" containerClasses={portrait2.bootstrapClass} key={portrait2.key} image = {portrait2} />
                         </div>
                     </div>
-                    <ImageBox containerClasses={classCol4} key={landscape1.key} image = {landscape1} />
+                    <ImageBox containerClasses={landscape1.bootstrapClass} key={landscape1.key} image = {landscape1} />
                 </React.Fragment>
             );
     }
@@ -263,29 +256,31 @@ const mapStateToProps = state => ({
         // we only need to do this if there are multiple items on the row
         var rows = [].concat(this.state.row);
 
-        function groupHeight(self) {
-            const max = .80 * window.screen.height;
+        function groupHeight(group) {
+            const max = .50 * window.screen.height;
             var retval = 999999;
-            for (var i=0; i<rows.length; i++) {
-                if (rows[i].height < retval) retval = rows[i].height;
+            for (var i=0; i<group.length; i++) {
+                retval = group[i].height < retval ? group[i].height : retval;
             }
             return retval < max ? retval : max;
         }
         function groupWidth(group) {
             var width = 0;
             for (var i=0; i<group.length; i++) {
-                width += group[i].height;
+                width += group[i].width;
             }
             return width;
         }
-        function compressionRatio(self) {
+        /*
+        function compressionRatio(group) {
             if (window.screen.height === 0) return 0;
-            return groupWidth(self) / window.screen.height;
+            return groupWidth(group) / window.screen.height;
         }
+        */
         function pairRectangles(rect1, rect2) {
             const rect1Area = rect1.width * rect1.height;
             const rect2Area = rect2.width * rect2.height;
-            var height = groupHeight(this);
+            var height = groupHeight([rect1, rect2]);
             var retval;
             if (rect1.orientation === rect2.orientation === "landscape") height /= 2;
 
@@ -295,7 +290,7 @@ const mapStateToProps = state => ({
                     rect2: {
                         height: height ,
                         aspect_ratio: rect2.aspect_ratio,
-                        width: height * rect2.aspect_ratio
+                        width: height / rect2.aspect_ratio
                     }
                 }
             }
@@ -305,7 +300,7 @@ const mapStateToProps = state => ({
                     rect1: {
                         height: height,
                         aspect_ratio: rect1.aspect_ratio,
-                        width: height * rect1.aspect_ratio
+                        width: height / rect1.aspect_ratio
                     }
                 }
             }
@@ -316,23 +311,31 @@ const mapStateToProps = state => ({
         if (this.state.row.length <= 1) {
             rows[0].columns = 8;
             rows[0].bootstrapClass = "col-8";
-            rows[0].height = groupHeight(this);
-            rows[0].width = rows[0].height * rows[0].aspect_ratio;
+            rows[0].height = groupHeight(rows);
+            rows[0].width = rows[0].height / rows[0].aspect_ratio;
         }
         else 
         // common orientations, or, only two items on the row
         if (this.state.portrait.length === 0 || 
             this.state.landscape.length === 0 ||
             this.state.portrait.length === this.state.landscape.length) {
-            const height = groupHeight(this);
-            const compression = compressionRatio(this);
-            // set item dimensions
-            for (var i=0; i<rows.length; i++) {
-                rows.height = height * compression;
-                rows.width = height * rows[i].aspect_ratio * compression;
-            }
-            // calc Bootstrap 12ths per item
+            var height = groupHeight(rows);
+            //var compression = compressionRatio(rows);
             var totWidth = groupWidth(rows);
+            // crude resize to fit view area
+            for (var i=0; i<rows.length; i++) {
+                const sizeFactor = (rows[i].width / totWidth);
+                rows[i].width = sizeFactor * rows[i].width;
+                rows[i].height = rows[i].width * rows[i].aspect_ratio;
+            }
+            height = groupHeight(rows);
+            for (var i=0; i<rows.length; i++) {
+                rows[i].height = height;
+                rows[i].width = rows[i].height / rows[i].aspect_ratio;
+            }
+
+            // calc Bootstrap 12ths per item
+            totWidth = groupWidth(rows);
             var totCols = 0;
             for (i=0; i<rows.length; i++) {
                 rows[i].columns = Math.floor(12 * (rows[i].width / totWidth));
@@ -342,7 +345,7 @@ const mapStateToProps = state => ({
             for (i=0; i<rows.length; i++) {
                 rows[i].bootstrapClass = "common-orientations col-" + rows[i].columns;
             }
-            console.log("common orientations", rows);
+            console.log("common orientations", height, rows);
         } else 
         // this would be an internal error
         if (this.state.row.length === 2) {
@@ -385,7 +388,6 @@ const mapStateToProps = state => ({
                     console.log("3-fer", landscapeRows[i].bootstrapClass);
                 }
 
-
                 rows = [landscape1, landscape2, portrait];
 
             } else {
@@ -398,6 +400,7 @@ const mapStateToProps = state => ({
         this.setState({
             row: rows
         });
+        console.log("final sizing:", this.state.row);
     }
 }
 
