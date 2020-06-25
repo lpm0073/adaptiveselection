@@ -248,9 +248,7 @@ const mapStateToProps = state => ({
             );
     }
 
-    calculateItemDimensions(row, portrait, landscape) {
-        // we only need to do this if there are multiple items on the row
-        var rows = [].concat(row);
+    calculateItemDimensions(rowItems, portrait, landscape) {
 
         function groupHeight(group) {
             const max = .50 * window.screen.height;
@@ -304,58 +302,58 @@ const mapStateToProps = state => ({
         }
 
         // easiest possible situation: only 1 item on the row
-        if (rows.length <= 1) {
-            rows[0].columns = 8;
-            rows[0].bootstrapClass = "col-8";
-            rows[0].height = groupHeight(rows);
-            rows[0].width = rows[0].height / rows[0].aspect_ratio;
+        if (rowItems.length <= 1) {
+            rowItems[0].columns = 8;
+            rowItems[0].bootstrapClass = "col-8";
+            rowItems[0].height = groupHeight(rowItems);
+            rowItems[0].width = rowItems[0].height / rowItems[0].aspect_ratio;
         }
         else 
         // common orientations, or, only two items on the row
         if (portrait.length === 0 || 
             landscape.length === 0 ||
             portrait.length === landscape.length) {
-            var height = groupHeight(rows);
-            //var compression = compressionRatio(rows);
-            var totWidth = groupWidth(rows);
+            var height = groupHeight(rowItems);
+            //var compression = compressionRatio(rowItems);
+            var totWidth = groupWidth(rowItems);
             // crude resize to fit view area
-            for (var i=0; i<rows.length; i++) {
-                const sizeFactor = (rows[i].width / totWidth);
-                rows[i].width = sizeFactor * rows[i].width;
-                rows[i].height = rows[i].width * rows[i].aspect_ratio;
+            for (var i=0; i<rowItems.length; i++) {
+                const sizeFactor = (rowItems[i].width / totWidth);
+                rowItems[i].width = sizeFactor * rowItems[i].width;
+                rowItems[i].height = rowItems[i].width * rowItems[i].aspect_ratio;
             }
-            height = groupHeight(rows);
-            for (var i=0; i<rows.length; i++) {
-                rows[i].height = height;
-                rows[i].width = rows[i].height / rows[i].aspect_ratio;
+            height = groupHeight(rowItems);
+            for (var i=0; i<rowItems.length; i++) {
+                rowItems[i].height = height;
+                rowItems[i].width = rowItems[i].height / rowItems[i].aspect_ratio;
             }
 
             // calc Bootstrap 12ths per item
-            totWidth = groupWidth(rows);
+            totWidth = groupWidth(rowItems);
             var totCols = 0;
-            for (i=0; i<rows.length; i++) {
-                rows[i].columns = Math.floor(12 * (rows[i].width / totWidth));
-                totCols += rows[i].columns;
+            for (i=0; i<rowItems.length; i++) {
+                rowItems[i].columns = Math.floor(12 * (rowItems[i].width / totWidth));
+                totCols += rowItems[i].columns;
             }
-            rows[rows.length - 1].columns += (12 - totCols);    // in case we're over/under
-            for (i=0; i<rows.length; i++) {
-                rows[i].bootstrapClass = "common-orientations col-" + rows[i].columns;
+            rowItems[rowItems.length - 1].columns += (12 - totCols);    // in case we're over/under
+            for (i=0; i<rowItems.length; i++) {
+                rowItems[i].bootstrapClass = "common-orientations col-" + rowItems[i].columns;
             }
-            console.log("common orientations", height, rows);
+            console.log("common orientations", height, rowItems);
         } else 
         // this would be an internal error
-        if (rows.length === 2) {
+        if (rowItems.length === 2) {
             console.log("we shouldn't be here.");
         } else
-        if (rows.length === 3) {
+        if (rowItems.length === 3) {
             console.log("there are three items.");
             if (landscape.length > 1) {
                 // a pair of rectangles
                 var portrait, landscape1, landscape2;
                 for (i=0; i<landscape.length; i++) {
                     const id = landscape[i];
-                    if (i===0) landscape1 = rows.filter((n) => n.id === id)[0];
-                    if (i===1) landscape2 = rows.filter((n) => n.id === id)[0];
+                    if (i===0) landscape1 = rowItems.filter((n) => n.id === id)[0];
+                    if (i===1) landscape2 = rowItems.filter((n) => n.id === id)[0];
                 }
 
                 var pairedRects = pairRectangles(landscape1, landscape2);
@@ -365,7 +363,7 @@ const mapStateToProps = state => ({
                 landscape2.width = pairedRects.rect2.width;
 
                 const id = portrait[0];
-                portrait = rows.filter((n) => n.id === id)[0];
+                portrait = rowItems.filter((n) => n.id === id)[0];
                 pairedRects = pairRectangles(landscape1, portrait);
                 portrait.height = pairedRects.rect2.height;
                 portrait.width = pairedRects.rect2.width;
@@ -384,7 +382,7 @@ const mapStateToProps = state => ({
                     console.log("3-fer", landscapeRows[i].bootstrapClass);
                 }
 
-                rows = [landscape1, landscape2, portrait];
+                rowItems = [landscape1, landscape2, portrait];
 
             } else {
                 console.log("a pair of portraits");
@@ -392,7 +390,7 @@ const mapStateToProps = state => ({
             }
         }
 
-        return(rows);
+        return(rowItems);
     }
 }
 

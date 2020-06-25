@@ -6,6 +6,7 @@ import undoable from 'redux-undo';
 import { Categories } from './categories';
 import { ItemCarousel } from './itemCarousel';
 import { UserSignal} from './userSignal';
+import { ItemRow } from './Itemrow';
 
 import thunk from 'redux-thunk';
 import logger from 'redux-thunk';
@@ -17,6 +18,7 @@ export const ConfigureStore = () => {
         
         combineReducers({
             categories: Categories,
+            itemRow: ItemRow,
             itemCarousel: undoable(ItemCarousel, {
                 undoType: 'UNDO_ITEM_CAROUSEL',
                 redoType: 'REDO_ITEM_CAROUSEL',

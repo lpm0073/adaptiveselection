@@ -118,6 +118,8 @@ class Home extends Component {
     this.setState({
       rows: rows
     });
+    this.props.actions.addItemRow(rows);
+
   }
   removeRow() {
     const rows = [].concat(this.state.rows);

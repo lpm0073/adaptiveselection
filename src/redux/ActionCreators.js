@@ -9,6 +9,28 @@ export const addUserSignal = (signal, image) => {
         payload: image
     }
 }
+/* ------------------------------------------------------------ */
+
+export const undoItemRow = (i) => {
+    return {
+        type: ActionTypes.UNDO_ITEMROW,
+        payload: i
+        };
+}
+export const redoItemRow = (i) => {
+    return {
+        type: ActionTypes.REDO_ITEMROW,
+        payload: i
+        };
+}
+export const addItemRow = (inserted) => {
+    return {
+        type: ActionTypes.ADD_ITEMROW,
+        payload: inserted
+        };
+}
+
+/* ------------------------------------------------------------ */
 export const undoItemCarousel = (i) => {
     return {
         type: ActionTypes.UNDO_ITEM_CAROUSEL,
