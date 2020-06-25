@@ -77,6 +77,7 @@ class ImageBox extends Component {
     };
     const grabberStyle = {height: imageFrameStyle.height};
 
+    console.log("ImageBox constructor", imageFrameStyle);
     this.state = {
       closerHeight: 'auto',
       imageContainerStyle: {

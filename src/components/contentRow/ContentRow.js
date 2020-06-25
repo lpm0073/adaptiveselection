@@ -68,16 +68,12 @@ const mapStateToProps = state => ({
         } 
 
         this.state = {
-            row: row,
+            row: this.calculateItemDimensions(row, portrait, landscape),
             portrait: portrait,
             landscape: landscape,
             layoutMethod: layoutMethod,
             componentKey: Math.floor(Math.random() * 100000).toString()
         }
-    }
-
-    componentDidMount() {
-        this.calculateItemDimensions();
     }
 
     render() {
@@ -252,9 +248,9 @@ const mapStateToProps = state => ({
             );
     }
 
-    calculateItemDimensions() {
+    calculateItemDimensions(row, portrait, landscape) {
         // we only need to do this if there are multiple items on the row
-        var rows = [].concat(this.state.row);
+        var rows = [].concat(row);
 
         function groupHeight(group) {
             const max = .50 * window.screen.height;
@@ -308,7 +304,7 @@ const mapStateToProps = state => ({
         }
 
         // easiest possible situation: only 1 item on the row
-        if (this.state.row.length <= 1) {
+        if (rows.length <= 1) {
             rows[0].columns = 8;
             rows[0].bootstrapClass = "col-8";
             rows[0].height = groupHeight(rows);
@@ -316,9 +312,9 @@ const mapStateToProps = state => ({
         }
         else 
         // common orientations, or, only two items on the row
-        if (this.state.portrait.length === 0 || 
-            this.state.landscape.length === 0 ||
-            this.state.portrait.length === this.state.landscape.length) {
+        if (portrait.length === 0 || 
+            landscape.length === 0 ||
+            portrait.length === landscape.length) {
             var height = groupHeight(rows);
             //var compression = compressionRatio(rows);
             var totWidth = groupWidth(rows);
@@ -348,16 +344,16 @@ const mapStateToProps = state => ({
             console.log("common orientations", height, rows);
         } else 
         // this would be an internal error
-        if (this.state.row.length === 2) {
+        if (rows.length === 2) {
             console.log("we shouldn't be here.");
         } else
-        if (this.state.row.length === 3) {
+        if (rows.length === 3) {
             console.log("there are three items.");
-            if (this.state.landscape.length > 1) {
+            if (landscape.length > 1) {
                 // a pair of rectangles
                 var portrait, landscape1, landscape2;
-                for (i=0; i<this.state.landscape.length; i++) {
-                    const id = this.state.landscape[i];
+                for (i=0; i<landscape.length; i++) {
+                    const id = landscape[i];
                     if (i===0) landscape1 = rows.filter((n) => n.id === id)[0];
                     if (i===1) landscape2 = rows.filter((n) => n.id === id)[0];
                 }
@@ -368,7 +364,7 @@ const mapStateToProps = state => ({
                 landscape2.height = pairedRects.rect2.height;
                 landscape2.width = pairedRects.rect2.width;
 
-                const id = this.state.portrait[0];
+                const id = portrait[0];
                 portrait = rows.filter((n) => n.id === id)[0];
                 pairedRects = pairRectangles(landscape1, portrait);
                 portrait.height = pairedRects.rect2.height;
@@ -396,11 +392,7 @@ const mapStateToProps = state => ({
             }
         }
 
-        // set our results
-        this.setState({
-            row: rows
-        });
-        console.log("final sizing:", this.state.row);
+        return(rows);
     }
 }
 
