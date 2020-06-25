@@ -25,23 +25,8 @@ export class WPImages {
 
     }
   
-    // find the next random page number to query by choosing
-    // a random page that has not already been queried.
     getNextPage() {
-      
       return this.pageNumber += 1;
-      /*
-      var potentialPages = [];
-      for (var i=1; i<this.numPages; i++) {
-        if (! this.pagesReturned.includes(i)) {
-          potentialPages.push(i);
-        }
-      }
-      if (potentialPages.length === 0) return 1;
-      var idx = Math.floor(Math.random() * potentialPages.length);
-      return potentialPages[idx];
-       */
-  
     }
   
     fetch() {
@@ -341,11 +326,9 @@ export const wpGetExclusions = (level, categories) => {
 
     return "";
 }
-  /*
-    return a dict of image meta data based on available
-    images, screen size, and aspect_ratio.
-  */
- export const wpGetImage = (item, max_height = window.screen.height, max_width = window.screen.width) => {
+
+/* return a dict of image meta data based on available images, screen size, and aspect_ratio. */
+export const wpGetImage = (item, max_height = window.screen.height, max_width = window.screen.width) => {
 
     let dict, imgDict;
     const aspect_ratio = getAspectRatio(item);
