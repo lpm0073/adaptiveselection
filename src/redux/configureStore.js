@@ -4,7 +4,7 @@ import { createStore, combineReducers, applyMiddleware } from 'redux';
 import undoable from 'redux-undo';
 
 import { Categories } from './categories';
-import { ImageCarousel } from './imageCarousel';
+import { ItemCarousel } from './itemCarousel';
 import { UserSignal} from './userSignal';
 
 import thunk from 'redux-thunk';
@@ -17,9 +17,9 @@ export const ConfigureStore = () => {
         
         combineReducers({
             categories: Categories,
-            imageCarousel: undoable(ImageCarousel, {
-                undoType: 'UNDO_IMAGE_CAROUSEL',
-                redoType: 'REDO_IMAGE_CAROUSEL',
+            itemCarousel: undoable(ItemCarousel, {
+                undoType: 'UNDO_ITEM_CAROUSEL',
+                redoType: 'REDO_ITEM_CAROUSEL',
               }),
             userSignals: UserSignal
         }),

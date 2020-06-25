@@ -77,7 +77,6 @@ class ImageBox extends Component {
     };
     const grabberStyle = {height: imageFrameStyle.height};
 
-    console.log("ImageBox constructor", imageFrameStyle);
     this.state = {
       closerHeight: 'auto',
       imageContainerStyle: {
@@ -315,8 +314,8 @@ class ImageBox extends Component {
     this._close = true;
     this.props.actions.addUserSignal(Signals.CLOSE, this.props.image);
 
-    const idx = this.props.imageCarousel.present.items.findIndex((item) => item.id === this.props.image.id); 
-    this.props.actions.removeImageCarousel(idx, "item");
+    const idx = this.props.itemCarousel.present.items.findIndex((item) => item.id === this.props.image.id); 
+    this.props.actions.removeItemCarousel(idx, "item");
   }
 
 

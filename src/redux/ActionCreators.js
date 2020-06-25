@@ -9,27 +9,27 @@ export const addUserSignal = (signal, image) => {
         payload: image
     }
 }
-export const undoImageCarousel = (i) => {
+export const undoItemCarousel = (i) => {
     return {
-        type: ActionTypes.UNDO_IMAGE_CAROUSEL,
+        type: ActionTypes.UNDO_ITEM_CAROUSEL,
         payload: i
         };
 }
-export const redoImageCarousel = (i) => {
+export const redoItemCarousel = (i) => {
     return {
-        type: ActionTypes.REDO_IMAGE_CAROUSEL,
+        type: ActionTypes.REDO_ITEM_CAROUSEL,
         payload: i
         };
 }
-export const addImageCarousel = (inserted) => {
+export const addItemCarousel = (inserted) => {
     return {
-        type: ActionTypes.ADD_IMAGE_CAROUSEL,
+        type: ActionTypes.ADD_ITEM_CAROUSEL,
         payload: inserted
         };
 }
 
-export const removeImageCarousel = (cnt, action) => ({
-    type: ActionTypes.DELETE_IMAGE_CAROUSEL,
+export const removeItemCarousel = (cnt, action) => ({
+    type: ActionTypes.DELETE_ITEM_CAROUSEL,
     action: action,
     payload: cnt
 });

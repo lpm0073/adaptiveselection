@@ -102,12 +102,12 @@ class Home extends Component {
   
   addMasterContent(items) {
     this.masterContent = this.masterContent.concat(items);
-    if (this.props.imageCarousel.present.items.length === 0) this.fetchRow(3);
+    if (this.props.itemCarousel.present.items.length === 0) this.fetchRow(3);
   }
 
   handleChangeLevel() {
     this.masterContent = [];
-    this.props.actions.removeImageCarousel(this.props.imageCarousel.present.items.length, "quantity");
+    this.props.actions.removeItemCarousel(this.props.itemCarousel.present.items.length, "quantity");
     this.wpImages = new WPImages(this.level, this.addMasterContent);
   }  
   
@@ -140,7 +140,7 @@ class Home extends Component {
       var row = [];
       for (var k=0; k<=j; k++) {
         const item = this.getNextItem();
-        this.props.actions.addImageCarousel(item);
+        this.props.actions.addItemCarousel(item);
         row.push(item.id);
       }
       this.addRow({

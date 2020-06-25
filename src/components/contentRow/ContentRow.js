@@ -34,7 +34,7 @@ const mapStateToProps = state => ({
         // build the item object array from the ID values in this.props.row
         var row = [];
         for (var i=0; i<this.props.row.length; i++) {
-            const carousel = this.props.imageCarousel.present.items;
+            const carousel = this.props.itemCarousel.present.items;
             const id = this.props.row[i];
             const item = carousel.filter((n) => n.id === id)[0];
             row.push(item);
