@@ -28,7 +28,7 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 const MAX_ITEMS_PER_ROW = 3;
-const MAX_ROWS = 10;
+const MAX_ROWS = 1000;
 
 class Home extends Component {
 
@@ -101,7 +101,7 @@ class Home extends Component {
   
   addMasterContent(items) {
     this.masterContent = this.masterContent.concat(items);
-    if (this.props.itemCarousel.present.items.length === 0) this.fetchRow(3);
+    if (this.props.itemCarousel.present.items.length === 0) this.fetchRow(6);
   }
 
   handleChangeLevel() {
@@ -119,6 +119,7 @@ class Home extends Component {
 
   fetchRow(n = 1) {
     if (this.fetching) return;
+    console.log("fetchRow()")
     this.fetching = true;
     var i;
 
@@ -134,7 +135,7 @@ class Home extends Component {
         row.push(item.id);
       }
       this.addRow({
-        id: Math.floor(Math.random() * 100000).toString(), 
+        id: Math.floor(Math.random() * 1000000000).toString(), 
         row: row
       });
 
@@ -188,7 +189,7 @@ class Home extends Component {
     const image = this.serializedImage(images[imageIdx]);
     const imageProps = wpGetImage(image);
     const obj = {
-      key: Math.floor(Math.random() * 100000).toString(),
+      key: Math.floor(Math.random() * 100000000).toString(),
       id: image.id,
       api_props: image,
       timestamp: new Date(),
@@ -292,15 +293,12 @@ class Home extends Component {
   requeueRange() {
     if (!this.page) this.page = document.getElementById("home-page");
 
-    const scrollable_area = this.page.scrollHeight - this.page.offsetHeight;
-    const scroll_position = scrollable_area > 0 ? this.page.scrollTop / scrollable_area : 0;
+    const viewHeight = this.page.offsetHeight;    // usually around 750px on a laptop
+    const scrollHeight = this.page.scrollHeight;  // total height of the DOM
+    const scrollTop = this.page.scrollTop;        // our current pixel position within the document
 
-    //console.log("requeueRange()", scroll_position);
-
-    if (scrollable_area === 0) return true; // not enough content on screen to need a scrollbar
-    if (scroll_position > .50) {
-      console.log("requeue", this.page.scrollHeight, this.page.offsetHeight, this.page.scrollTop);
-      //this.page.scrollTop = 0;
+    //console.log("requeue", scrollHeight, scrollTop, viewHeight, scrollHeight - scrollTop );
+    if ((scrollHeight - scrollTop) < (viewHeight * 1.15)) {
       return true;
     }
   }

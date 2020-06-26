@@ -101,10 +101,6 @@ class ImageBox extends Component {
 
   }
 
-  componentWillUpdate() {
-
-  }
-
   componentWillUnmount() {
     clearTimeout(this.windowCloseDelay);
   }
