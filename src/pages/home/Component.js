@@ -119,7 +119,6 @@ class Home extends Component {
 
   fetchRow(n = 1) {
     if (this.fetching) return;
-    console.log("fetchRow()")
     this.fetching = true;
     var i;
 

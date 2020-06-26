@@ -254,23 +254,17 @@ const mapStateToProps = state => ({
             const max = .50 * window.screen.height;
             var retval = 999999;
             for (var i=0; i<group.length; i++) {
-                retval = group[i].height < retval ? group[i].height : retval;
+                retval = group[i].image_props.height < retval ? group[i].image_props.height : retval;
             }
             return retval < max ? retval : max;
         }
         function groupWidth(group) {
             var width = 0;
             for (var i=0; i<group.length; i++) {
-                width += group[i].width;
+                width += group[i].image_props.width;
             }
             return width;
         }
-        /*
-        function compressionRatio(group) {
-            if (window.screen.height === 0) return 0;
-            return groupWidth(group) / window.screen.height;
-        }
-        */
         function pairRectangles(rect1, rect2) {
             const rect1Area = rect1.width * rect1.height;
             const rect2Area = rect2.width * rect2.height;
@@ -306,30 +300,32 @@ const mapStateToProps = state => ({
             rowItems[0].columns = 8;
             rowItems[0].bootstrapClass = "col-8";
             rowItems[0].height = groupHeight(rowItems);
-            rowItems[0].width = rowItems[0].height / rowItems[0].aspect_ratio;
+            rowItems[0].width = rowItems[0].height / rowItems[0].image_props.aspect_ratio;
         }
         else 
         // common orientations, or, only two items on the row
         if (portrait.length === 0 || 
             landscape.length === 0 ||
             portrait.length === landscape.length) {
-            var height = groupHeight(rowItems);
-            //var compression = compressionRatio(rowItems);
-            var totWidth = groupWidth(rowItems);
-            // crude resize to fit view area
+            
+            // normalize widths
+            var totWidth = rowItems.map((item) => {return item.image_props.width;}).reduce((a, b) => a + b);
+            var compressionFactor = window.screen.width / totWidth;
             for (var i=0; i<rowItems.length; i++) {
-                const sizeFactor = (rowItems[i].width / totWidth);
-                rowItems[i].width = sizeFactor * rowItems[i].width;
-                rowItems[i].height = rowItems[i].width * rowItems[i].aspect_ratio;
+                const widthFactor = (rowItems[i].image_props.width / totWidth);
+                rowItems[i].width = compressionFactor * widthFactor * rowItems[i].image_props.width;
+                rowItems[i].height = rowItems[i].width * rowItems[i].image_props.aspect_ratio;
             }
-            height = groupHeight(rowItems);
+            // normalize heights
+            const targetHeight = rowItems.sort((a, b) => b.height - a.height)[0].height;
+            console.log("targetHeight", targetHeight);
             for (i=0; i<rowItems.length; i++) {
-                rowItems[i].height = height;
-                rowItems[i].width = rowItems[i].height / rowItems[i].aspect_ratio;
+                rowItems[i].height = targetHeight;
+                rowItems[i].width = rowItems[i].height / rowItems[i].image_props.aspect_ratio;
             }
 
             // calc Bootstrap 12ths per item
-            totWidth = groupWidth(rowItems);
+            totWidth = rowItems.map((item) => {return item.width;}).reduce((a, b) => a + b);
             var totCols = 0;
             for (i=0; i<rowItems.length; i++) {
                 rowItems[i].columns = Math.floor(12 * (rowItems[i].width / totWidth));
@@ -339,7 +335,7 @@ const mapStateToProps = state => ({
             for (i=0; i<rowItems.length; i++) {
                 rowItems[i].bootstrapClass = "common-orientations col-" + rowItems[i].columns;
             }
-            console.log("common orientations", height, rowItems);
+            console.log("common orientations", rowItems);
         } else 
         // this would be an internal error
         if (rowItems.length === 2) {
