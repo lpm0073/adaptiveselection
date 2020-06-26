@@ -41,13 +41,10 @@ const mapStateToProps = state => ({
         }
 
         const numItems = row.length;
-        var portrait = [],
-            landscape = [];
-
-        for (i=0; i<numItems; i++) {
-            if (row[i].orientation === 'landscape') landscape.push(row[i].id);
-            else portrait.push(row[i].id);
-        }
+        const portrait = row.filter((item) => item.image_props.orientation === "portrait")
+                            .map((item) => {return item.id});
+        const landscape = row.filter((item) => item.image_props.orientation === "landscape")
+                             .map((item) => {return item.id});
 
         var layoutMethod;
         if (numItems === 0) layoutMethod = this.layout_null;
@@ -93,12 +90,13 @@ const mapStateToProps = state => ({
     }
     layout_1(self) {
         const item = self.state.row[0];
-        const colClass = item.orientation === "landscape" ? "col-2" : "col-3";
+        const colLeft = Math.floor((12 - item.columns)/2);
+        const colRight = 12 - item.columns - colLeft;
         return(
             <React.Fragment>
-                <div className={colClass}></div>
+                <div className={"col-" + colLeft}></div>
                 <ImageBox parent={self.state.componentKey} layout="layout_1" containerClasses={item.bootstrapClass} key={item.key} image = {item} />
-                <div className={colClass}></div>
+                <div className={"col-" + colRight}></div>
             </React.Fragment>
         );        
     }
@@ -297,10 +295,13 @@ const mapStateToProps = state => ({
 
         // easiest possible situation: only 1 item on the row
         if (rowItems.length <= 1) {
+            const viewWidth = 0.75 * window.screen.width;
             rowItems[0].height = groupHeight(rowItems);
             rowItems[0].width = rowItems[0].height / rowItems[0].image_props.aspect_ratio;
-            rowItems[0].columns = Math.floor(12 * (rowItems[0].width / window.screen.width));
+            rowItems[0].columns = Math.floor(12 * (rowItems[0].width / viewWidth));
+            rowItems[0].columns = rowItems[0].columns > 1 ? rowItems[0].columns : 2;
             rowItems[0].bootstrapClass = "single-item col-" + rowItems[0].columns;
+            console.log("single item", rowItems[0], window.screen.width);
             return(rowItems);
         }
         else 
@@ -339,7 +340,6 @@ const mapStateToProps = state => ({
                 else rowItems[i].bootstrapClass = "common-orientations ";
                 rowItems[i].bootstrapClass += " col-" + rowItems[i].columns;
             }
-            console.log("common orientations", rowItems);
             return(rowItems);
 
         } else 
