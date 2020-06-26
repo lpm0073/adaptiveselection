@@ -297,10 +297,11 @@ const mapStateToProps = state => ({
 
         // easiest possible situation: only 1 item on the row
         if (rowItems.length <= 1) {
-            rowItems[0].columns = 8;
-            rowItems[0].bootstrapClass = "col-8";
             rowItems[0].height = groupHeight(rowItems);
             rowItems[0].width = rowItems[0].height / rowItems[0].image_props.aspect_ratio;
+            rowItems[0].columns = Math.floor(12 * (rowItems[0].width / window.screen.width));
+            rowItems[0].bootstrapClass = "single-item col-" + rowItems[0].columns;
+            return(rowItems);
         }
         else 
         // common orientations, or, only two items on the row
@@ -318,7 +319,6 @@ const mapStateToProps = state => ({
             }
             // normalize heights
             const targetHeight = rowItems.sort((a, b) => b.height - a.height)[0].height;
-            console.log("targetHeight", targetHeight);
             for (i=0; i<rowItems.length; i++) {
                 rowItems[i].height = targetHeight;
                 rowItems[i].width = rowItems[i].height / rowItems[i].image_props.aspect_ratio;
@@ -331,11 +331,17 @@ const mapStateToProps = state => ({
                 rowItems[i].columns = Math.floor(12 * (rowItems[i].width / totWidth));
                 totCols += rowItems[i].columns;
             }
-            rowItems[rowItems.length - 1].columns += (12 - totCols);    // in case we're over/under
+            // adjust for over/under
+            var columns = rowItems.slice(1).map((item) => {return item.columns;}).reduce((a, b) => a + b);
+            rowItems[0].columns = (12 - columns);    
             for (i=0; i<rowItems.length; i++) {
-                rowItems[i].bootstrapClass = "common-orientations col-" + rowItems[i].columns;
+                if (portrait.length === landscape.length) rowItems[i].bootstrapClass = "2-images ";
+                else rowItems[i].bootstrapClass = "common-orientations ";
+                rowItems[i].bootstrapClass += " col-" + rowItems[i].columns;
             }
             console.log("common orientations", rowItems);
+            return(rowItems);
+
         } else 
         // this would be an internal error
         if (rowItems.length === 2) {
