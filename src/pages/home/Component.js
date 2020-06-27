@@ -108,6 +108,7 @@ class Home extends Component {
 
   doIdle() {
     console.log("doIdle()");
+    this.props.actions.deleteEmptyItemRow();
     const n = this.props.itemRow.present.items.length - MAX_ROWS;
     if (n > 0) {
       this.removeRow(n);

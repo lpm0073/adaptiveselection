@@ -29,6 +29,11 @@ export const removeItemRow = (n, action) => ({
     payload: n
 });
 
+export const deleteEmptyItemRow = () => ({
+    type: ActionTypes.DELETE_EMPTY_ITEMROW,
+    payload: null
+});
+
 export const resetItemRow = () => ({
     type: ActionTypes.DELETE_ITEMROW,
     payload: null
