@@ -31,7 +31,7 @@ const MAX_ROWS = 1000;
 
 class Home extends Component {
 
-  queueDelay = null;
+  idleDelay = null;
   masterContent = [];
   wpImages = null;
   page;
@@ -62,12 +62,14 @@ class Home extends Component {
     this.addRow = this.addRow.bind(this);
     this.handleScroll = this.handleScroll.bind(this);
     this.requeueRange = this.requeueRange.bind(this);
+    this.resetIdleTimeout = this.resetIdleTimeout.bind(this);
+    this.doIdle = this.doIdle.bind(this);
 
     this.existsClass = this.existsClass.bind(this);
     this.handleMasonryLayoutComplete = this.handleMasonryLayoutComplete.bind(this);
 
     this.state = {
-      level: 3,
+      level: 0,
       nextSerialNumber: 0
     }
 
@@ -75,9 +77,11 @@ class Home extends Component {
 
   componentDidMount() {
     this.wpImages = new WPImages(this.state.level, this.addMasterContent);
+    this.resetIdleTimeout();
   }
+
   componentWillUnmount() {
-    clearTimeout(this.queueDelay);
+    clearTimeout(this.idleDelay);
   }
 
   render() {
@@ -97,7 +101,24 @@ class Home extends Component {
         </div>
     );
   }
-  
+
+  doIdle() {
+    console.log("doIdle()");
+    this.resetIdleTimeout();  
+  }
+
+  resetIdleTimeout() {
+    const self = this;
+
+    clearTimeout(this.idleDelay);
+
+    const idleDelay = setTimeout(function() {
+      self.doIdle();
+      }, 5000);
+
+    this.idleDelay = idleDelay;
+  }
+
   addMasterContent(items) {
     this.masterContent = this.masterContent.concat(items);
     if (this.props.itemCarousel.present.items.length === 0) this.fetchRow(6);

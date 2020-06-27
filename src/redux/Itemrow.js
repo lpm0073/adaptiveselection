@@ -14,9 +14,9 @@ export const ItemRow = (state = {
             return {...state, added: true, deleted: false, items: [...state.items, action.payload]};
 
         case ActionTypes.DELETE_ITEMROW:
-            console.log("Row() - delete");
+            console.log("Row() - delete", action.payload);
             return {...state, added: false, deleted: true, items: [
-                ...state.items.slice(1),
+                ...state.items.slice(action.payload - 1),
             ]};
         
         case ActionTypes.UNDO_ITEMROW:
