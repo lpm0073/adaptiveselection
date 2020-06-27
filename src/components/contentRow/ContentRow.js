@@ -29,6 +29,8 @@ const mapStateToProps = state => ({
         this.layout_3_2 = this.layout_3_2.bind(this);
         this.layout_3_3 = this.layout_3_3.bind(this);
         this.generateRowArray = this.generateRowArray.bind(this);
+        this.getPortrait = this.getPortrait.bind(this);
+        this.getLandscape = this.getLandscape.bind(this);
         this.init = this.init.bind(this);
         this.setLayout = this.setLayout.bind(this);
         this.calculateItemDimensions = this.calculateItemDimensions.bind(this);
@@ -59,6 +61,22 @@ const mapStateToProps = state => ({
         );
     }
 
+    getPortrait() {
+
+        const row = this.generateRowArray();
+
+        return row.filter((item) => item.image_props.orientation === "portrait")
+                .map((item) => {return item.id});
+
+    }
+    getLandscape() {
+
+        const row = this.generateRowArray();
+
+        return row.filter((item) => item.image_props.orientation === "landscape")
+                .map((item) => {return item.id});
+
+    }
     generateRowArray() {
         var row = [];
         const itemRow = this.props.itemRow.present.items
@@ -76,35 +94,21 @@ const mapStateToProps = state => ({
     }
 
     init() {
-        var row = this.generateRowArray();
-
-        const portrait = row.filter((item) => item.image_props.orientation === "portrait")
-                            .map((item) => {return item.id});
-        const landscape = row.filter((item) => item.image_props.orientation === "landscape")
-                             .map((item) => {return item.id});
 
         this.setState({
             row: this.calculateItemDimensions(),
-            portrait: portrait,
-            landscape: landscape,
+            portrait: this.getPortrait(),
+            landscape: this.getLandscape(),
             layoutMethod: this.setLayout(),
         });
     }
 
     setLayout() {
-        var row = [];
-        for (var i=0; i<this.props.row.length; i++) {
-            const carousel = this.props.itemCarousel.present.items;
-            const id = this.props.row[i];
-            const item = carousel.filter((n) => n.id === id)[0];
-            row.push(item);
-        }
+        var row = this.generateRowArray();
 
         const numItems = row.length;
-        const portrait = row.filter((item) => item.image_props.orientation === "portrait")
-                            .map((item) => {return item.id});
-        const landscape = row.filter((item) => item.image_props.orientation === "landscape")
-                             .map((item) => {return item.id});
+        const portrait = this.getPortrait();
+        const landscape = this.getLandscape();
 
         var layoutMethod;
         if (numItems === 0) layoutMethod = this.layout_0;
@@ -290,6 +294,7 @@ const mapStateToProps = state => ({
 
     calculateItemDimensions() {
         var rowItems = this.generateRowArray();
+        if (rowItems.length === 0) return;
 
         function groupHeight(group) {
             const max = .50 * window.screen.height;
@@ -393,10 +398,12 @@ const mapStateToProps = state => ({
         } else
         if (rowItems.length === 3) {
             console.log("there are three items.");
-            if (this.state.landscape.length > 1) {
+            const portrait = this.getPortrait();
+            const landscape = this.getLandscape();
+            if (landscape.length > 1) {
                 // a pair of rectangles
                 var landscape1, landscape2;
-                for (i=0; i<this.state.landscape.length; i++) {
+                for (i=0; i<landscape.length; i++) {
                     const id = this.state.landscape[i];
                     if (i===0) landscape1 = rowItems.filter((n) => n.id === id)[0];
                     if (i===1) landscape2 = rowItems.filter((n) => n.id === id)[0];
@@ -408,7 +415,7 @@ const mapStateToProps = state => ({
                 landscape2.height = pairedRects.rect2.height;
                 landscape2.width = pairedRects.rect2.width;
 
-                const id = this.state.portrait[0];
+                const id = portrait[0];
                 var thisPortrait = rowItems.filter((n) => n.id === id)[0];
                 pairedRects = pairRectangles(landscape1, thisPortrait);
                 thisPortrait.height = pairedRects.rect2.height;
