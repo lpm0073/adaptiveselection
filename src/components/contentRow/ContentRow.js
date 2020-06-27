@@ -39,18 +39,19 @@ const mapStateToProps = state => ({
 
         this.state = {
             id: this.props.id,      // row identifier
-            row: null,
+            presentationRow: null,
+            rawRow: null,
             portrait: [],
             landscape: [],
             layoutMethod: this.layout_0,
             componentKey: Math.floor(Math.random() * 100000).toString()
         }
     }
-    componentDidMount() {
-    }
+
     componentWillReceiveProps() {
         this.init();
     }
+
     render() {
         return(
             <React.Fragment>
@@ -80,38 +81,38 @@ const mapStateToProps = state => ({
 
     }
     generateRowArray() {
-        var row = [];
+        // id's for row items for this instance, sorted
         const itemRow = this.props.itemRow.present.items
-                                .filter((item) => item.id === this.state.id)
-                                .map((item) => {return item.row})[0];
+                        .filter((item) => item.id === this.state.id)
+                        .map((item) => {return item.row})[0];
 
-                                
-        const carousel = this.props.itemCarousel.present.items;
-        for (var i=0; i<itemRow.length; i++) {
-            const id = this.props.row[i];
-            const item = carousel.filter((n) => n.id === id)[0];
-            row.push(item);
-        }
-        row = row.sort((a, b) => a.id - b.id);
-        return row;
+        // item objects for the id's in itemRow
+        return this.props.itemCarousel.present.items
+                .filter((item) => itemRow.includes(item.id))
+                .sort((a, b) => a.id - b.id);
     }
 
     init() {
 
-        this.setState({
-            row: this.calculateItemDimensions(),
-            portrait: this.getPortrait(),
-            landscape: this.getLandscape(),
-            layoutMethod: this.setLayout(),
-        });
-    }
-
-    setLayout() {
-        var row = this.generateRowArray();
-
-        const numItems = row.length;
+        const rawRow = this.generateRowArray();
         const portrait = this.getPortrait();
         const landscape = this.getLandscape();
+
+        this.setState({
+            rawRow: rawRow,
+            portrait: portrait,
+            landscape: landscape
+        });
+
+        this.setState({
+            presentationRow: this.calculateItemDimensions(rawRow, portrait, landscape),
+            layoutMethod: this.setLayout(rawRow, portrait, landscape)
+        });
+
+    }
+
+    setLayout(row, portrait, landscape) {
+        const numItems = row.length;
 
         var layoutMethod;
         if (numItems === 0) layoutMethod = this.layout_0;
@@ -138,7 +139,7 @@ const mapStateToProps = state => ({
     }
     
     layout_1(self) {
-        const item = self.state.row[0];
+        const item = self.state.presentationRow[0];
         const colLeft = Math.floor((12 - item.columns)/2);
         const colRight = 12 - item.columns - colLeft;
         return(
@@ -153,8 +154,8 @@ const mapStateToProps = state => ({
     layout_2_1(self) {
         if (!self.props) return(<React.Fragment></React.Fragment>);
 
-        const item1 = self.state.row[0];
-        const item2 = self.state.row[1];
+        const item1 = self.state.presentationRow[0];
+        const item2 = self.state.presentationRow[1];
         return(
             <React.Fragment>
                 <ImageBox parent={self.state.componentKey} layout="layout_2_1" containerClasses={item1.bootstrapClass} key={item1.key} image = {item1} />
@@ -164,8 +165,8 @@ const mapStateToProps = state => ({
     }
 
     layout_2_2(self) {
-        const item1 = self.state.row[0];
-        const item2 = self.state.row[1];
+        const item1 = self.state.presentationRow[0];
+        const item2 = self.state.presentationRow[1];
 
         const landscape = item1.orientation === 'landscape' ? item1 : item2;
         const portrait = item1.orientation === 'portrait' ? item1 : item2;
@@ -179,8 +180,8 @@ const mapStateToProps = state => ({
     }
 
     layout_2_3(self) {
-        const item1 = self.state.row[0];
-        const item2 = self.state.row[1];
+        const item1 = self.state.presentationRow[0];
+        const item2 = self.state.presentationRow[1];
 
         const landscape = item1.orientation === 'landscape' ? item1 : item2;
         const portrait = item1.orientation === 'portrait' ? item1 : item2;
@@ -194,9 +195,9 @@ const mapStateToProps = state => ({
     }
 
     layout_3_1(self) {
-        const item1 = self.state.row[0];
-        const item2 = self.state.row[1];
-        const item3 = self.state.row[2];
+        const item1 = self.state.presentationRow[0];
+        const item2 = self.state.presentationRow[1];
+        const item3 = self.state.presentationRow[2];
 
         return(
             <React.Fragment>
@@ -210,7 +211,7 @@ const mapStateToProps = state => ({
     layout_3_2(self) {
         if (!self.props) return(<React.Fragment></React.Fragment>);
         var portrait1 = null, portrait2 = null, landscape1 = null, landscape2 = null;
-        const items = self.state.row;
+        const items = self.state.presentationRow;
         const portraits = this.state.portrait;
         const landscapes = this.state.landscape;
 
@@ -254,7 +255,7 @@ const mapStateToProps = state => ({
     layout_3_3(self) {
         if (!self.props) return(<React.Fragment></React.Fragment>);
         var portrait1 = null, portrait2 = null, landscape1 = null, landscape2 = null;
-        const items = self.state.row;
+        const items = self.state.presentationRow;
         const portraits = this.state.portrait;
         const landscapes = this.state.landscape;
 
@@ -295,8 +296,7 @@ const mapStateToProps = state => ({
             );
     }
 
-    calculateItemDimensions() {
-        var rowItems = this.generateRowArray();
+    calculateItemDimensions(rowItems, portrait, landscape) {
         if (rowItems.length === 0) return;
 
         function groupHeight(group) {
@@ -401,8 +401,6 @@ const mapStateToProps = state => ({
         } else
         if (rowItems.length === 3) {
             console.log("there are three items.");
-            const portrait = this.getPortrait();
-            const landscape = this.getLandscape();
             if (landscape.length > 1) {
                 // a pair of rectangles
                 var landscape1, landscape2;
