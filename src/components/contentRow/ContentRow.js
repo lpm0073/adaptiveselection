@@ -53,13 +53,10 @@ const mapStateToProps = state => ({
     }
 
     render() {
-        console.log("render()", this.state.layoutMethod.name, this.state.presentationRow);
         return(
-            <React.Fragment>
-                <div id={this.state.componentKey} key={this.state.componentKey} className="row content-row">
-                    {this.state.layoutMethod(this)}
-                </div>
-            </React.Fragment>
+            <div id={this.state.componentKey} key={this.state.componentKey} className="row content-row">
+                {this.state.layoutMethod(this)}
+            </div>
         );
     }
 
@@ -289,6 +286,7 @@ const mapStateToProps = state => ({
 
         var portraitItems = rowItems.filter((item) => portrait.includes(item.id));
         var landscapeItems = rowItems.filter((item) => landscape.includes(item.id));
+        let landscape1, landscape2, portrait1, portrait2;
 
         function groupHeight(group) {
             const max = .50 * window.screen.height;
@@ -345,17 +343,9 @@ const mapStateToProps = state => ({
                 rowItems[i].height = targetHeight;
                 rowItems[i].width = rowItems[i].height / rowItems[i].image_props.aspect_ratio;
             }
-            
-            // normalize widths
-            var totWidth = rowItems.map((item) => {return item.width;}).reduce((a, b) => a + b);
-            var compressionFactor = window.screen.width / totWidth;
-            for (i=0; i<rowItems.length; i++) {
-                rowItems[i].width *= compressionFactor;
-                rowItems[i].height = rowItems[i].width * rowItems[i].image_props.aspect_ratio;
-            }
 
             // calc Bootstrap 12ths per item
-            totWidth = rowItems.map((item) => {return item.width;}).reduce((a, b) => a + b);
+            var totWidth = rowItems.map((item) => {return item.width;}).reduce((a, b) => a + b);
             var totCols = 0;
             for (i=0; i<rowItems.length; i++) {
                 rowItems[i].columns = 1 + Math.floor(11 * (rowItems[i].width / totWidth));
@@ -379,10 +369,10 @@ const mapStateToProps = state => ({
             console.log("calculateItemDimensions() internal error: rowItems.length === 2. We shouldn't be here.");
         } else
         if (rowItems.length === 3) {
-            //console.log("there are three items.");
             if (landscape.length > 1) {
                 // a pair of rectangles
-                var landscape1 = landscapeItems[0], landscape2 = landscapeItems[1];
+                landscape1 = landscapeItems[0];
+                landscape2 = landscapeItems[1];
 
                 const pairedRects = pairRectangles(landscape1, landscape2);
                 landscape1.height = pairedRects.rect1.height;
@@ -390,8 +380,8 @@ const mapStateToProps = state => ({
                 landscape2.height = pairedRects.rect2.height;
                 landscape2.width = pairedRects.rect2.width;
 
-                var portrait1 = portraitItems[0];
-                portrait1.height = landscape1.height + landscape2.height;
+                portrait1 = portraitItems[0];
+                portrait1.height = (landscape1.height + landscape2.height + 8); // 8px for padding
                 portrait1.width = portrait1.height / portrait1.image_props.aspect_ratio;
 
                 // rectangles are stacked. both should be 12 columns wide
@@ -414,10 +404,9 @@ const mapStateToProps = state => ({
                 return([landscape1, landscape2, portrait1]);
 
             } else {
-                console.log("a pair of portraits");
                 landscape1 = landscapeItems[0];
-                var portrait1 = portraitItems[0], 
-                    portrait2 = portraitItems[1];
+                portrait1 = portraitItems[0];
+                portrait2 = portraitItems[1];
 
                 landscape1.width = 0.25 * window.screen.height;
                 landscape1.height = landscape1.width / landscape1.image_props.aspect_ratio;
