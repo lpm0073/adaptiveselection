@@ -34,30 +34,18 @@ export const ItemRow = (state = {
             ]};
 
         case ActionTypes.DELETE_EMPTY_ITEMROW:
-            const empty = [...state.items].filter((item) => item.row.length === 0)
-                                          .map((item, idx) => {return idx});
-            const notEmpty = [];
-            for (var i=0; i<[...state.items].length; i++) {
-                if (!empty.includes(i)) notEmpty.push([...state.items][i]);
-            }
+            const empty = [...state.items]
+                            .filter((item) => item.row.length === 0)
+                            .map((item, idx) => {return idx});
+            const notEmpty = [...state.items]
+                            .filter((item, idx) => !empty.includes(idx));
+
             return {...state, added: false, deleted: true, items: notEmpty};
 
         case ActionTypes.DELETE_ITEM_CAROUSEL:
-            var rows = [...state.items];
-            for (i=0; i<rows.length; i++) {
-                const idx = rows[i].row.map(function(image) {return image.id;}).indexOf(action.payload.id);
-                if (!idx > 0) {
-                    var items = [];
-                    if (rows[i].length > 1) items = [
-                        rows[i].row.slice(0, idx),
-                        rows[i].row.slice(idx + 1),
-                    ];
-                    rows[i].row = items;
-                    return {...state, added: false, deleted: true, items: rows};
-                }
-            }
-            return {...state, added: false, deleted: true, items: rows};
-                
+            const newRows = [...state.items].filter((item) => item.id !== action.payload.id);
+            return {...state, added: false, deleted: true, items: newRows};
+
         default: 
         return state;
     }

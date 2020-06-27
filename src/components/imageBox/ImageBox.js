@@ -111,7 +111,7 @@ class ImageBox extends Component {
     const key = "image-box-" + this.props.image.key;
     var likeStyles = null;
     var dislikeStyles = null;
-    var containerClasses = "image-container m-0 p-1 handle " + this.props.containerClasses;
+    var containerClasses = "image-container m-0 p-1 handle " + this.props.containerClasses + " " + this.props.layout;
     var infoPanelClasses = "info-panel m-0 p-5 text-center";
 
     if (this.state.isClosed) containerClasses += " window-closer window-closing";

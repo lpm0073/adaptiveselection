@@ -62,20 +62,16 @@ const mapStateToProps = state => ({
         );
     }
 
-    getPortrait() {
+    getPortrait(row) {
 
-        const row = this.generateRowArray();
-
-        return row.filter((item) => item.image_props.orientation === "portrait")
+        return row.filter((item) => item.orientation === "portrait")
                 .map((item) => {return item.id})
                 .sort((a, b) => a.id - b.id);
 
     }
-    getLandscape() {
+    getLandscape(row) {
 
-        const row = this.generateRowArray();
-
-        return row.filter((item) => item.image_props.orientation === "landscape")
+        return row.filter((item) => item.orientation === "landscape")
                 .map((item) => {return item.id})
                 .sort((a, b) => a.id - b.id);
 
@@ -95,8 +91,8 @@ const mapStateToProps = state => ({
     init() {
 
         const rawRow = this.generateRowArray();
-        const portrait = this.getPortrait();
-        const landscape = this.getLandscape();
+        const portrait = this.getPortrait(rawRow);
+        const landscape = this.getLandscape(rawRow);
 
         this.setState({
             rawRow: rawRow,
@@ -114,13 +110,13 @@ const mapStateToProps = state => ({
     setLayout(row, portrait, landscape) {
         const numItems = row.length;
 
-        var layoutMethod;
+        var layoutMethod = this.layout_0;
         if (numItems === 0) layoutMethod = this.layout_0;
         else if (numItems === 1) layoutMethod = this.layout_1
         else if (numItems === 2) {
             if (landscape.length === 2 || portrait.length === 2) layoutMethod = this.layout_2_1;
             else {
-                if (Math.random() > 0.5) layoutMethod = this.layout_2_2;
+                if (this.state.landscape[0].id % 2 === 0) layoutMethod = this.layout_2_2;
                 else layoutMethod = this.layout_2_3;
             }
         }
@@ -134,7 +130,7 @@ const mapStateToProps = state => ({
         return layoutMethod;
     }
 
-    layout_0() {
+    layout_0(self) {
         return(<React.Fragment></React.Fragment>);        
     }
     
