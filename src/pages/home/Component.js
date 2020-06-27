@@ -27,7 +27,6 @@ const mapDispatchToProps = (dispatch) => {
   });
 };
 
-const MAX_ITEMS_PER_ROW = 3;
 const MAX_ROWS = 1000;
 
 class Home extends Component {
@@ -126,9 +125,16 @@ class Home extends Component {
     //this.rankWorkingSet();
 
     for (i = 0; i<n; i++) {
-      const j = Math.floor(Math.random() * 10) % MAX_ITEMS_PER_ROW;
+
+      // row item count weighting
+      var j = Math.floor(Math.random() * 10);
+      if (j <= 5) j = 1;
+      else if (j <= 8) j = 2;
+      else j = 3;
+      console.log("J", j);
+
       var row = [];
-      for (var k=0; k<=j; k++) {
+      for (var k=0; k<j; k++) {
         const item = this.getNextItem();
         this.props.actions.addItemCarousel(item);
         row.push(item.id);

@@ -74,6 +74,7 @@ const mapStateToProps = state => ({
     }
 
     render() {
+        if (!this.state.layoutMethod) return(<React.Fragment></React.Fragment>);
         return(
             <React.Fragment>
                 <div id={this.state.componentKey} key={this.state.componentKey} className="row content-row">
@@ -301,7 +302,6 @@ const mapStateToProps = state => ({
             rowItems[0].columns = Math.floor(12 * (rowItems[0].width / viewWidth));
             rowItems[0].columns = rowItems[0].columns > 1 ? rowItems[0].columns : 2;
             rowItems[0].bootstrapClass = "single-item col-" + rowItems[0].columns;
-            console.log("single item", rowItems[0], window.screen.width);
             return(rowItems);
         }
         else 
@@ -329,12 +329,14 @@ const mapStateToProps = state => ({
             totWidth = rowItems.map((item) => {return item.width;}).reduce((a, b) => a + b);
             var totCols = 0;
             for (i=0; i<rowItems.length; i++) {
-                rowItems[i].columns = Math.floor(12 * (rowItems[i].width / totWidth));
+                rowItems[i].columns = 1 + Math.floor(11 * (rowItems[i].width / totWidth));
                 totCols += rowItems[i].columns;
             }
             // adjust for over/under
             var columns = rowItems.slice(1).map((item) => {return item.columns;}).reduce((a, b) => a + b);
-            rowItems[0].columns = (12 - columns);    
+            rowItems[0].columns = (12 - columns);
+
+            // generate bootstrap classes
             for (i=0; i<rowItems.length; i++) {
                 if (portrait.length === landscape.length) rowItems[i].bootstrapClass = "2-images ";
                 else rowItems[i].bootstrapClass = "common-orientations ";
