@@ -66,7 +66,8 @@ const mapStateToProps = state => ({
         const row = this.generateRowArray();
 
         return row.filter((item) => item.image_props.orientation === "portrait")
-                .map((item) => {return item.id});
+                .map((item) => {return item.id})
+                .sort((a, b) => a.id - b.id);
 
     }
     getLandscape() {
@@ -74,7 +75,8 @@ const mapStateToProps = state => ({
         const row = this.generateRowArray();
 
         return row.filter((item) => item.image_props.orientation === "landscape")
-                .map((item) => {return item.id});
+                .map((item) => {return item.id})
+                .sort((a, b) => a.id - b.id);
 
     }
     generateRowArray() {
@@ -90,6 +92,7 @@ const mapStateToProps = state => ({
             const item = carousel.filter((n) => n.id === id)[0];
             row.push(item);
         }
+        row = row.sort((a, b) => a.id - b.id);
         return row;
     }
 
