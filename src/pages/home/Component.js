@@ -104,6 +104,11 @@ class Home extends Component {
 
   doIdle() {
     console.log("doIdle()");
+    const n = this.props.itemRow.items.length - MAX_ROWS;
+    if (n > 0) {
+      this.removeRow(n);
+    }
+
     this.resetIdleTimeout();  
   }
 
@@ -133,8 +138,8 @@ class Home extends Component {
   addRow(row) {
     this.props.actions.addItemRow(row);
   }
-  removeRow() {
-    this.props.actions.removeItemRow();
+  removeRow(n = 1) {
+    this.props.actions.removeItemRow(n);
   }
 
   fetchRow(n = 1) {
@@ -163,13 +168,6 @@ class Home extends Component {
         id: Math.floor(Math.random() * 1000000000).toString(), 
         row: row
       });
-
-      const l = this.props.itemRow.items.length - MAX_ROWS;
-      if (l > 0) {
-        for (i=0; i<l; i++) {
-          this.removeRow();
-        }
-      }
 
       this.fetching = false;
     }  
@@ -331,6 +329,7 @@ class Home extends Component {
   handleScroll() {
     // https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect
 
+    this.resetIdleTimeout();
     if (this.requeueRange() && !this.fetching) {
       this.fetchRow(10);
     }
