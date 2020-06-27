@@ -70,7 +70,7 @@ class Home extends Component {
     this.handleMasonryLayoutComplete = this.handleMasonryLayoutComplete.bind(this);
 
     this.state = {
-      level: 2,
+      level: 0,
       nextSerialNumber: 0
     }
 
@@ -87,7 +87,9 @@ class Home extends Component {
 
   render() {
     //console.log("Home.render()", this.props);
-    if (this.props.itemRow.present.items.length === 0) return(
+    const rows = this.props.itemRow.present.items.filter((item) => item.row.length > 0);
+
+    if (rows.length === 0) return(
       <div key="home-page" id="home-page" className="home-page m-0 p-0 row" onScroll={this.handleScroll}>
         <h1 className="text-center text-light">Adaptive Selection (Beta)</h1>
         <Loading />
@@ -97,7 +99,7 @@ class Home extends Component {
         <div key="home-page" id="home-page" className="home-page m-0 p-0 row" onScroll={this.handleScroll}>
           <div className="col-1"></div>
           <div className="col-10">
-          {this.props.itemRow.present.items.map((row, idx) => {return (<ContentRow key={row.id} id={row.id} row = {row.row} />);})}
+          {rows.map((row, idx) => {return (<ContentRow key={row.id} id={row.id} row = {row.row} />);})}
           </div>
           <div className="col-1"></div>
         </div>
