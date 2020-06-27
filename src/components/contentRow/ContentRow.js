@@ -169,8 +169,8 @@ const mapStateToProps = state => ({
 
         return(
             <React.Fragment>
-                <ImageBox parent={self.state.componentKey} layout="layout_2_3" containerClasses={portrait.bootstrapClass} key={portrait.key} image = {portrait} />
-                <ImageBox parent={self.state.componentKey} layout="layout_2_3" containerClasses={landscape.bootstrapClass} key={landscape.key} image = {landscape} />
+                <ImageBox parent={self.state.componentKey} layout="layout_2_2" containerClasses={portrait.bootstrapClass} key={portrait.key} image = {portrait} />
+                <ImageBox parent={self.state.componentKey} layout="layout_2_2" containerClasses={landscape.bootstrapClass} key={landscape.key} image = {landscape} />
             </React.Fragment>
         );
     }
@@ -227,11 +227,11 @@ const mapStateToProps = state => ({
                 <React.Fragment>
                     <div className="col-md-8">
                         <div className="row">
-                            <ImageBox parent={self.state.componentKey} layout="layout_3_3" containerClasses={landscape1.bootstrapClass} key={landscape1.key} image = {landscape1} />
-                            <ImageBox parent={self.state.componentKey} layout="layout_3_3" containerClasses={landscape2.bootstrapClass} key={landscape2.key} image = {landscape2} />
+                            <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={landscape1.bootstrapClass} key={landscape1.key} image = {landscape1} />
+                            <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={landscape2.bootstrapClass} key={landscape2.key} image = {landscape2} />
                         </div>
                     </div>
-                    <ImageBox containerClasses={portrait1.bootstrapClass} key={portrait1.key} image = {portrait1} />
+                    <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={portrait1.bootstrapClass} key={portrait1.key} image = {portrait1} />
                 </React.Fragment>
             );
         else
@@ -239,11 +239,11 @@ const mapStateToProps = state => ({
                 <React.Fragment>
                     <div className="col-md-8">
                         <div className="row">
-                            <ImageBox parent={self.state.componentKey} layout="layout_3_3" containerClasses={portrait1.bootstrapClass} key={portrait1.key} image = {portrait1} />
-                            <ImageBox parent={self.state.componentKey} layout="layout_3_3" containerClasses={portrait2.bootstrapClass} key={portrait2.key} image = {portrait2} />
+                            <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={portrait1.bootstrapClass} key={portrait1.key} image = {portrait1} />
+                            <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={portrait2.bootstrapClass} key={portrait2.key} image = {portrait2} />
                         </div>
                     </div>
-                    <ImageBox containerClasses={landscape1.bootstrapClass} key={landscape1.key} image = {landscape1} />
+                    <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={landscape1.bootstrapClass} key={landscape1.key} image = {landscape1} />
                 </React.Fragment>
             );
     }
@@ -275,7 +275,7 @@ const mapStateToProps = state => ({
                             <ImageBox parent={self.state.componentKey} layout="layout_3_3" containerClasses={landscape2.bootstrapClass} key={landscape2.key} image = {landscape2} />
                         </div>
                     </div>
-                    <ImageBox containerClasses={portrait1.bootstrapClass} key={portrait1.key} image = {portrait1} />
+                    <ImageBox parent={self.state.componentKey} layout="layout_3_3" containerClasses={portrait1.bootstrapClass} key={portrait1.key} image = {portrait1} />
                 </React.Fragment>
             );
         else
@@ -287,13 +287,16 @@ const mapStateToProps = state => ({
                             <ImageBox parent={self.state.componentKey} layout="layout_3_3" containerClasses={portrait2.bootstrapClass} key={portrait2.key} image = {portrait2} />
                         </div>
                     </div>
-                    <ImageBox containerClasses={landscape1.bootstrapClass} key={landscape1.key} image = {landscape1} />
+                    <ImageBox parent={self.state.componentKey} layout="layout_3_3" containerClasses={landscape1.bootstrapClass} key={landscape1.key} image = {landscape1} />
                 </React.Fragment>
             );
     }
 
     calculateItemDimensions(rowItems, portrait, landscape) {
         if (rowItems.length === 0) return;
+
+        var portraitItems = rowItems.filter((item) => portrait.includes(item.id));
+        var landscapeItems = rowItems.filter((item) => landscape.includes(item.id));
 
         function groupHeight(group) {
             const max = .50 * window.screen.height;
@@ -352,9 +355,9 @@ const mapStateToProps = state => ({
         }
         else 
         // common orientations, or, only two items on the row
-        if (this.state.portrait.length === 0 || 
-            this.state.landscape.length === 0 ||
-            this.state.portrait.length === this.state.landscape.length) {
+        if (portrait.length === 0 || 
+            landscape.length === 0 ||
+            portrait.length === landscape.length) {
 
             // normalize heights
             const targetHeight = .50 * window.screen.height;
@@ -384,7 +387,7 @@ const mapStateToProps = state => ({
 
             // generate bootstrap classes
             for (i=0; i<rowItems.length; i++) {
-                if (this.state.portrait.length === this.state.landscape.length) rowItems[i].bootstrapClass = "2-images ";
+                if (portrait.length === landscape.length) rowItems[i].bootstrapClass = "2-images ";
                 else rowItems[i].bootstrapClass = "common-orientations ";
                 rowItems[i].bootstrapClass += " col-sm-12 col-md-" + rowItems[i].columns;
             }
@@ -399,9 +402,9 @@ const mapStateToProps = state => ({
             console.log("there are three items.");
             if (landscape.length > 1) {
                 // a pair of rectangles
-                var landscape1, landscape2;
+                var landscape1 = landscape[0], landscape2 = landscape[1];
                 for (i=0; i<landscape.length; i++) {
-                    const id = this.state.landscape[i];
+                    const id = landscape[i];
                     if (i===0) landscape1 = rowItems.filter((n) => n.id === id)[0];
                     if (i===1) landscape2 = rowItems.filter((n) => n.id === id)[0];
                 }
@@ -429,7 +432,7 @@ const mapStateToProps = state => ({
                 landscapeRows[landscapeRows.length - 1].columns += (6 - totCols);    // in case we're over/under
                 for (i=0; i<landscapeRows.length; i++) {
                     landscapeRows[i].bootstrapClass = "3-w-pair-of-landscapes col-sm-12 col-md-" + landscapeRows[i].columns;
-                    console.log("3-fer", landscapeRows[i].bootstrapClass);
+                    console.log("3-fer", landscapeRows[i].bootstrapClass, landscapeRows[i]);
                 }
 
                 rowItems = [landscape1, landscape2, thisPortrait];

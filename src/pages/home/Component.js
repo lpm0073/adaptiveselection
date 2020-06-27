@@ -70,7 +70,7 @@ class Home extends Component {
     this.handleMasonryLayoutComplete = this.handleMasonryLayoutComplete.bind(this);
 
     this.state = {
-      level: 4,
+      level: 3,
       nextSerialNumber: 0
     }
 
