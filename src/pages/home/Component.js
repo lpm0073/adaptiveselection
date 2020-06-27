@@ -70,7 +70,7 @@ class Home extends Component {
     this.handleMasonryLayoutComplete = this.handleMasonryLayoutComplete.bind(this);
 
     this.state = {
-      level: 0,
+      level: 4,
       nextSerialNumber: 0
     }
 
@@ -124,7 +124,7 @@ class Home extends Component {
 
     const idleDelay = setTimeout(function() {
       self.doIdle();
-      }, 5000);
+      }, 30000);
 
     this.idleDelay = idleDelay;
   }

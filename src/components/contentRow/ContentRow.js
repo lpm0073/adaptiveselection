@@ -116,7 +116,7 @@ const mapStateToProps = state => ({
         else if (numItems === 2) {
             if (landscape.length === 2 || portrait.length === 2) layoutMethod = this.layout_2_1;
             else {
-                if (this.state.landscape[0].id % 2 === 0) layoutMethod = this.layout_2_2;
+                if (landscape[0].id % 2 === 0) layoutMethod = this.layout_2_2;
                 else layoutMethod = this.layout_2_3;
             }
         }
@@ -423,7 +423,7 @@ const mapStateToProps = state => ({
                 totWidth = groupWidth(landscapeRows);
                 totCols = 0;
                 for (i=0; i<landscapeRows.length; i++) {
-                    landscapeRows[i].columns = Math.floor(6 * (landscapeRows[i].width / totWidth));
+                    landscapeRows[i].columns = 1 + Math.floor(5 * (landscapeRows[i].width / totWidth));
                     totCols += landscapeRows[i].columns;
                 }
                 landscapeRows[landscapeRows.length - 1].columns += (6 - totCols);    // in case we're over/under
