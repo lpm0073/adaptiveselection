@@ -18,10 +18,13 @@ export const ConfigureStore = () => {
         
         combineReducers({
             categories: Categories,
-            itemRow: ItemRow,
+            itemRow: undoable(ItemRow, {
+                undoType: 'UNDO_ITEMROW',
+                redoType: 'REDO_ITEMROW'
+            }),
             itemCarousel: undoable(ItemCarousel, {
                 undoType: 'UNDO_ITEM_CAROUSEL',
-                redoType: 'REDO_ITEM_CAROUSEL',
+                redoType: 'REDO_ITEM_CAROUSEL'
               }),
             userSignals: UserSignal
         }),

@@ -27,7 +27,7 @@ const mapDispatchToProps = (dispatch) => {
   });
 };
 
-const MAX_ROWS = 1000;
+const MAX_ROWS = 75;
 
 class Home extends Component {
 
@@ -69,7 +69,7 @@ class Home extends Component {
     this.handleMasonryLayoutComplete = this.handleMasonryLayoutComplete.bind(this);
 
     this.state = {
-      level: 0,
+      level: 2,
       nextSerialNumber: 0
     }
 
@@ -86,8 +86,9 @@ class Home extends Component {
 
   render() {
     //console.log("Home.render()", this.props);
-    if (this.props.itemRow.items.length === 0) return(
+    if (this.props.itemRow.present.items.length === 0) return(
       <div key="home-page" id="home-page" className="home-page m-0 p-0 row" onScroll={this.handleScroll}>
+        <h1 className="text-center text-light">Adaptive Selection (Beta)</h1>
         <Loading />
       </div>
     );
@@ -95,7 +96,7 @@ class Home extends Component {
         <div key="home-page" id="home-page" className="home-page m-0 p-0 row" onScroll={this.handleScroll}>
           <div className="col-1"></div>
           <div className="col-10">
-          {this.props.itemRow.items.map((row, idx) => {return (<ContentRow key={row.id} row = {row.row} />);})}
+          {this.props.itemRow.present.items.map((row, idx) => {return (<ContentRow key={row.id} row = {row.row} />);})}
           </div>
           <div className="col-1"></div>
         </div>
@@ -104,7 +105,7 @@ class Home extends Component {
 
   doIdle() {
     console.log("doIdle()");
-    const n = this.props.itemRow.items.length - MAX_ROWS;
+    const n = this.props.itemRow.present.items.length - MAX_ROWS;
     if (n > 0) {
       this.removeRow(n);
     }
