@@ -309,20 +309,20 @@ const mapStateToProps = state => ({
         if (portrait.length === 0 || 
             landscape.length === 0 ||
             portrait.length === landscape.length) {
-            
-            // normalize widths
-            var totWidth = rowItems.map((item) => {return item.image_props.width;}).reduce((a, b) => a + b);
-            var compressionFactor = window.screen.width / totWidth;
-            for (var i=0; i<rowItems.length; i++) {
-                const widthFactor = (rowItems[i].image_props.width / totWidth);
-                rowItems[i].width = compressionFactor * widthFactor * rowItems[i].image_props.width;
-                rowItems[i].height = rowItems[i].width * rowItems[i].image_props.aspect_ratio;
-            }
+
             // normalize heights
-            const targetHeight = rowItems.sort((a, b) => b.height - a.height)[0].height;
-            for (i=0; i<rowItems.length; i++) {
+            const targetHeight = .50 * window.screen.height;
+            for (var i=0; i<rowItems.length; i++) {
                 rowItems[i].height = targetHeight;
                 rowItems[i].width = rowItems[i].height / rowItems[i].image_props.aspect_ratio;
+            }
+            
+            // normalize widths
+            var totWidth = rowItems.map((item) => {return item.width;}).reduce((a, b) => a + b);
+            var compressionFactor = window.screen.width / totWidth;
+            for (i=0; i<rowItems.length; i++) {
+                rowItems[i].width *= compressionFactor;
+                rowItems[i].height = rowItems[i].width * rowItems[i].image_props.aspect_ratio;
             }
 
             // calc Bootstrap 12ths per item
