@@ -299,8 +299,8 @@ const mapStateToProps = state => ({
             const viewWidth = 0.75 * window.screen.width;
             rowItems[0].height = groupHeight(rowItems);
             rowItems[0].width = rowItems[0].height / rowItems[0].image_props.aspect_ratio;
-            rowItems[0].columns = Math.floor(12 * (rowItems[0].width / viewWidth));
-            rowItems[0].columns = rowItems[0].columns > 1 ? rowItems[0].columns : 2;
+            rowItems[0].columns = 1 + Math.floor(11 * (rowItems[0].width / viewWidth));
+            rowItems[0].columns = rowItems[0].columns >= 3 ? rowItems[0].columns : 3;
             rowItems[0].bootstrapClass = "single-item col-" + rowItems[0].columns;
             return(rowItems);
         }

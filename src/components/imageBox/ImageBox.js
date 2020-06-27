@@ -129,7 +129,6 @@ class ImageBox extends Component {
     if (this._dislike) containerClasses += " analytics_dislike window-closing";
     if (this._close) containerClasses += " analytics_close";
 
-    if (this.props.image.orientation === "portrait") containerClasses += " green-border"
     
     // CSSTransition
     // https://reactcommunity.org/react-transition-group/css-transition

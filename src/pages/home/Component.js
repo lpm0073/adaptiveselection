@@ -67,7 +67,7 @@ class Home extends Component {
     this.handleMasonryLayoutComplete = this.handleMasonryLayoutComplete.bind(this);
 
     this.state = {
-      level: 4,
+      level: 3,
       nextSerialNumber: 0
     }
 
@@ -131,7 +131,6 @@ class Home extends Component {
       if (j <= 5) j = 1;
       else if (j <= 8) j = 2;
       else j = 3;
-      console.log("J", j);
 
       var row = [];
       for (var k=0; k<j; k++) {
@@ -312,10 +311,7 @@ class Home extends Component {
     // https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect
 
     if (this.requeueRange() && !this.fetching) {
-      const self = this;
-      setTimeout(function() {
-        self.fetchRow();
-      }, 5);
+      this.fetchRow(10);
     }
   }
 
