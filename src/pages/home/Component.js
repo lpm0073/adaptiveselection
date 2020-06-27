@@ -161,8 +161,8 @@ class Home extends Component {
 
       // row item count weighting
       var j = Math.floor(Math.random() * 10);
-      if (j <= 2) j = 1;
-      else if (j <= 4) j = 2;
+      if (j <= 5) j = 1;
+      else if (j <= 8) j = 2;
       else j = 3;
 
       var row = [];

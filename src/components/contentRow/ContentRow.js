@@ -62,6 +62,26 @@ const mapStateToProps = state => ({
         );
     }
 
+
+    init() {
+
+        const rawRow = this.generateRowArray();
+        const portrait = this.getPortrait(rawRow);
+        const landscape = this.getLandscape(rawRow);
+
+        this.setState({
+            rawRow: rawRow,
+            portrait: portrait,
+            landscape: landscape
+        });
+
+        this.setState({
+            presentationRow: this.calculateItemDimensions(rawRow, portrait, landscape),
+            layoutMethod: this.setLayout(rawRow, portrait, landscape)
+        });
+
+    }
+
     getPortrait(row) {
 
         return row.filter((item) => item.orientation === "portrait")
@@ -88,46 +108,27 @@ const mapStateToProps = state => ({
                 .sort((a, b) => a.id - b.id);
     }
 
-    init() {
-
-        const rawRow = this.generateRowArray();
-        const portrait = this.getPortrait(rawRow);
-        const landscape = this.getLandscape(rawRow);
-
-        this.setState({
-            rawRow: rawRow,
-            portrait: portrait,
-            landscape: landscape
-        });
-
-        this.setState({
-            presentationRow: this.calculateItemDimensions(rawRow, portrait, landscape),
-            layoutMethod: this.setLayout(rawRow, portrait, landscape)
-        });
-
-    }
-
     setLayout(row, portrait, landscape) {
         const numItems = row.length;
 
-        var layoutMethod = this.layout_0;
-        if (numItems === 0) layoutMethod = this.layout_0;
-        else if (numItems === 1) layoutMethod = this.layout_1
-        else if (numItems === 2) {
-            if (landscape.length === 2 || portrait.length === 2) layoutMethod = this.layout_2_1;
+        if (numItems === 0) return this.layout_0;
+        if (numItems === 1) return this.layout_1;
+        if (numItems === 2) {
+            if (landscape.length === 2 || portrait.length === 2) return this.layout_2_1;
             else {
-                if (landscape[0].id % 2 === 0) layoutMethod = this.layout_2_2;
-                else layoutMethod = this.layout_2_3;
+                if (landscape[0].id % 2 === 0) return this.layout_2_2;
+                else return this.layout_2_3;
             }
         }
-        else if (numItems === 3) {
-            if (portrait.length === 0 || landscape.length === 0) layoutMethod = this.layout_3_1;
+        if (numItems === 3) {
+            if (portrait.length === 0 || landscape.length === 0) return this.layout_3_1;
             else {
-                if (landscape[0].id % 2 === 0) layoutMethod = this.layout_3_2;
-                else layoutMethod = this.layout_3_3;
+                if (landscape[0].id % 2 === 0) return this.layout_3_2;
+                else return this.layout_3_3;
             }
         } 
-        return layoutMethod;
+        console.log("setLayout - internal error: didn't resolve to a layout", row, portrait, landscape, this.state.rawRow, this.state.presentationRow);
+        return this.layout_0;
     }
 
     layout_0(self) {
@@ -138,13 +139,30 @@ const mapStateToProps = state => ({
         const item = self.state.presentationRow[0];
         const colLeft = Math.floor((12 - item.columns)/2);
         const colRight = 12 - item.columns - colLeft;
-        return(
-            <React.Fragment>
-                <div className={"col-sm-12 col-md-" + colLeft}></div>
-                <ImageBox parent={self.state.componentKey} layout="layout_1" containerClasses={item.bootstrapClass} key={item.key} image = {item} />
-                <div className={"col-sm-12 col-md-" + colRight}></div>
-            </React.Fragment>
-        );        
+        const colTotal = colLeft + colRight;
+
+        if (self.state.presentationRow[0].id % 3 === 0)
+            return(
+                <React.Fragment>
+                    <div className={"col-sm-12 col-md-" + colLeft}></div>
+                    <ImageBox parent={self.state.componentKey} layout="layout_1" containerClasses={item.bootstrapClass} key={item.key} image = {item} />
+                    <div className={"col-sm-12 col-md-" + colRight}></div>
+                </React.Fragment>
+            );        
+        if (self.state.presentationRow[0].id % 3 === 1)
+            return(
+                <React.Fragment>
+                    <div className={"col-sm-12 col-md-" + colTotal}></div>
+                    <ImageBox parent={self.state.componentKey} layout="layout_1" containerClasses={item.bootstrapClass} key={item.key} image = {item} />
+                </React.Fragment>
+            );
+        if (self.state.presentationRow[0].id % 3 === 2)
+            return(
+                <React.Fragment>
+                    <ImageBox parent={self.state.componentKey} layout="layout_1" containerClasses={item.bootstrapClass} key={item.key} image = {item} />
+                    <div className={"col-sm-12 col-md-" + colTotal}></div>
+                </React.Fragment>
+            );        
     }
 
     layout_2_1(self) {
@@ -390,7 +408,7 @@ const mapStateToProps = state => ({
                 landscape1.bootstrapClass = "3-w-pair-of-landscapes col-12";
                 landscape2.bootstrapClass = "3-w-pair-of-landscapes col-12";
                 thisPortrait.columns = 6;
-                thisPortrait.bootstrapClass = "3-w-pair-of-landscapes col-4";
+                thisPortrait.bootstrapClass = "3-w-pair-of-landscapes col-sm-12 col-md-4";
 
                 console.log("pair of landscapes", [landscape1, landscape2, thisPortrait]);
                 return([landscape1, landscape2, thisPortrait]);

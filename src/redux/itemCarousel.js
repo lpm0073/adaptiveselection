@@ -8,10 +8,14 @@ export const ItemCarousel = (state = {
     }, action) => {
         switch(action.type) {
         case ActionTypes.ADD_ITEM_CAROUSEL:
+            const ids = [...state.items].map((item) => {return item.id});
             if (Array.isArray(action.payload)) {
-                return {...state, added: true, deleted: false, items: [...state.items].concat(action.payload)};
+                const newItems = action.payload.filter((id) => !ids.includes(id));
+                return {...state, added: true, deleted: false, items: [...state.items].concat(newItems)};
             }
-            return {...state, added: true, deleted: false, items: [...state.items, action.payload]};
+            const dup = ids.filter((id) => id === action.payload.id);
+            if (dup.length === 0) return {...state, added: true, deleted: false, items: [...state.items, action.payload]};
+            else return {...state, added: true, deleted: false, items: [...state.items]};
 
         case ActionTypes.DELETE_ITEM_CAROUSEL:
             const idx = [...state.items].map(function(image) {return image.id;}).indexOf(action.payload.id);
