@@ -133,7 +133,7 @@ class Home extends Component {
 
   handleChangeLevel() {
     this.masterContent = [];
-    this.props.actions.removeItemCarousel(this.props.itemCarousel.present.items.length, "quantity");
+    this.props.actions.resetItemCarousel();
     this.wpImages = new WPImages(this.level, this.addMasterContent);
   }  
   

@@ -62,6 +62,11 @@ export const removeItemCarousel = (cnt, action) => ({
     payload: cnt
 });
 
+export const resetItemCarousel = () => ({
+    type: ActionTypes.RESET_ITEM_CAROUSEL,
+    payload: null
+});
+
 /*  ----------------------------------- 
     methods to fetch data from api / cdn
     -----------------------------------  */

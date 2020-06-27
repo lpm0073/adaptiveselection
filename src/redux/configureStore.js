@@ -6,7 +6,7 @@ import undoable from 'redux-undo';
 import { Categories } from './categories';
 import { ItemCarousel } from './itemCarousel';
 import { UserSignal} from './userSignal';
-import { ItemRow } from './Itemrow';
+import { ItemRow } from './ItemRow';
 
 import thunk from 'redux-thunk';
 import logger from 'redux-thunk';

@@ -31,7 +31,8 @@ export const ItemRow = (state = {
                 ...state.items.slice(action.payload + 1),
             ]};
 
-            default: 
-            return state;
+            
+        default: 
+        return state;
     }
 };
