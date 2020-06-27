@@ -384,7 +384,7 @@ const mapStateToProps = state => ({
         } else 
         // this would be an internal error
         if (rowItems.length === 2) {
-            console.log("we shouldn't be here.");
+            console.log("calculateItemDimensions() internal error: rowItems.length === 2. We shouldn't be here.");
         } else
         if (rowItems.length === 3) {
             //console.log("there are three items.");
@@ -398,20 +398,28 @@ const mapStateToProps = state => ({
                 landscape2.height = pairedRects.rect2.height / 2;
                 landscape2.width = landscape2.height * landscape2.image_props.aspect_ratio;
 
-                var thisPortrait = portraitItems[0];
-                thisPortrait.height = landscape1.height + landscape2.height;
-                thisPortrait.width = thisPortrait.height / thisPortrait.image_props.aspect_ratio;
+                var portrait1 = portraitItems[0];
+                portrait1.height = landscape1.height + landscape2.height;
+                portrait1.width = portrait1.height / portrait1.image_props.aspect_ratio;
 
                 // rectangles are stacked. both should be 12 columns wide
                 landscape1.columns = 12;
                 landscape2.columns = 12;
                 landscape1.bootstrapClass = "3-w-pair-of-landscapes col-12";
                 landscape2.bootstrapClass = "3-w-pair-of-landscapes col-12";
-                thisPortrait.columns = 6;
-                thisPortrait.bootstrapClass = "3-w-pair-of-landscapes col-sm-12 col-md-4";
+                portrait1.columns = 6;
+                portrait1.bootstrapClass = "3-w-pair-of-landscapes col-sm-12 col-md-4";
 
-                console.log("pair of landscapes", [landscape1, landscape2, thisPortrait]);
-                return([landscape1, landscape2, thisPortrait]);
+                if (
+                    landscape1.height === 0 || landscape1.height === 'NaN' || landscape1.height === undefined ||
+                    landscape1.width === 0 || landscape1.width === 'NaN' || landscape1.width === undefined ||
+                    landscape2.height === 0 || landscape2.height === 'NaN' || landscape2.height === undefined ||
+                    landscape2.width === 0 ||  landscape2.width === 'NaN' || landscape2.width === undefined ||
+                    portrait1.height === 0 || portrait1.height === 'NaN' || portrait1.height === undefined ||
+                    portrait1.width === 0 || portrait1.width === 'NaN' || portrait1.width === undefined
+                    )
+                    console.log("internal error w pair of landscapes", [landscape1, landscape2, portrait1]);
+                return([landscape1, landscape2, portrait1]);
 
             } else {
                 console.log("a pair of portraits");
@@ -442,7 +450,15 @@ const mapStateToProps = state => ({
                     portraitRows[i].bootstrapClass = "3-w-pair-of-landscapes col-sm-12 col-md-" + portraitRows[i].columns;
                 }
 
-                console.log("pair of portraits", portraitRows);
+                if (
+                    landscape1.height === 0 || landscape1.height === 'NaN' || landscape1.height === undefined ||
+                    landscape1.width === 0 || landscape1.width === 'NaN' || landscape1.width === undefined ||
+                    portrait2.height === 0 || portrait2.height === 'NaN' || portrait2.height === undefined ||
+                    portrait2.width === 0 ||  portrait2.width === 'NaN' || portrait2.width === undefined ||
+                    portrait1.height === 0 || portrait1.height === 'NaN' || portrait1.height === undefined ||
+                    portrait1.width === 0 || portrait1.width === 'NaN' || portrait1.width === undefined
+                    )
+                    console.log("internal error w pair of landscapes", portraitRows);
                 return(portraitRows);
 
             }
