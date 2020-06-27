@@ -232,7 +232,7 @@ const mapStateToProps = state => ({
         if (self.state.landscape.length === 2) 
             return(
                 <React.Fragment>
-                    <div className="col-md-8">
+                    <div className="col-md-7">
                         <div className="row">
                             <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={landscapeItems[0].bootstrapClass} key={landscapeItems[0].key} image = {landscapeItems[0]} />
                             <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={landscapeItems[1].bootstrapClass} key={landscapeItems[1].key} image = {landscapeItems[1]} />
@@ -262,7 +262,7 @@ const mapStateToProps = state => ({
             return(
                 <React.Fragment>
                     <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={portraitItems[0].bootstrapClass} key={portraitItems[0].key} image = {portraitItems[0]} />
-                    <div className="col-md-8">
+                    <div className="col-md-7">
                         <div className="row">
                             <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={landscapeItems[0].bootstrapClass} key={landscapeItems[0].key} image = {landscapeItems[0]} />
                             <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={landscapeItems[1].bootstrapClass} key={landscapeItems[1].key} image = {landscapeItems[1]} />
@@ -390,7 +390,7 @@ const mapStateToProps = state => ({
                 landscape1.bootstrapClass = "3-w-pair-of-landscapes col-12";
                 landscape2.bootstrapClass = "3-w-pair-of-landscapes col-12";
                 portrait1.columns = 6;
-                portrait1.bootstrapClass = "3-w-pair-of-landscapes col-sm-12 col-md-4";
+                portrait1.bootstrapClass = "3-w-pair-of-landscapes col-sm-12 col-md-5";
 
                 if (
                     landscape1.height === 0 || landscape1.height === 'NaN' || landscape1.height === undefined ||
