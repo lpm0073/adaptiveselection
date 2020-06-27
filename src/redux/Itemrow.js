@@ -14,11 +14,13 @@ export const ItemRow = (state = {
             return {...state, added: true, deleted: false, items: [...state.items, action.payload]};
 
         case ActionTypes.DELETE_ITEMROW:
-            console.log("Row() - delete", action.payload);
             return {...state, added: false, deleted: true, items: [
                 ...state.items.slice(action.payload - 1),
             ]};
         
+        case ActionTypes.RESET_ITEMROW:
+            return {...state, added: false, deleted: true, items: []};
+
         case ActionTypes.UNDO_ITEMROW:
             return {...state, added: false, deleted: true, items: [
                 ...state.items.slice(0, action.payload),
@@ -31,7 +33,22 @@ export const ItemRow = (state = {
                 ...state.items.slice(action.payload + 1),
             ]};
 
-            
+        case ActionTypes.DELETE_ITEM_CAROUSEL:
+            var rows = [...state.items];
+            for (var i=0; i<rows.length; i++) {
+                const idx = rows[i].row.map(function(image) {return image.id;}).indexOf(action.payload.id);
+                if (!idx > 0) {
+                    var items = [];
+                    if (rows[i].length > 1) items = [
+                        rows[i].row.slice(0, idx),
+                        rows[i].row.slice(idx + 1),
+                    ];
+                    rows[i].row = items;
+                    return {...state, added: false, deleted: true, items: rows};
+                }
+            }
+            return {...state, added: false, deleted: true, items: rows};
+                
         default: 
         return state;
     }

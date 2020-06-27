@@ -14,22 +14,17 @@ export const ItemCarousel = (state = {
             return {...state, added: true, deleted: false, items: [...state.items, action.payload]};
 
         case ActionTypes.DELETE_ITEM_CAROUSEL:
-            if (action.action === "quantity")
+            const idx = [...state.items].map(function(image) {return image.id;}).indexOf(action.payload.id);
+            if (!idx > 0)  
                 return {...state, added: false, deleted: true, items: [
-                    ...state.items.slice(action.payload)
+                    ...state.items.slice(0, idx),
+                    ...state.items.slice(idx + 1),
                 ]};
-            if (action.action === "item") {
-                console.log("ItemCarousel() - delete", action.payload.id);
-                const idx = [...state.items].map(function(image) {return image.id;}).indexOf(action.payload.id);
-                if (!idx > 0)  
-                    return {...state, added: false, deleted: true, items: [
-                        ...state.items.slice(0, idx),
-                        ...state.items.slice(idx + 1),
-                    ]};
-                else return {...state, added: false, deleted: true, items: [...state.items]};
-            }
-            break;
+            else return {...state, added: false, deleted: true, items: [...state.items]};
         
+        case ActionTypes.RESET_ITEM_CAROUSEL:
+            return {...state, added: false, deleted: true, items: []};
+
         case ActionTypes.UNDO_ITEM_CAROUSEL:
             return {...state, added: false, deleted: true, items: [
                 ...state.items.slice(0, action.payload),

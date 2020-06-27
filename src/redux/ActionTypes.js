@@ -14,5 +14,6 @@ export const ADD_ITEMROW = 'ADD_ITEMROW';
 export const DELETE_ITEMROW = 'DELETE_ITEMROW';
 export const UNDO_ITEMROW = 'UNDO_ITEMROW';
 export const REDO_ITEMROW = 'REDO_ITEMROW';
+export const RESET_ITEMROW = 'RESET_ITEMROW';
 
 export const ADD_USER_SIGNAL =   'ADD_USER_SIGNAL';

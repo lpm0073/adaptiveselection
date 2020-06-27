@@ -310,7 +310,7 @@ class ImageBox extends Component {
     this.props.actions.addUserSignal(Signals.CLOSE, this.props.image);
 
     const idx = this.props.itemCarousel.present.items.findIndex((item) => item.id === this.props.image.id); 
-    this.props.actions.removeItemCarousel(idx, "item");
+    this.props.actions.removeItemCarousel(idx);
   }
 
 

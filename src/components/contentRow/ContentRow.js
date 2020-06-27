@@ -21,7 +21,7 @@ const mapStateToProps = state => ({
     constructor(props) {
         super(props);
 
-        this.layout_null = this.layout_null.bind(this);
+        this.layout_0 = this.layout_0.bind(this);
         this.layout_1 = this.layout_1.bind(this);
         this.layout_2_1 = this.layout_2_1.bind(this);
         this.layout_2_2 = this.layout_2_2.bind(this);
@@ -47,7 +47,7 @@ const mapStateToProps = state => ({
                              .map((item) => {return item.id});
 
         var layoutMethod;
-        if (numItems === 0) layoutMethod = this.layout_null;
+        if (numItems === 0) layoutMethod = this.layout_0;
         else if (numItems === 1) layoutMethod = this.layout_1
         else if (numItems === 2) {
             if (landscape.length === 2 || portrait.length === 2) layoutMethod = this.layout_2_1;
@@ -84,11 +84,10 @@ const mapStateToProps = state => ({
         );
     }
 
-    layout_null() {
-        return(
-            <Loading />
-        );        
+    layout_0() {
+        return(<React.Fragment></React.Fragment>);        
     }
+    
     layout_1(self) {
         const item = self.state.row[0];
         const colLeft = Math.floor((12 - item.columns)/2);

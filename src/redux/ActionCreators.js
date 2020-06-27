@@ -29,6 +29,11 @@ export const removeItemRow = (n, action) => ({
     payload: n
 });
 
+export const resetItemRow = () => ({
+    type: ActionTypes.DELETE_ITEMROW,
+    payload: null
+});
+
 export const addItemRow = (inserted) => {
     return {
         type: ActionTypes.ADD_ITEMROW,
@@ -56,9 +61,8 @@ export const addItemCarousel = (inserted) => {
         };
 }
 
-export const removeItemCarousel = (cnt, action) => ({
+export const removeItemCarousel = (cnt) => ({
     type: ActionTypes.DELETE_ITEM_CAROUSEL,
-    action: action,
     payload: cnt
 });
 
