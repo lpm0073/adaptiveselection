@@ -123,7 +123,7 @@ const mapStateToProps = state => ({
         else if (numItems === 3) {
             if (portrait.length === 0 || landscape.length === 0) layoutMethod = this.layout_3_1;
             else {
-                if (Math.random() > 0.5) layoutMethod = this.layout_3_2;
+                if (landscape[0].id % 2 === 0) layoutMethod = this.layout_3_2;
                 else layoutMethod = this.layout_3_3;
             }
         } 
@@ -206,88 +206,58 @@ const mapStateToProps = state => ({
 
     layout_3_2(self) {
         if (!self.props) return(<React.Fragment></React.Fragment>);
-        var portrait1 = null, portrait2 = null, landscape1 = null, landscape2 = null;
-        const items = self.state.presentationRow;
-        const portraits = this.state.portrait;
-        const landscapes = this.state.landscape;
+        const portraitItems = self.state.presentationRow.filter((item) => this.state.portrait.includes(item.id));
+        const landscapeItems = self.state.presentationRow.filter((item) => this.state.landscape.includes(item.id));
 
-        for (var i=0; i<landscapes.length; i++) {
-            const id = landscapes[i];
-            if (i===0) landscape1 = items.filter((item) => item.id === id)[0];
-            if (i===1) landscape2 = items.filter((item) => item.id === id)[0];
-        }
-        for (i=0; i<portraits.length; i++) {
-            const id = portraits[i];
-            if (i===0) portrait1 = items.filter((item) => item.id === id)[0];
-            if (i===1) portrait2 = items.filter((item) => item.id === id)[0];
-        }
 
         if (self.state.landscape.length === 2) 
             return(
                 <React.Fragment>
                     <div className="col-md-8">
                         <div className="row">
-                            <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={landscape1.bootstrapClass} key={landscape1.key} image = {landscape1} />
-                            <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={landscape2.bootstrapClass} key={landscape2.key} image = {landscape2} />
+                            <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={landscapeItems[0].bootstrapClass} key={landscapeItems[0].key} image = {landscapeItems[0]} />
+                            <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={landscapeItems[1].bootstrapClass} key={landscapeItems[1].key} image = {landscapeItems[1]} />
                         </div>
                     </div>
-                    <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={portrait1.bootstrapClass} key={portrait1.key} image = {portrait1} />
+                    <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={portraitItems[0].bootstrapClass} key={portraitItems[0].key} image = {portraitItems[0]} />
                 </React.Fragment>
             );
         else
+        // a pair of portraits
             return(
                 <React.Fragment>
-                    <div className="col-md-8">
-                        <div className="row">
-                            <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={portrait1.bootstrapClass} key={portrait1.key} image = {portrait1} />
-                            <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={portrait2.bootstrapClass} key={portrait2.key} image = {portrait2} />
-                        </div>
-                    </div>
-                    <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={landscape1.bootstrapClass} key={landscape1.key} image = {landscape1} />
+                    <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={portraitItems[0].bootstrapClass} key={portraitItems[0].key} image = {portraitItems[0]} />
+                    <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={portraitItems[1].bootstrapClass} key={portraitItems[1].key} image = {portraitItems[1]} />
+                    <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={landscapeItems[0].bootstrapClass} key={landscapeItems[0].key} image = {landscapeItems[0]} />
                 </React.Fragment>
             );
     }
 
     layout_3_3(self) {
         if (!self.props) return(<React.Fragment></React.Fragment>);
-        var portrait1 = null, portrait2 = null, landscape1 = null, landscape2 = null;
-        const items = self.state.presentationRow;
-        const portraits = this.state.portrait;
-        const landscapes = this.state.landscape;
+        const portraitItems = self.state.presentationRow.filter((item) => this.state.portrait.includes(item.id));
+        const landscapeItems = self.state.presentationRow.filter((item) => this.state.landscape.includes(item.id));
 
-        for (var i=0; i<landscapes.length; i++) {
-            const id = landscapes[i];
-            if (i===0) landscape1 = items.filter((item) => item.id === id)[0];
-            if (i===1) landscape2 = items.filter((item) => item.id === id)[0];
-        }
-        for (i=0; i<portraits.length; i++) {
-            const id = portraits[i];
-            if (i===0) portrait1 = items.filter((item) => item.id === id)[0];
-            if (i===1) portrait2 = items.filter((item) => item.id === id)[0];
-        }
 
         if (self.state.landscape.length === 2) 
             return(
                 <React.Fragment>
+                    <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={portraitItems[0].bootstrapClass} key={portraitItems[0].key} image = {portraitItems[0]} />
                     <div className="col-md-8">
                         <div className="row">
-                            <ImageBox parent={self.state.componentKey} layout="layout_3_3" containerClasses={landscape1.bootstrapClass} key={landscape1.key} image = {landscape1} />
-                            <ImageBox parent={self.state.componentKey} layout="layout_3_3" containerClasses={landscape2.bootstrapClass} key={landscape2.key} image = {landscape2} />
+                            <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={landscapeItems[0].bootstrapClass} key={landscapeItems[0].key} image = {landscapeItems[0]} />
+                            <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={landscapeItems[1].bootstrapClass} key={landscapeItems[1].key} image = {landscapeItems[1]} />
                         </div>
                     </div>
-                    <ImageBox parent={self.state.componentKey} layout="layout_3_3" containerClasses={portrait1.bootstrapClass} key={portrait1.key} image = {portrait1} />
                 </React.Fragment>
             );
         else
+        // a pair of portraits
             return(
                 <React.Fragment>
-                    <div className="col-md-8">
-                        <div className="row">
-                            <ImageBox parent={self.state.componentKey} layout="layout_3_3" containerClasses={portrait1.bootstrapClass} key={portrait1.key} image = {portrait1} />
-                            <ImageBox parent={self.state.componentKey} layout="layout_3_3" containerClasses={portrait2.bootstrapClass} key={portrait2.key} image = {portrait2} />
-                        </div>
-                    </div>
-                    <ImageBox parent={self.state.componentKey} layout="layout_3_3" containerClasses={landscape1.bootstrapClass} key={landscape1.key} image = {landscape1} />
+                    <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={landscapeItems[0].bootstrapClass} key={landscapeItems[0].key} image = {landscapeItems[0]} />
+                    <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={portraitItems[0].bootstrapClass} key={portraitItems[0].key} image = {portraitItems[0]} />
+                    <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={portraitItems[1].bootstrapClass} key={portraitItems[1].key} image = {portraitItems[1]} />
                 </React.Fragment>
             );
     }
@@ -399,46 +369,63 @@ const mapStateToProps = state => ({
             console.log("we shouldn't be here.");
         } else
         if (rowItems.length === 3) {
-            console.log("there are three items.");
+            //console.log("there are three items.");
             if (landscape.length > 1) {
                 // a pair of rectangles
-                var landscape1 = landscape[0], landscape2 = landscape[1];
-                for (i=0; i<landscape.length; i++) {
-                    const id = landscape[i];
-                    if (i===0) landscape1 = rowItems.filter((n) => n.id === id)[0];
-                    if (i===1) landscape2 = rowItems.filter((n) => n.id === id)[0];
-                }
+                var landscape1 = landscapeItems[0], landscape2 = landscapeItems[1];
 
                 var pairedRects = pairRectangles(landscape1, landscape2);
-                landscape1.height = pairedRects.rect1.height;
-                landscape1.width = pairedRects.rect1.width;
-                landscape2.height = pairedRects.rect2.height;
-                landscape2.width = pairedRects.rect2.width;
+                landscape1.height = pairedRects.rect1.height / 2;
+                landscape1.width = landscape1.height * landscape1.image_props.aspect_ratio;
+                landscape2.height = pairedRects.rect2.height / 2;
+                landscape2.width = landscape2.height * landscape2.image_props.aspect_ratio;
 
-                const id = portrait[0];
-                var thisPortrait = rowItems.filter((n) => n.id === id)[0];
-                pairedRects = pairRectangles(landscape1, thisPortrait);
-                thisPortrait.height = pairedRects.rect2.height;
-                thisPortrait.width = pairedRects.rect2.width;
+                var thisPortrait = portraitItems[0];
+                thisPortrait.height = landscape1.height + landscape2.height;
+                thisPortrait.width = thisPortrait.height / thisPortrait.image_props.aspect_ratio;
 
-                // calc Bootstrap 12ths per item
-                var landscapeRows = [landscape1, landscape2];
-                totWidth = groupWidth(landscapeRows);
-                totCols = 0;
-                for (i=0; i<landscapeRows.length; i++) {
-                    landscapeRows[i].columns = 1 + Math.floor(5 * (landscapeRows[i].width / totWidth));
-                    totCols += landscapeRows[i].columns;
-                }
-                landscapeRows[landscapeRows.length - 1].columns += (6 - totCols);    // in case we're over/under
-                for (i=0; i<landscapeRows.length; i++) {
-                    landscapeRows[i].bootstrapClass = "3-w-pair-of-landscapes col-sm-12 col-md-" + landscapeRows[i].columns;
-                    console.log("3-fer", landscapeRows[i].bootstrapClass, landscapeRows[i]);
-                }
+                // rectangles are stacked. both should be 12 columns wide
+                landscape1.columns = 12;
+                landscape2.columns = 12;
+                landscape1.bootstrapClass = "3-w-pair-of-landscapes col-12";
+                landscape2.bootstrapClass = "3-w-pair-of-landscapes col-12";
+                thisPortrait.columns = 6;
+                thisPortrait.bootstrapClass = "3-w-pair-of-landscapes col-4";
 
-                rowItems = [landscape1, landscape2, thisPortrait];
+                console.log("pair of landscapes", [landscape1, landscape2, thisPortrait]);
+                return([landscape1, landscape2, thisPortrait]);
 
             } else {
                 console.log("a pair of portraits");
+                landscape1 = landscapeItems[0];
+                var portrait1 = portraitItems[0], 
+                    portrait2 = portraitItems[1];
+
+                landscape1.width = 0.25 * window.screen.height;
+                landscape1.height = landscape1.width / landscape1.image_props.aspect_ratio;
+
+                portrait1.height = landscape1.height;
+                portrait1.width = portrait1.height * portrait1.image_props.aspect_ratio;
+
+                portrait2.height = landscape1.height;
+                portrait2.width = portrait2.height * portrait2.image_props.aspect_ratio;
+
+
+                // calc Bootstrap 12ths per item
+                var portraitRows = [portrait1, portrait2, landscape1];
+                totWidth = groupWidth(portraitRows);
+                totCols = 0;
+                for (i=0; i<portraitRows.length; i++) {
+                    portraitRows[i].columns = 1 + Math.floor(11 * (portraitRows[i].width / totWidth));
+                    totCols += portraitRows[i].columns;
+                }
+                portraitRows[portraitRows.length - 1].columns += (12 - totCols);    // in case we're over/under
+                for (i=0; i<portraitRows.length; i++) {
+                    portraitRows[i].bootstrapClass = "3-w-pair-of-landscapes col-sm-12 col-md-" + portraitRows[i].columns;
+                }
+
+                console.log("pair of portraits", portraitRows);
+                return(portraitRows);
 
             }
         }
