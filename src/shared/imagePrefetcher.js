@@ -1,12 +1,10 @@
 //import { wpGetImage } from './wpGetImage';
 
-export const imagePreFetcher = (arr, delay, desc) => {
+export const imagePreFetcher = (url) => {
 
     setTimeout(function() {
-        arr.forEach((post) => {
-            new Image().src = "FIX ME: wpGetImage(post);"
-        });
-        }, delay * 1000 * Math.random());
+        console.log("imagePreFetcher()", url);
+        new Image().src = url;
+        }, 10);
 
-    return arr;
 }

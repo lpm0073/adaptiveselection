@@ -16,6 +16,7 @@ import * as Signals from '../../redux/userSignals';
 import './styles.css';
 import ContentRow from '../../components/contentRow/ContentRow'
 import { WPImages, wpGetImage, wpGetExclusionArray } from '../../shared/wpImages';
+import { imagePreFetcher } from '../../shared/imagePrefetcher';
 import Loading from '../../components/Loading';
 
 const mapStateToProps = state => ({
@@ -224,6 +225,7 @@ class Home extends Component {
       aspect_ratio: imageProps.aspect_ratio,
       image_props: imageProps
     };
+    imagePreFetcher(obj.source_url);
     return(obj);
   }
 
