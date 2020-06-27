@@ -53,6 +53,7 @@ const mapStateToProps = state => ({
     }
 
     render() {
+        console.log("render()", this.state.layoutMethod.name, this.state.presentationRow);
         return(
             <React.Fragment>
                 <div id={this.state.componentKey} key={this.state.componentKey} className="row content-row">
@@ -75,9 +76,12 @@ const mapStateToProps = state => ({
             landscape: landscape
         });
 
+        const presentationRow = this.calculateItemDimensions(rawRow, portrait, landscape);
+        const layoutMethod = this.setLayout(rawRow, portrait, landscape);
+
         this.setState({
-            presentationRow: this.calculateItemDimensions(rawRow, portrait, landscape),
-            layoutMethod: this.setLayout(rawRow, portrait, landscape)
+            presentationRow: presentationRow,
+            layoutMethod: layoutMethod
         });
 
     }
@@ -116,14 +120,14 @@ const mapStateToProps = state => ({
         if (numItems === 2) {
             if (landscape.length === 2 || portrait.length === 2) return this.layout_2_1;
             else {
-                if (landscape[0].id % 2 === 0) return this.layout_2_2;
+                if (landscape[0] % 2 === 0) return this.layout_2_2;
                 else return this.layout_2_3;
             }
         }
         if (numItems === 3) {
             if (portrait.length === 0 || landscape.length === 0) return this.layout_3_1;
             else {
-                if (landscape[0].id % 2 === 0) return this.layout_3_2;
+                if (landscape[0] % 2 === 0) return this.layout_3_2;
                 else return this.layout_3_3;
             }
         } 
@@ -302,33 +306,21 @@ const mapStateToProps = state => ({
             return width;
         }
         function pairRectangles(rect1, rect2) {
-            const rect1Area = rect1.width * rect1.height;
-            const rect2Area = rect2.width * rect2.height;
             var height = groupHeight([rect1, rect2]);
-            var retval;
-            if (rect1.orientation === rect2.orientation === "landscape") height /= 2;
+            if (rect1.orientation === rect2.orientation === "landscape") height = height / 2;
 
-            if (rect1Area < rect2Area) {
-                retval = {
-                    rect1: height,
-                    rect2: {
-                        height: height ,
-                        aspect_ratio: rect2.aspect_ratio,
-                        width: height / rect2.aspect_ratio
-                    }
+            return {
+                rect1: {
+                    height: height,
+                    aspect_ratio: rect1.image_props.aspect_ratio,
+                    width: height / rect1.image_props.aspect_ratio
+                },
+                rect2: {
+                    height: height ,
+                    aspect_ratio: rect2.image_props.aspect_ratio,
+                    width: height / rect2.image_props.aspect_ratio
                 }
             }
-            else {
-                retval = {
-                    rect2: rect2,
-                    rect1: {
-                        height: height,
-                        aspect_ratio: rect1.aspect_ratio,
-                        width: height / rect1.aspect_ratio
-                    }
-                }
-            }
-            return retval;
         }
 
         // easiest possible situation: only 1 item on the row
@@ -392,11 +384,11 @@ const mapStateToProps = state => ({
                 // a pair of rectangles
                 var landscape1 = landscapeItems[0], landscape2 = landscapeItems[1];
 
-                var pairedRects = pairRectangles(landscape1, landscape2);
-                landscape1.height = pairedRects.rect1.height / 2;
-                landscape1.width = landscape1.height * landscape1.image_props.aspect_ratio;
-                landscape2.height = pairedRects.rect2.height / 2;
-                landscape2.width = landscape2.height * landscape2.image_props.aspect_ratio;
+                const pairedRects = pairRectangles(landscape1, landscape2);
+                landscape1.height = pairedRects.rect1.height;
+                landscape1.width = pairedRects.rect1.width;
+                landscape2.height = pairedRects.rect2.height;
+                landscape2.width = pairedRects.rect2.width;
 
                 var portrait1 = portraitItems[0];
                 portrait1.height = landscape1.height + landscape2.height;
