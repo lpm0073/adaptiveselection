@@ -97,7 +97,7 @@ class Home extends Component {
         <div key="home-page" id="home-page" className="home-page m-0 p-0 row" onScroll={this.handleScroll}>
           <div className="col-1"></div>
           <div className="col-10">
-          {this.props.itemRow.present.items.map((row, idx) => {return (<ContentRow key={row.id} row = {row.row} />);})}
+          {this.props.itemRow.present.items.map((row, idx) => {return (<ContentRow key={row.id} id={row.id} row = {row.row} />);})}
           </div>
           <div className="col-1"></div>
         </div>

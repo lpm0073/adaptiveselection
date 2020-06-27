@@ -8,7 +8,6 @@ import * as Actions from '../../redux/ActionCreators';
 // my stuff
 import './styles.css';
 import ImageBox from '../imageBox/ImageBox';
-import Loading from '../Loading';
 
 const mapStateToProps = state => ({
     ...state
@@ -29,9 +28,70 @@ const mapStateToProps = state => ({
         this.layout_3_1 = this.layout_3_1.bind(this);
         this.layout_3_2 = this.layout_3_2.bind(this);
         this.layout_3_3 = this.layout_3_3.bind(this);
+        this.generateRowArray = this.generateRowArray.bind(this);
+        this.init = this.init.bind(this);
+        this.setLayout = this.setLayout.bind(this);
         this.calculateItemDimensions = this.calculateItemDimensions.bind(this);
 
         // build the item object array from the ID values in this.props.row
+
+        this.state = {
+            id: this.props.id,      // row identifier
+            row: null,
+            portrait: [],
+            landscape: [],
+            layoutMethod: this.layout_0,
+            componentKey: Math.floor(Math.random() * 100000).toString()
+        }
+    }
+    componentDidMount() {
+    }
+    componentWillReceiveProps() {
+        this.init();
+    }
+    render() {
+        return(
+            <React.Fragment>
+                <div id={this.state.componentKey} key={this.state.componentKey} className="row content-row">
+                    {this.state.layoutMethod(this)}
+                </div>
+            </React.Fragment>
+        );
+    }
+
+    generateRowArray() {
+        var row = [];
+        const itemRow = this.props.itemRow.present.items
+                                .filter((item) => item.id === this.state.id)
+                                .map((item) => {return item.row})[0];
+
+                                
+        const carousel = this.props.itemCarousel.present.items;
+        for (var i=0; i<itemRow.length; i++) {
+            const id = this.props.row[i];
+            const item = carousel.filter((n) => n.id === id)[0];
+            row.push(item);
+        }
+        return row;
+    }
+
+    init() {
+        var row = this.generateRowArray();
+
+        const portrait = row.filter((item) => item.image_props.orientation === "portrait")
+                            .map((item) => {return item.id});
+        const landscape = row.filter((item) => item.image_props.orientation === "landscape")
+                             .map((item) => {return item.id});
+
+        this.setState({
+            row: this.calculateItemDimensions(),
+            portrait: portrait,
+            landscape: landscape,
+            layoutMethod: this.setLayout(),
+        });
+    }
+
+    setLayout() {
         var row = [];
         for (var i=0; i<this.props.row.length; i++) {
             const carousel = this.props.itemCarousel.present.items;
@@ -63,25 +123,7 @@ const mapStateToProps = state => ({
                 else layoutMethod = this.layout_3_3;
             }
         } 
-
-        this.state = {
-            row: this.calculateItemDimensions(row, portrait, landscape),
-            portrait: portrait,
-            landscape: landscape,
-            layoutMethod: layoutMethod,
-            componentKey: Math.floor(Math.random() * 100000).toString()
-        }
-    }
-
-    render() {
-        if (!this.state.layoutMethod) return(<React.Fragment></React.Fragment>);
-        return(
-            <React.Fragment>
-                <div id={this.state.componentKey} key={this.state.componentKey} className="row content-row">
-                    {this.state.layoutMethod(this)}
-                </div>
-            </React.Fragment>
-        );
+        return layoutMethod;
     }
 
     layout_0() {
@@ -246,7 +288,8 @@ const mapStateToProps = state => ({
             );
     }
 
-    calculateItemDimensions(rowItems, portrait, landscape) {
+    calculateItemDimensions() {
+        var rowItems = this.generateRowArray();
 
         function groupHeight(group) {
             const max = .50 * window.screen.height;
@@ -305,9 +348,9 @@ const mapStateToProps = state => ({
         }
         else 
         // common orientations, or, only two items on the row
-        if (portrait.length === 0 || 
-            landscape.length === 0 ||
-            portrait.length === landscape.length) {
+        if (this.state.portrait.length === 0 || 
+            this.state.landscape.length === 0 ||
+            this.state.portrait.length === this.state.landscape.length) {
 
             // normalize heights
             const targetHeight = .50 * window.screen.height;
@@ -337,7 +380,7 @@ const mapStateToProps = state => ({
 
             // generate bootstrap classes
             for (i=0; i<rowItems.length; i++) {
-                if (portrait.length === landscape.length) rowItems[i].bootstrapClass = "2-images ";
+                if (this.state.portrait.length === this.state.landscape.length) rowItems[i].bootstrapClass = "2-images ";
                 else rowItems[i].bootstrapClass = "common-orientations ";
                 rowItems[i].bootstrapClass += " col-sm-12 col-md-" + rowItems[i].columns;
             }
@@ -350,11 +393,11 @@ const mapStateToProps = state => ({
         } else
         if (rowItems.length === 3) {
             console.log("there are three items.");
-            if (landscape.length > 1) {
+            if (this.state.landscape.length > 1) {
                 // a pair of rectangles
                 var landscape1, landscape2;
-                for (i=0; i<landscape.length; i++) {
-                    const id = landscape[i];
+                for (i=0; i<this.state.landscape.length; i++) {
+                    const id = this.state.landscape[i];
                     if (i===0) landscape1 = rowItems.filter((n) => n.id === id)[0];
                     if (i===1) landscape2 = rowItems.filter((n) => n.id === id)[0];
                 }
@@ -365,11 +408,11 @@ const mapStateToProps = state => ({
                 landscape2.height = pairedRects.rect2.height;
                 landscape2.width = pairedRects.rect2.width;
 
-                const id = portrait[0];
-                portrait = rowItems.filter((n) => n.id === id)[0];
-                pairedRects = pairRectangles(landscape1, portrait);
-                portrait.height = pairedRects.rect2.height;
-                portrait.width = pairedRects.rect2.width;
+                const id = this.state.portrait[0];
+                var thisPortrait = rowItems.filter((n) => n.id === id)[0];
+                pairedRects = pairRectangles(landscape1, thisPortrait);
+                thisPortrait.height = pairedRects.rect2.height;
+                thisPortrait.width = pairedRects.rect2.width;
 
                 // calc Bootstrap 12ths per item
                 var landscapeRows = [landscape1, landscape2];
@@ -385,7 +428,7 @@ const mapStateToProps = state => ({
                     console.log("3-fer", landscapeRows[i].bootstrapClass);
                 }
 
-                rowItems = [landscape1, landscape2, portrait];
+                rowItems = [landscape1, landscape2, thisPortrait];
 
             } else {
                 console.log("a pair of portraits");
