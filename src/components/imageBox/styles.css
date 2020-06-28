@@ -1,16 +1,15 @@
 :root {
+  --image-frame-color: goldenrod;
+  --image-frame-highlight-color: gold;
   --window-control-delay: 300ms;
   --window-control-transition: 150ms;
+  --info-panel-background-color: rgba(0,0,0, .75);
+  --info-panel-color: white;
 }
 
 .hovering {
   /* set by ImageBox.render() when user is hovering */
   transition-delay: 0ms;
-}
-
-/* for development / testing */
-.green-border {
-  border: 2px solid green;
 }
 
 .window-closer {
@@ -52,10 +51,10 @@
   bottom: 0px;
   width: 100%;
   z-index: 1;
-  background-color: rgba(0,0,0, .75);
+  background-color: var(--info-panel-background-color);
   animation: info-panel-slide-up .5s ease-in-out 0ms;
   animation-fill-mode: forwards;
-  color: white;
+  color: var(--info-panel-color);
 }
 
 @keyframes info-panel-slide-up {
@@ -75,7 +74,7 @@
 
 /* --------------------- Window Controls --------------------- */
 .image-frame:hover {
-  border: 3px solid goldenrod;
+  border: 2px solid var(--image-frame-color);
   transition-duration: var(--window-control-transition);
   transition-delay: var(--window-control-delay);
 }
@@ -94,9 +93,9 @@
 }
 
 /* hover styling */
-.top-right:hover {border-right: 1px solid gold; border-top: 1px solid gold;}
-.bottom-left:hover {border-left: 1px solid gold; border-bottom: 1px solid gold;}
-.bottom-right:hover {border-right: 1px solid gold; border-bottom: 1px solid gold;}
+.top-right:hover {border-right: 1px solid var(--image-frame-highlight-color); border-top: 1px solid var(--image-frame-highlight-color);}
+.bottom-left:hover {border-left: 1px solid var(--image-frame-highlight-color); border-bottom: 1px solid var(--image-frame-highlight-color);}
+.bottom-right:hover {border-right: 1px solid var(--image-frame-highlight-color); border-bottom: 1px solid var(--image-frame-highlight-color);}
 
 .image-frame:hover #button-bar {
   display: inherit;
@@ -142,7 +141,7 @@
   position: relative;
   bottom: 0;
   width: 100%;
-  background-color: goldenrod;
+  background-color: var(--image-frame-color);
   height: 25px;
   bottom: 0;
   border-bottom-right-radius: 3px;
@@ -207,7 +206,6 @@
 
 
 /* --------------------- Animations --------------------- */
-
 @keyframes fade-out {
   from { opacity: 1;  }
   25% { opacity: 0.75; }
