@@ -161,10 +161,12 @@ class Home extends Component {
     for (i = 0; i<n; i++) {
 
       // row item count weighting
-      var j = Math.floor(Math.random() * 10);
-      if (j <= 3) j = 1;
-      else if (j <= 6) j = 2;
-      else j = 3;
+      var j = Math.random();
+      if (j <= Defaults.IMAGE_CONTENT_3ITEMS) j = 3;
+      else {
+        if (j <= Defaults.IMAGE_CONTENT_3ITEMS + Defaults.IMAGE_CONTENT_2ITEMS) j = 2;
+        else j = 1;
+      }
 
       var row = [];
       for (var k=0; k<j; k++) {

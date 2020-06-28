@@ -8,6 +8,12 @@
 // during timeouts.
 export const MAX_ROWS = 75;
 
+// IMAGE_CONTENT
+// governs the veracity of multi-image content
+// on ItemRow data.
+export const IMAGE_CONTENT_2ITEMS = .20;
+export const IMAGE_CONTENT_3ITEMS = .15;
+
 // IDLE_TIMEOUT
 // ----------------------------------------------------------------
 // wait period between on-screen garbage
