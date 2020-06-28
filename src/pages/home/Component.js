@@ -98,11 +98,11 @@ class Home extends Component {
     );
     return(
         <div key="home-page" id="home-page" className="home-page m-0 p-0 row" onScroll={this.handleScroll}>
-          <div className="col-md-12 col-xl-2"></div>
-          <div className="col-md-12 col-xl-8">
+          <div className="col-sm-12 col-xl-2"></div>
+          <div className="col-sm-12 col-xl-8">
           {rows.map((row, idx) => {return (<ContentRow key={row.id} id={row.id} row = {row.row} />);})}
           </div>
-          <div className="col-md-12 col-xl-2"></div>
+          <div className="col-sm-12 col-xl-2"></div>
         </div>
     );
   }
