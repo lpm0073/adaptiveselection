@@ -145,15 +145,15 @@ const mapStateToProps = state => ({
         if (self.state.presentationRow[0].id % 3 === 0)
             return(
                 <React.Fragment>
-                    <div className={"col-sm-12 col-md-" + colLeft}></div>
+                    <div className={"col-md-12 col-lg-" + colLeft}></div>
                     <ImageBox parent={self.state.componentKey} layout="layout_1" containerClasses={item.bootstrapClass} key={item.key} image = {item} />
-                    <div className={"col-sm-12 col-md-" + colRight}></div>
+                    <div className={"col-md-12 col-lg-" + colRight}></div>
                 </React.Fragment>
             );        
         if (self.state.presentationRow[0].id % 3 === 1)
             return(
                 <React.Fragment>
-                    <div className={"col-sm-12 col-md-" + colTotal}></div>
+                    <div className={"col-md-12 col-lg-" + colTotal}></div>
                     <ImageBox parent={self.state.componentKey} layout="layout_1" containerClasses={item.bootstrapClass} key={item.key} image = {item} />
                 </React.Fragment>
             );
@@ -161,7 +161,7 @@ const mapStateToProps = state => ({
             return(
                 <React.Fragment>
                     <ImageBox parent={self.state.componentKey} layout="layout_1" containerClasses={item.bootstrapClass} key={item.key} image = {item} />
-                    <div className={"col-sm-12 col-md-" + colTotal}></div>
+                    <div className={"col-md-12 col-lg-" + colTotal}></div>
                 </React.Fragment>
             );        
     }
@@ -232,7 +232,7 @@ const mapStateToProps = state => ({
         if (self.state.landscape.length === 2) 
             return(
                 <React.Fragment>
-                    <div className="col-md-7">
+                    <div className="col-lg-7">
                         <div className="row">
                             <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={landscapeItems[0].bootstrapClass} key={landscapeItems[0].key} image = {landscapeItems[0]} />
                             <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={landscapeItems[1].bootstrapClass} key={landscapeItems[1].key} image = {landscapeItems[1]} />
@@ -262,7 +262,7 @@ const mapStateToProps = state => ({
             return(
                 <React.Fragment>
                     <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={portraitItems[0].bootstrapClass} key={portraitItems[0].key} image = {portraitItems[0]} />
-                    <div className="col-md-7">
+                    <div className="col-lg-7">
                         <div className="row">
                             <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={landscapeItems[0].bootstrapClass} key={landscapeItems[0].key} image = {landscapeItems[0]} />
                             <ImageBox parent={self.state.componentKey} layout="layout_3_2" containerClasses={landscapeItems[1].bootstrapClass} key={landscapeItems[1].key} image = {landscapeItems[1]} />
@@ -328,7 +328,7 @@ const mapStateToProps = state => ({
             rowItems[0].width = rowItems[0].height / rowItems[0].image_props.aspect_ratio;
             rowItems[0].columns = 1 + Math.floor(11 * (rowItems[0].width / viewWidth));
             rowItems[0].columns = rowItems[0].columns >= 3 ? rowItems[0].columns : 3;
-            rowItems[0].bootstrapClass = "single-item col-sm-12 col-md-" + rowItems[0].columns;
+            rowItems[0].bootstrapClass = "single-item col-md-12 col-lg-" + rowItems[0].columns;
             return(rowItems);
         }
         else 
@@ -359,7 +359,7 @@ const mapStateToProps = state => ({
             for (i=0; i<rowItems.length; i++) {
                 if (portrait.length === landscape.length) rowItems[i].bootstrapClass = "2-images ";
                 else rowItems[i].bootstrapClass = "common-orientations ";
-                rowItems[i].bootstrapClass += " col-sm-12 col-md-" + rowItems[i].columns;
+                rowItems[i].bootstrapClass += " col-md-12 col-lg-" + rowItems[i].columns;
             }
             return(rowItems);
 
@@ -390,7 +390,7 @@ const mapStateToProps = state => ({
                 landscape1.bootstrapClass = "3-w-pair-of-landscapes col-12";
                 landscape2.bootstrapClass = "3-w-pair-of-landscapes col-12";
                 portrait1.columns = 6;
-                portrait1.bootstrapClass = "3-w-pair-of-landscapes col-sm-12 col-md-5";
+                portrait1.bootstrapClass = "3-w-pair-of-landscapes col-md-12 col-lg-5";
 
                 if (
                     landscape1.height === 0 || landscape1.height === 'NaN' || landscape1.height === undefined ||
@@ -428,7 +428,7 @@ const mapStateToProps = state => ({
                 }
                 portraitRows[portraitRows.length - 1].columns += (12 - totCols);    // in case we're over/under
                 for (i=0; i<portraitRows.length; i++) {
-                    portraitRows[i].bootstrapClass = "3-w-pair-of-landscapes col-sm-12 col-md-" + portraitRows[i].columns;
+                    portraitRows[i].bootstrapClass = "3-w-pair-of-landscapes col-md-12 col-lg-" + portraitRows[i].columns;
                 }
 
                 if (

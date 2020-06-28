@@ -1,6 +1,7 @@
 :root {
-  --image-frame-color: goldenrod;
-  --image-frame-highlight-color: gold;
+  --image-frame-color: #41B3A3;
+  --image-frame-highlight-color: green;
+  --image-frame-background-color: lightgray;
   --window-control-delay: 300ms;
   --window-control-transition: 150ms;
   --info-panel-background-color: rgba(0,0,0, .75);
@@ -38,6 +39,7 @@
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
+  background-color: var(--image-frame-background-color);
   border-radius: 3px;
   -webkit-box-shadow: 5px 5px 3px 3px rgba(0,0,0,0.5);
   -moz-box-shadow: 5px 5px 3px 3px rgba(0,0,0,0.5);

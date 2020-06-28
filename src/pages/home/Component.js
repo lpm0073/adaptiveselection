@@ -98,11 +98,11 @@ class Home extends Component {
     );
     return(
         <div key="home-page" id="home-page" className="home-page m-0 p-0 row" onScroll={this.handleScroll}>
-          <div className="col-1"></div>
-          <div className="col-10">
+          <div className="col-md-12 col-xl-2"></div>
+          <div className="col-md-12 col-xl-8">
           {rows.map((row, idx) => {return (<ContentRow key={row.id} id={row.id} row = {row.row} />);})}
           </div>
-          <div className="col-1"></div>
+          <div className="col-md-12 col-xl-2"></div>
         </div>
     );
   }
@@ -159,10 +159,20 @@ class Home extends Component {
     //this.rankWorkingSet();
 
     for (i = 0; i<n; i++) {
+      /*
+      Extra small   <576px	
+      Small         ≥576px
+      Medium        ≥768px	
+      Large         ≥992px	
+      Extra large   ≥1200px
+      */
 
       // row item count weighting
       var j = Math.random();
-      if (j <= Defaults.IMAGE_CONTENT_3ITEMS) j = 3;
+      if (j <= Defaults.IMAGE_CONTENT_3ITEMS) {
+        // don't bother with 3-image layouts unless we really need to
+        j = window.screen.width >= 992 ? 3 : 2;
+      }
       else {
         if (j <= Defaults.IMAGE_CONTENT_3ITEMS + Defaults.IMAGE_CONTENT_2ITEMS) j = 2;
         else j = 1;
