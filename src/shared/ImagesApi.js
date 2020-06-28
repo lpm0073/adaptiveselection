@@ -39,7 +39,10 @@ export class ImagesApi {
         this.level = level;
         this.callBackMethod = callBackMethod;
 
-        if (channel !== null) this.getChannelId();
+        if (channel !== "") {
+          console.log("constructor() - channel", channel, typeof channel);
+          this.getChannelId();
+        }
         else {
           this.fetch(); // query the splash page data
           this.fetchCategories(); // fetch & process categories, then recall fetch()
