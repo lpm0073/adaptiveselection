@@ -1,14 +1,11 @@
-const BackendURL = 'https://api.fotomashup.com/wp-json/wp/v2/';
-const MediaURL = BackendURL + 'media?_fields=id,categories,acf,media_details&per_page=100';
-const SplashURL = MediaURL + '&categories=41';
-
-
-export const CategoriesURL = BackendURL + 'categories?per_page=100&_fields=id,count,acf';
-
 
 // https://api.fotomashup.com/wp-json/wp/v2/media?_fields=id,categories,acf,media_details&per_page=100&categories=41
 export class ImagesApi {
 
+    MediaURL = null;
+    SplashURL = null;
+    CategoriesURL = null;
+  
     level = 0;
     pageNumber = 1;
     pagesReturned = [];
@@ -19,7 +16,11 @@ export class ImagesApi {
     gettingSplashData = false;
     gotSplashData = false;
   
-    constructor(level, callBackMethod) {
+    constructor(level, callBackMethod, mediaURL, categoriesURL, splashURL) {
+        this.MediaURL = mediaURL;
+        this.SplashURL = splashURL;
+        this.CategoriesURL = categoriesURL;
+  
         this.level = level;
         this.callBackMethod = callBackMethod;
 
@@ -37,9 +38,9 @@ export class ImagesApi {
 
       if (this.categories !== null && !this.gettingSplashData && !this.gotSplashData) {
         this.gettingSplashData = true;
-        url = SplashURL;
+        url = this.SplashURL;
       } else {
-        if (this.categories) url = MediaURL + "&page=" + this.pageNumber + "&" + wpGetExclusions(this.level, this.categories);
+        if (this.categories) url = this.MediaURL + "&page=" + this.pageNumber + "&" + wpGetExclusions(this.level, this.categories);
         else return;
         if (this.pageNumber < 1) return;
         this.pageNumber = this.getNextPage(); 
@@ -97,7 +98,7 @@ export class ImagesApi {
 
   fetchCategories() {
 
-    return fetch(CategoriesURL)
+    return fetch(this.CategoriesURL)
     .then(
         response => {
             if (response.ok) {
