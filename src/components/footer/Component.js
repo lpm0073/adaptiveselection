@@ -1,6 +1,5 @@
 import React from 'react';
 import { a } from 'react-router-dom';
-import { legalUrl } from '../../shared/urls';
 import './styles.css';
 
 function Footer(props) {
@@ -15,7 +14,7 @@ function Footer(props) {
                     <div className="row justify-content-center">
                         <div className="col-auto">
                             <div className="text-center">                        
-                                <a className="mx-1" href={legalUrl} target="_blank" rel="noopener noreferrer">Legal</a><span> | </span>
+                                <a className="mx-1" href="/" target="_blank" rel="noopener noreferrer">Legal</a><span> | </span>
                                 <a className="mx-1" href="https://www.linkedin.com/" target="_blank" rel="noopener noreferrer">LinkedIn</a><span> | </span>
                                 <a className="mx-1" href="https://www.facebook.com/" target="_blank" rel="noopener noreferrer">Facebook</a><span className="footer-extra-links"> | </span>
                             </div>

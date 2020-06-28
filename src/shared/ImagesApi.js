@@ -288,6 +288,26 @@ export class ImagesApi {
 
 }  /* ---------------------------------- ImagesApi --------------------------------------------------- */
 
+export const imagePreFetcher = (url) => {
+
+  setTimeout(function() {
+      new Image().src = url;
+      }, 10);
+
+}
+
+export const getPixelRatio = context => {
+  var backingStore = context.backingStorePixelRatio ||
+                      context.webkitBackingStorePixelRatio ||
+                      context.mozBackingStorePixelRatio ||
+                      context.msBackingStorePixelRatio ||
+                      context.oBackingStorePixelRatio ||
+                      context.backingStorePixelRatio || 
+                      1;
+  
+  return (window.devicePixelRatio || 1) / backingStore;
+}
+
 function array_to_csv(level, categories) {
 
     if (categories.hasOwnProperty("level0_exclusions")) {

@@ -16,8 +16,7 @@ import * as Signals from '../../redux/userSignals';
 import './styles.css';
 import * as Defaults from '../../appDefaults';
 import ContentRow from '../../components/contentRow/ContentRow'
-import { ImagesApi, wpGetImage, wpGetExclusionArray } from '../../shared/ImagesApi';
-import { imagePreFetcher } from '../../shared/imagePrefetcher';
+import { ImagesApi, wpGetImage, imagePreFetcher, wpGetExclusionArray } from '../../shared/ImagesApi';
 import Loading from '../../components/Loading';
 
 const mapStateToProps = state => ({
