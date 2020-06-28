@@ -34,8 +34,8 @@ class Routes extends Component {
     return(
         <React.Fragment>
           <Switch>
-            <Route path="/home" component={Home} />
-            <Redirect to="/home" />
+            <Route path="/" component={Home} />
+            <Redirect to="/" />
           </Switch>
         </React.Fragment>
     );
