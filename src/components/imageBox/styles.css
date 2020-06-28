@@ -40,10 +40,6 @@
   -moz-box-shadow: 5px 5px 3px 3px rgba(0,0,0,0.5);
   box-shadow: 5px 5px 3px 3px rgba(0,0,0,0.5);
 }
-.image-frame:hover {
-  border: 3px solid goldenrod;
-  transition-duration: 150ms;
-}
 
 .hidden {
   display: none;
@@ -95,6 +91,39 @@
 
 
 /* --------------------- Window Controls --------------------- */
+.image-frame:hover {
+  border: 3px solid goldenrod;
+  transition-duration: 150ms;
+  transition-delay: 1s;
+}
+#window-controls:hover div {display: inherit;}
+
+/* hover styling */
+.top-right:hover {border-right: 1px solid gold; border-top: 1px solid gold;}
+.bottom-left:hover {border-left: 1px solid gold; border-bottom: 1px solid gold;}
+.bottom-right:hover {border-right: 1px solid gold; border-bottom: 1px solid gold;}
+
+.image-frame:hover #button-bar {
+  display: inherit;
+  transition-duration: 150ms;
+  transition-delay: 1s;
+}
+.image-frame:hover #button-bar {
+  /* shorthand:  animation-name, animation-duration, animation-timing-function, animation-delay, animation-iteration-count, animation-direction, animation-fill-mode, and animation-play-state */
+  animation: button-bar-slide-up 300ms ease-in-out 1s;
+  -webkit-animation: button-bar-slide-up 300ms ease-in-out 1s;
+  animation-fill-mode: forwards;
+
+}
+@keyframes button-bar-slide-up {
+  from { bottom: 0px; opacity: 0;}
+  100% { bottom: 28px; opacity: 1;}
+}
+#window-controls > div:hover {
+  /* vertical-align: text-top; DELETE THIS SELECTOR ?? */
+}
+
+
 #window-controls {
   position: relative;
   width: 100%;
@@ -105,18 +134,9 @@
   width: 20px;
   height: 20px;
 }
-#window-controls > div:hover {
-  vertical-align: text-top;
-}
 
 /* hide window control when not in use */
 #window-controls > div {display: none;}
-#window-controls:hover div {display: inherit;}
-
-/* hover styling */
-.top-right:hover {border-right: 1px solid gold; border-top: 1px solid gold;}
-.bottom-left:hover {border-left: 1px solid gold; border-bottom: 1px solid gold;}
-.bottom-right:hover {border-right: 1px solid gold; border-bottom: 1px solid gold;}
 
 /* control positioning and cursor types */
 .top-left {top: 0; left: 0; font-size: .75em; color: #f1f1f1;}
@@ -124,35 +144,22 @@
 .bottom-left {bottom: 5px; left: 0; cursor: sw-resize;}
 .bottom-right {bottom: 5px; right: 0; cursor: se-resize;}
 
-/* development */
-#window-controls > div {
-  /*background-color: hotpink;*/
-}
 
 /* ------------------- like/dislike/info buttons */
 #button-bar {
   display: none;
+  opacity: 0;
   position: relative;
   bottom: 0;
   width: 100%;
-}
-
-.image-frame:hover #button-bar {
-  display: inherit;
   background-color: goldenrod;
   height: 25px;
   bottom: 0;
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
-  animation: button-bar-slide-up 300ms ease-in-out 0ms;
-  -webkit-animation: button-bar-slide-up 300ms ease-in-out 0ms;
-  animation-fill-mode: forwards;
 
 }
-@keyframes button-bar-slide-up {
-  from { bottom: 0px; }
-  100% { bottom: 28px; }
-}
+
 
 /* button bar buttons */
 #button-bar > div {
