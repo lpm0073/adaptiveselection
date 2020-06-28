@@ -5,6 +5,8 @@ export class ImagesApi {
     MediaURL = null;
     SplashURL = null;
     CategoriesURL = null;
+    PageIdentifer = null;
+    CategoryExclusionIdentifier = null;
   
     level = 0;
     pageNumber = 1;
@@ -16,10 +18,12 @@ export class ImagesApi {
     gettingSplashData = false;
     gotSplashData = false;
   
-    constructor(level, callBackMethod, mediaURL, categoriesURL, splashURL) {
+    constructor(mediaURL, categoriesURL, splashURL, pageIdentifer, categoryExclusionIdentifier, callBackMethod, level) {
         this.MediaURL = mediaURL;
         this.SplashURL = splashURL;
         this.CategoriesURL = categoriesURL;
+        this.PageIdentifer = pageIdentifer;
+        this.CategoryExclusionIdentifier = categoryExclusionIdentifier;
   
         this.level = level;
         this.callBackMethod = callBackMethod;
@@ -40,7 +44,7 @@ export class ImagesApi {
         this.gettingSplashData = true;
         url = this.SplashURL;
       } else {
-        if (this.categories) url = this.MediaURL + "&page=" + this.pageNumber + "&" + wpGetExclusions(this.level, this.categories);
+        if (this.categories) url = this.MediaURL + this.PageIdentifer + this.pageNumber + "&" + wpGetExclusions(this.level, this.categories, this.CategoryExclusionIdentifier);
         else return;
         if (this.pageNumber < 1) return;
         this.pageNumber = this.getNextPage(); 
@@ -76,7 +80,7 @@ export class ImagesApi {
   
         // attribute pre-initializations
         new_images = new_images.map((image) => {
-          image.type = "WPData";
+          image.type = "ImagesApi";
           image.viewing_sequence = 0;
           image.rank = 1;   
           return image;
@@ -339,13 +343,13 @@ export const wpGetExclusionArray = (level, categories) => {
     return [];
 }
 
-export const wpGetExclusions = (level, categories) => {
+export const wpGetExclusions = (level, categories, categoryExclusionIdentifier) => {
     // https://api.fotomashup.com/wp-json/wp/v2/media?categories=5,2&_fields=id,categories,acf,media_details&categories_exclude=3,10
     
     const exclusions = array_to_csv(level, categories);
 
     if (exclusions.length > 0) {
-        return "categories_exclude=" + exclusions;
+        return categoryExclusionIdentifier + exclusions;
     }
 
     return "";

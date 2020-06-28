@@ -16,7 +16,8 @@ import * as Signals from '../../redux/userSignals';
 import './styles.css';
 import * as Defaults from '../../appDefaults';
 import ContentRow from '../../components/contentRow/ContentRow'
-import { ImagesApi, wpGetImage, imagePreFetcher, wpGetExclusionArray } from '../../shared/ImagesApi';
+import { wpGetImage, imagePreFetcher, wpGetExclusionArray } from '../../shared/ImagesApi';
+import { DemoImages } from '../../shared/BuiltInPlugins';
 import Loading from '../../components/Loading';
 
 const mapStateToProps = state => ({
@@ -77,7 +78,7 @@ class Home extends Component {
   }
 
   componentDidMount() {
-    this.wpImages = new ImagesApi(this.state.level, this.addMasterContent);
+    this.wpImages = new DemoImages(this.level, this.addMasterContent);
     this.resetIdleTimeout();
   }
 
@@ -139,7 +140,7 @@ class Home extends Component {
   handleChangeLevel() {
     this.masterContent = [];
     this.props.actions.resetItemCarousel();
-    this.wpImages = new ImagesApi(this.level, this.addMasterContent);
+    this.wpImages = new DemoImages(this.level, this.addMasterContent);
   }  
   
   addRow(row) {
