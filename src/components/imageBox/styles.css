@@ -1,3 +1,7 @@
+:root {
+  --window-control-delay: 300ms;
+  --window-control-transition: 150ms;
+}
 
 .hovering {
   /* set by ImageBox.render() when user is hovering */
@@ -41,11 +45,7 @@
   box-shadow: 5px 5px 3px 3px rgba(0,0,0,0.5);
 }
 
-.hidden {
-  display: none;
-  height: 0;
-  width: 0;
-}
+.hidden {display: none; height: 0; width: 0;}
 
 .info-panel {
   position: absolute;
@@ -64,39 +64,34 @@
 }
 
 /* --------------------- Interactions --------------------- */
-.analytics_hovering {
-  /* do not delete! */
-  transition-delay: 0ms;
-}
-.analytics_like {
-  /* do not delete! */
-  transition-delay: 0ms;
-}
-.analytics_dislike {
-  /* do not delete! */
-}
-.analytics_click {
-  /* do not delete! */
-  transition-delay: 0ms;
-}
-.analytics_move {
-  transition-delay: 0ms;
-}
-.analytics_resize {
-  transition-delay: 0ms;
-}
-.analytics_close {
-  transition-delay: 0ms;
-}
+.analytics_hovering {transition-delay: 0ms;}
+.analytics_like {transition-delay: 0ms;}
+.analytics_dislike {transition-delay: 0ms;}
+.analytics_click {transition-delay: 0ms;}
+.analytics_move {transition-delay: 0ms;}
+.analytics_resize {transition-delay: 0ms;}
+.analytics_close {transition-delay: 0ms;}
 
 
 /* --------------------- Window Controls --------------------- */
 .image-frame:hover {
   border: 3px solid goldenrod;
-  transition-duration: 150ms;
-  transition-delay: 1s;
+  transition-duration: var(--window-control-transition);
+  transition-delay: var(--window-control-delay);
 }
-#window-controls:hover div {display: inherit;}
+#window-controls:hover div {
+  display: inherit;
+
+  /* shorthand:  animation-name, animation-duration, animation-timing-function, animation-delay, animation-iteration-count, animation-direction, animation-fill-mode, and animation-play-state */
+  animation: window-controls-appear var(--window-control-transition) ease-in-out var(--window-control-delay);
+  -webkit-animation: window-controls-appear var(--window-control-transition) ease-in-out var(--window-control-delay);
+  animation-fill-mode: forwards;
+
+}
+@keyframes window-controls-appear {
+  from { opacity: 0;}
+  100% { opacity: 1;}
+}
 
 /* hover styling */
 .top-right:hover {border-right: 1px solid gold; border-top: 1px solid gold;}
@@ -105,29 +100,24 @@
 
 .image-frame:hover #button-bar {
   display: inherit;
-  transition-duration: 150ms;
-  transition-delay: 1s;
+  transition-duration: var(--window-control-transition);
+  transition-delay: var(--window-control-delay);
 }
 .image-frame:hover #button-bar {
   /* shorthand:  animation-name, animation-duration, animation-timing-function, animation-delay, animation-iteration-count, animation-direction, animation-fill-mode, and animation-play-state */
-  animation: button-bar-slide-up 300ms ease-in-out 1s;
-  -webkit-animation: button-bar-slide-up 300ms ease-in-out 1s;
+  animation: button-bar-slide-up 300ms ease-in-out var(--window-control-delay);
+  -webkit-animation: button-bar-slide-up 300ms ease-in-out var(--window-control-delay);
   animation-fill-mode: forwards;
-
 }
 @keyframes button-bar-slide-up {
   from { bottom: 0px; opacity: 0;}
   100% { bottom: 28px; opacity: 1;}
-}
-#window-controls > div:hover {
-  /* vertical-align: text-top; DELETE THIS SELECTOR ?? */
 }
 
 
 #window-controls {
   position: relative;
   width: 100%;
-  z-index: 10;
 }
 #window-controls > div {
   position:absolute;
@@ -136,7 +126,7 @@
 }
 
 /* hide window control when not in use */
-#window-controls > div {display: none;}
+#window-controls > div {display: none; opacity: 0;}
 
 /* control positioning and cursor types */
 .top-left {top: 0; left: 0; font-size: .75em; color: #f1f1f1;}
