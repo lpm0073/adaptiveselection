@@ -1,10 +1,13 @@
-export const wpBackendUrl = 'https://api.fotomashup.com/wp-json/wp/v2/';
-export const wpMediaUrl = wpBackendUrl + 'media?_fields=id,categories,acf,media_details&per_page=100';
-export const wpCategoriesUrl = wpBackendUrl + 'categories?per_page=100&_fields=id,count,acf';
-const wpSplashUrl = wpMediaUrl + '&categories=41';
+const BackendURL = 'https://api.fotomashup.com/wp-json/wp/v2/';
+const MediaURL = BackendURL + 'media?_fields=id,categories,acf,media_details&per_page=100';
+const SplashURL = MediaURL + '&categories=41';
+
+
+export const CategoriesURL = BackendURL + 'categories?per_page=100&_fields=id,count,acf';
+
 
 // https://api.fotomashup.com/wp-json/wp/v2/media?_fields=id,categories,acf,media_details&per_page=100&categories=41
-export class WPImages {
+export class ImagesApi {
 
     level = 0;
     pageNumber = 1;
@@ -34,9 +37,9 @@ export class WPImages {
 
       if (this.categories !== null && !this.gettingSplashData && !this.gotSplashData) {
         this.gettingSplashData = true;
-        url = wpSplashUrl;
+        url = SplashURL;
       } else {
-        if (this.categories) url = wpMediaUrl + "&page=" + this.pageNumber + "&" + wpGetExclusions(this.level, this.categories);
+        if (this.categories) url = MediaURL + "&page=" + this.pageNumber + "&" + wpGetExclusions(this.level, this.categories);
         else return;
         if (this.pageNumber < 1) return;
         this.pageNumber = this.getNextPage(); 
@@ -94,7 +97,7 @@ export class WPImages {
 
   fetchCategories() {
 
-    return fetch(wpCategoriesUrl)
+    return fetch(CategoriesURL)
     .then(
         response => {
             if (response.ok) {
@@ -283,7 +286,7 @@ export class WPImages {
 
 } /* ------------------- fetchCategories)() ------------------- */
 
-}  /* ---------------------------------- WPImages --------------------------------------------------- */
+}  /* ---------------------------------- ImagesApi --------------------------------------------------- */
 
 function array_to_csv(level, categories) {
 

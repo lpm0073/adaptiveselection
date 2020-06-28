@@ -1,5 +1,5 @@
 import * as ActionTypes from './ActionTypes';
-import { wpCategoriesUrl } from '../shared/wpImages';
+import { CategoriesURL } from '../shared/ImagesApi';
 
 
 export const addUserSignal = (signal, image) => {
@@ -83,7 +83,7 @@ export const resetItemCarousel = () => ({
 export const fetchCategories = () => (dispatch) => {
     dispatch(CategoriesLoading(true));
 
-    return fetch(wpCategoriesUrl)
+    return fetch(CategoriesURL)
     .then(
         response => {
             if (response.ok) {

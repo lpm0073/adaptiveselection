@@ -16,7 +16,7 @@ import * as Signals from '../../redux/userSignals';
 import './styles.css';
 import * as Defaults from '../../appDefaults';
 import ContentRow from '../../components/contentRow/ContentRow'
-import { WPImages, wpGetImage, wpGetExclusionArray } from '../../shared/wpImages';
+import { ImagesApi, wpGetImage, wpGetExclusionArray } from '../../shared/ImagesApi';
 import { imagePreFetcher } from '../../shared/imagePrefetcher';
 import Loading from '../../components/Loading';
 
@@ -78,7 +78,7 @@ class Home extends Component {
   }
 
   componentDidMount() {
-    this.wpImages = new WPImages(this.state.level, this.addMasterContent);
+    this.wpImages = new ImagesApi(this.state.level, this.addMasterContent);
     this.resetIdleTimeout();
   }
 
@@ -140,7 +140,7 @@ class Home extends Component {
   handleChangeLevel() {
     this.masterContent = [];
     this.props.actions.resetItemCarousel();
-    this.wpImages = new WPImages(this.level, this.addMasterContent);
+    this.wpImages = new ImagesApi(this.level, this.addMasterContent);
   }  
   
   addRow(row) {
@@ -171,7 +171,7 @@ class Home extends Component {
       var j = Math.random();
       if (j <= Defaults.IMAGE_CONTENT_3ITEMS) {
         // don't bother with 3-image layouts unless we really need to
-        j = window.screen.width >= 992 ? 3 : 2;
+        j = window.screen.width >= 1200 ? 3 : 2;
       }
       else {
         if (j <= Defaults.IMAGE_CONTENT_3ITEMS + Defaults.IMAGE_CONTENT_2ITEMS) j = 2;
