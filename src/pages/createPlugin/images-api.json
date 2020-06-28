@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1040,
+    "categories": [21, 2, 11, 41],
+    "acf": { "marketing_url": "" },
+    "media_details": {
+      "width": 2258,
+      "height": 1500,
+      "file": "2020/06/xwaterproof_bodyart_LanaChromium-9-1.jpg",
+      "sizes": {
+        "medium": {
+          "file": "xwaterproof_bodyart_LanaChromium-9-1-300x199.jpg",
+          "width": 300,
+          "height": 199,
+          "source_url": "https://cdn.fotomashup.com/2020/06/10214313/xwaterproof_bodyart_LanaChromium-9-1-300x199.jpg"
+        },
+        "large": {
+          "file": "xwaterproof_bodyart_LanaChromium-9-1-1024x680.jpg",
+          "width": 1024,
+          "height": 680,
+          "source_url": "https://cdn.fotomashup.com/2020/06/10214313/xwaterproof_bodyart_LanaChromium-9-1-1024x680.jpg"
+        },
+        "thumbnail": {
+          "file": "xwaterproof_bodyart_LanaChromium-9-1-150x150.jpg",
+          "width": 150,
+          "height": 150,
+          "source_url": "https://cdn.fotomashup.com/2020/06/10214313/xwaterproof_bodyart_LanaChromium-9-1-150x150.jpg"
+        }
+      }
+    }
+  },
+  {
+    "id": 1038,
+    "categories": [15, 36, 5, 35, 2, 11, 41, 18],
+    "acf": { "marketing_url": "" },
+    "media_details": {
+      "width": 1120,
+      "height": 700,
+      "file": "2020/06/xf366110106c3d40f98d8dbbe7decab0a-700.jpg",
+      "sizes": {
+        "thumbnail": {
+          "file": "xf366110106c3d40f98d8dbbe7decab0a-700-150x150.jpg",
+          "width": 150,
+          "height": 150,
+          "source_url": "https://cdn.fotomashup.com/2020/06/10214304/xf366110106c3d40f98d8dbbe7decab0a-700-150x150.jpg"
+        },
+        "medium_large": {
+          "file": "xf366110106c3d40f98d8dbbe7decab0a-700-768x480.jpg",
+          "width": 768,
+          "height": 480,
+          "source_url": "https://cdn.fotomashup.com/2020/06/10214304/xf366110106c3d40f98d8dbbe7decab0a-700-768x480.jpg"
+        },
+        "full": {
+          "file": "xf366110106c3d40f98d8dbbe7decab0a-700.jpg",
+          "width": 1120,
+          "height": 700,
+          "source_url": "https://cdn.fotomashup.com/2020/06/10214304/xf366110106c3d40f98d8dbbe7decab0a-700.jpg"
+        }
+      }
+    }
+  }
+]

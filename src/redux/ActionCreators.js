@@ -1,6 +1,7 @@
 import * as ActionTypes from './ActionTypes';
-import { CategoriesURL } from '../shared/ImagesApi';
 
+const BackendURL = 'https://api.fotomashup.com/wp-json/wp/v2/';
+const CategoriesURL = BackendURL + 'categories?per_page=100&_fields=id,count,acf';
 
 export const addUserSignal = (signal, image) => {
     return {
