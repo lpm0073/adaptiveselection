@@ -3,7 +3,7 @@ import { ImagesApi } from './ImagesApi';
 
 export class DemoImages extends ImagesApi {
     
-    constructor(level, callBackMethod) {
+    constructor(level, callBackMethod, channel) {
 
         const BackendURL = 'https://api.fotomashup.com/wp-json/wp/v2/';
         const MediaURL = BackendURL + 'media?_fields=id,categories,acf,media_details&per_page=100';
@@ -12,6 +12,6 @@ export class DemoImages extends ImagesApi {
         const PageIdentifer = "&page=";
         const CategoryExclusionIdentifier = "categories_exclude=";
     
-        super(MediaURL, CategoriesURL, SplashURL, PageIdentifer, CategoryExclusionIdentifier, callBackMethod, level);
+        super(MediaURL, CategoriesURL, SplashURL, PageIdentifer, CategoryExclusionIdentifier, callBackMethod, level, channel);
     }
 }

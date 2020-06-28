@@ -41,7 +41,6 @@ class Home extends Component {
 
   constructor(props) {
     super(props);
-
     // content management
     this.handleChangeLevel = this.handleChangeLevel.bind(this);
     this.addMasterContent = this.addMasterContent.bind(this);
@@ -72,13 +71,14 @@ class Home extends Component {
 
     this.state = {
       level: Defaults.DEFAULT_ADULT_CONTENT,
-      nextSerialNumber: 0
+      nextSerialNumber: 0,
+      channel: props.location.pathname.replace("/", "")
     }
 
   }
 
   componentDidMount() {
-    this.wpImages = new DemoImages(this.level, this.addMasterContent);
+    this.wpImages = new DemoImages(this.level, this.addMasterContent, this.state.channel);
     this.resetIdleTimeout();
   }
 
@@ -140,7 +140,7 @@ class Home extends Component {
   handleChangeLevel() {
     this.masterContent = [];
     this.props.actions.resetItemCarousel();
-    this.wpImages = new DemoImages(this.level, this.addMasterContent);
+    this.wpImages = new DemoImages(this.level, this.addMasterContent, this.state.channel);
   }  
   
   addRow(row) {

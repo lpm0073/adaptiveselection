@@ -7,6 +7,8 @@ export class ImagesApi {
     categoriesURL = null;
     pageIdentifer = null;
     categoryExclusionIdentifier = null;
+    channel = null;
+    channelId = null;
   
     level = 0;
     pageNumber = 1;
@@ -24,19 +26,26 @@ export class ImagesApi {
                 pageIdentifer,                // &page=
                 categoryExclusionIdentifier,  // categories_exclude=
                 callBackMethod,               // a callable javascript method object
-                level                         // 0 - 5
+                level,                        // 0 - 5
+                channel                       // name of an api channel. Ex: body-painting
                 ) {
         this.mediaURL = mediaURL;
         this.splashURL = splashURL;
         this.categoriesURL = categoriesURL;
         this.pageIdentifer = pageIdentifer;
         this.categoryExclusionIdentifier = categoryExclusionIdentifier;
+        this.channel = channel;
   
         this.level = level;
         this.callBackMethod = callBackMethod;
 
-        this.fetch(); // query the splash page data
-        this.fetchCategories(); // fetch & process categories, then recall fetch()
+        if (channel !== null) this.getChannelId();
+        else {
+          this.fetch(); // query the splash page data
+          this.fetchCategories(); // fetch & process categories, then recall fetch()
+        }
+
+        
 
     }
   
@@ -44,18 +53,49 @@ export class ImagesApi {
       return this.pageNumber += 1;
     }
   
-    fetch() {
-      var url;
+    getChannelId(channel) {
+      var url = "https://api.fotomashup.com/wp-json/wp/v2/channels?slug=body-painting&_fields=id,count,description,link,name,slug";
 
-      if (this.categories !== null && !this.gettingSplashData && !this.gotSplashData) {
-        this.gettingSplashData = true;
-        url = this.splashURL;
-      } else {
-        if (this.categories) url = this.mediaURL + this.pageIdentifer + this.pageNumber + "&" + wpGetExclusions(this.level, this.categories, this.categoryExclusionIdentifier);
-        else return;
-        if (this.pageNumber < 1) return;
-        this.pageNumber = this.getNextPage(); 
+      fetch(url)
+      .then(response => {
+        if (response.ok) {
+            return response;
+        } else {
+            var error = new Error('Error ' + response.status + ': ' + response.statusText);
+            error.response = response;
+            throw error;
+        }
+        },
+        error => {
+            throw new Error(error.message);
+      })
+      .then(response => response.json())
+      .then(obj => {
+        this.channelId = Number(obj[0].id);
+        console.log("getChannelId", this.channelId);
 
+        const url = "https://api.fotomashup.com/wp-json/wp/v2/media?channels=" + this.channelId + "&_fields=id,date,categories,channels,acf,caption,media_details,source_url";
+        this.fetch(url);
+
+      })
+      .catch(error => {
+        console.log("getChannelId() - something went wrong :(");
+      });
+
+
+    }
+    fetch(url = null) {
+
+      if (url === null) {
+        if (this.categories !== null && !this.gettingSplashData && !this.gotSplashData) {
+          this.gettingSplashData = true;
+          url = this.splashURL;
+        } else {
+          if (this.categories) url = this.mediaURL + this.pageIdentifer + this.pageNumber + "&" + wpGetExclusions(this.level, this.categories, this.categoryExclusionIdentifier);
+          else return;
+          if (this.pageNumber < 1) return;
+          this.pageNumber = this.getNextPage(); 
+        }
       }
 
       fetch(url)
