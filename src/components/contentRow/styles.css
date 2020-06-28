@@ -1,8 +1,9 @@
 
 .content-row {
-    margin: 5px;
-    padding: 5px;
-    border: 2px solid red;
+    margin-top: 0px;
+    margin-bottom: 2px;
+    padding-top: 0px;
+    padding-bottom: 2px;
 }
 
 .layout_3_3 { }
