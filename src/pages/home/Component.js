@@ -14,6 +14,7 @@ import * as Signals from '../../redux/userSignals';
 
 // my stuff
 import './styles.css';
+import * as Defaults from '../../appDefaults';
 import ContentRow from '../../components/contentRow/ContentRow'
 import { WPImages, wpGetImage, wpGetExclusionArray } from '../../shared/wpImages';
 import { imagePreFetcher } from '../../shared/imagePrefetcher';
@@ -28,7 +29,7 @@ const mapDispatchToProps = (dispatch) => {
   });
 };
 
-const MAX_ROWS = 75;
+
 
 class Home extends Component {
 
@@ -70,7 +71,7 @@ class Home extends Component {
     this.handleMasonryLayoutComplete = this.handleMasonryLayoutComplete.bind(this);
 
     this.state = {
-      level: 3,
+      level: Defaults.DEFAULT_ADULT_CONTENT,
       nextSerialNumber: 0
     }
 
@@ -111,7 +112,7 @@ class Home extends Component {
     return;
 
     this.props.actions.deleteEmptyItemRow();
-    const n = this.props.itemRow.present.items.length - MAX_ROWS;
+    const n = this.props.itemRow.present.items.length - Defaults.MAX_ROWS;
     if (n > 0) {
       this.removeRow(n);
     }
@@ -126,7 +127,7 @@ class Home extends Component {
 
     const idleDelay = setTimeout(function() {
       self.doIdle();
-      }, 30000);
+      }, Defaults.IDLE_TIMEOUT);
 
     this.idleDelay = idleDelay;
   }
@@ -346,4 +347,3 @@ class Home extends Component {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);
-

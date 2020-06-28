@@ -1,0 +1,27 @@
+
+// app defaults
+
+// MAX_ROWS
+// ----------------------------------------------------------------
+// number of rows of on-screen content
+// before garbage collection begins purging
+// during timeouts.
+export const MAX_ROWS = 75;
+
+// IDLE_TIMEOUT
+// ----------------------------------------------------------------
+// wait period between on-screen garbage
+// collection.
+export const IDLE_TIMEOUT = 30000;
+
+// DEFAULT_ADULT_CONTENT
+// ----------------------------------------------------------------
+// passed to content plugins to govern the extent to which
+// adult content can be passed from the api.
+// 0 - Suitable for general audiences
+// 1 - Adult/suggestive themed, including exposed breasts
+// 2 - Adult/suggestive themed, including exposed breasts, buttocks
+// 3 - Fully nude
+// 4 - Exposed genitalia
+// 5 - Sexually explicit content
+export const DEFAULT_ADULT_CONTENT = 3;
