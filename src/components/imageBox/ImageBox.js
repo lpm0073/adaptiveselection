@@ -75,7 +75,7 @@ class ImageBox extends Component {
     backgroundImage: "url('" + this.props.image.source_url + "')",
     height: Number(this.props.image.height)
     };
-    const grabberStyle = {height: imageFrameStyle.height};
+    const windowControlsStyle = {height: imageFrameStyle.height};
 
     this.state = {
       closerHeight: 'auto',
@@ -83,7 +83,7 @@ class ImageBox extends Component {
         zIndex: this.getNextZOrder(),
       },
       imageFrameStyle: imageFrameStyle,
-      grabberStyle: grabberStyle,
+      windowControlsStyle: windowControlsStyle,
       isClosed: false,
       isHovering: false,
       showInfoPanel: false,
@@ -132,7 +132,6 @@ class ImageBox extends Component {
     
     // CSSTransition
     // https://reactcommunity.org/react-transition-group/css-transition
-    /*
     const CSSTransitionClassNames={
       appear: 'CSSTransition-appear',
       appearActive: 'CSSTransition-appear-active',
@@ -144,33 +143,17 @@ class ImageBox extends Component {
       exitActive: 'CSSTransition-exit-active',
       exitDone: 'CSSTransition-exit-done',
      }  
-     */
 
     // See: https://github.com/STRML/react-draggable
               /*defaultPosition={{x: this.props.image.position_props.left, y: this.props.image.position_props.top}}*/
      /*
-            <CSSTransition 
-                key={key + '-css-transition'} 
-                in={this.state.isMounted}
-                classNames={CSSTransitionClassNames} 
-                timeout={1000} 
-                onEnter={this.CSSTransitionOnEnter}
-                >
-              <AnimateHeight
-                duration={ 1500 }
-                height={ this.state.closerHeight }              >
-              <Draggable
-              axis="both"
-              cancel=".body"
-              defaultClassName="react-draggable"
-              defaultClassNameDragging="react-draggable-dragging"
-              defaultClassNameDragged="react-draggable-dragged"
-              handle=".handle"
-              onMouseDown={this.handleContainerMouseDown}
-              onStart={this.handleDragStart}
-              onDrag={this.handleDrag}
-              onStop={this.handleDragEnd}
-              >
+                <CSSTransition 
+                  key={key + '-css-transition'} 
+                  in={this.state.isMounted}
+                  classNames={CSSTransitionClassNames} 
+                  timeout={1000} 
+                  onEnter={this.CSSTransitionOnEnter}
+                  ></CSSTransition>
      
      */
     return(
@@ -185,8 +168,8 @@ class ImageBox extends Component {
             onMouseEnter={this.handleMouseEnter}
             onMouseLeave={this.handleMouseLeave}
             >
-              <AnimateHeight duration={ 1500 } height={ this.state.closerHeight }>
-                  <div className={"image-frame m-0 p-0 "} 
+             <AnimateHeight duration={ 1500 } height={ this.state.closerHeight }>
+                  <div className={"image-frame m-0 p-0"} 
                     style={this.state.imageFrameStyle}>
                     <div id="info-panel" className={infoPanelClasses} onMouseLeave={this.handleInfoPanelLeave} >
                       I am the info panel.
@@ -195,7 +178,7 @@ class ImageBox extends Component {
                       <div>Categories: {this.props.image.api_props.categories.join()}</div>
                       
                     </div>
-                    <div id="grabbers" style={this.state.grabberStyle}>
+                    <div id="window-controls" style={this.state.windowControlsStyle}>
                       <div className="top-left text-center" onMouseDown={this.handleWindowClose}><i className="fa fa-window-close m-0 p-0"></i></div>
                       <div className="top-right" onMouseDown={this.handleResizing}></div>
                       <div className="bottom-left" onMouseDown={this.handleResizing}></div>
@@ -206,6 +189,7 @@ class ImageBox extends Component {
                       <div className="info" onMouseDown={this.handleInfoButton}><i className="fa fa-info-circle"></i></div>
                       <div className="dislike" style={dislikeStyles} onMouseDown={this.handleDislike}><i className="fa fa-thumbs-down"></i></div>
                     </div>
+                
                   </div>
               </AnimateHeight>
             </div>

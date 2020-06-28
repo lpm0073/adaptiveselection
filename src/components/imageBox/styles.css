@@ -4,6 +4,7 @@
   transition-delay: 0ms;
 }
 
+/* for development / testing */
 .green-border {
   border: 2px solid green;
 }
@@ -92,92 +93,50 @@
   transition-delay: 0ms;
 }
 
-/* --------------------- Animations --------------------- */
 
-@keyframes fade-out {
-  from { opacity: 1;  }
-  25% { opacity: 0.75; }
-  50% { opacity: 0.5; }
-  75% { opacity: 0.25; }
-  100% { opacity: 0}
-}
-
-.react-draggable {
-  
-}
-/* https://www.cssmatic.com/box-shadow */
-.react-draggable-dragging {
-  border: 1px solid gray;
-  border-radius: 5px;
-  cursor: move;
-}
-
-.react-draggable-dragged {
-  
-}
-
-/* --------------------- corner grabbers --------------------- */
-#grabbers {
+/* --------------------- Window Controls --------------------- */
+#window-controls {
   position: relative;
   width: 100%;
+  z-index: 10;
 }
-#grabbers > div {
+#window-controls > div {
   position:absolute;
   width: 20px;
   height: 20px;
 }
-#grabbers > div:hover {
+#window-controls > div:hover {
   vertical-align: text-top;
 }
 
-#grabbers .top-left {
-  display: none;
-}
-#grabbers:hover .top-left {
-  display: inherit;
+/* hide window control when not in use */
+#window-controls > div {display: none;}
+#window-controls:hover div {display: inherit;}
+
+/* hover styling */
+.top-right:hover {border-right: 1px solid gold; border-top: 1px solid gold;}
+.bottom-left:hover {border-left: 1px solid gold; border-bottom: 1px solid gold;}
+.bottom-right:hover {border-right: 1px solid gold; border-bottom: 1px solid gold;}
+
+/* control positioning and cursor types */
+.top-left {top: 0; left: 0; font-size: .75em; color: #f1f1f1;}
+.top-right {top: 0; right: 0; cursor: ne-resize;}
+.bottom-left {bottom: 5px; left: 0; cursor: sw-resize;}
+.bottom-right {bottom: 5px; right: 0; cursor: se-resize;}
+
+/* development */
+#window-controls > div {
+  /*background-color: hotpink;*/
 }
 
-.top-left {
-  top: 0;
-  left: 0;
-  font-size: .75em;
-  color: #f1f1f1;
-}
-
-.top-right {
-  top: 0;
-  right: 0;
-  background-color: gray;
-  cursor: ne-resize;
-}
-.top-right:hover {border-right: 2px solid black; border-top: 2px solid black;}
-
-.bottom-left {
-  bottom: 0;
-  left: 0;
-  background-color: hotpink;
-  cursor: sw-resize;
-}
-.bottom-left:hover {border-left: 2px solid black; border-bottom: 2px solid black;}
-
-.bottom-right {
-  bottom: 0;
-  right: 0;
-  background-color: khaki;
-  cursor: se-resize;
-}
-.bottom-right:hover {border-right: 2px solid black; border-bottom: 2px solid black;}
-
-/* ------------------- like buttons */
+/* ------------------- like/dislike/info buttons */
 #button-bar {
-  position: absolute;
+  display: none;
+  position: relative;
   bottom: 0;
   width: 100%;
 }
 
-#button-bar {
-  display: none;
-}
 .image-frame:hover #button-bar {
   display: inherit;
   background-color: goldenrod;
@@ -185,16 +144,17 @@
   bottom: 0;
   border-bottom-right-radius: 3px;
   border-bottom-left-radius: 3px;
-  animation: button-bar-slide-up 1s ease-in-out 0ms;
+  animation: button-bar-slide-up 300ms ease-in-out 0ms;
   -webkit-animation: button-bar-slide-up 300ms ease-in-out 0ms;
   animation-fill-mode: forwards;
 
 }
 @keyframes button-bar-slide-up {
-  from { bottom: -28px; }
-  100% { bottom: 0px; }
+  from { bottom: 0px; }
+  100% { bottom: 28px; }
 }
 
+/* button bar buttons */
 #button-bar > div {
   position:absolute;
   bottom: 0px;
@@ -203,23 +163,16 @@
   color: white;
 }
 
+/* make button bar buttons larger when hovering over them */
 #button-bar > div:hover {
   font-size: larger;
   transition-delay: 0ms;
   transition-duration: 250ms;
 }
 
-.like {
-  left: 40%;
-}
-
-.dislike {
-  left: 60%;
-}
-
-.info {
-  left: 50%;
-}
+.like {left: 40%;}
+.dislike {left: 60%;}
+.info {left: 50%;}
 
 
 /* ------------------------ TransitionGroup CSSTransition ------------------------ */
@@ -255,12 +208,14 @@
 .CSSTransition-exit-done {}
 
 
-/* ------------------------ Masonry ------------------------ */
 
-.masonry-container {
+/* --------------------- Animations --------------------- */
 
+@keyframes fade-out {
+  from { opacity: 1;  }
+  25% { opacity: 0.75; }
+  50% { opacity: 0.5; }
+  75% { opacity: 0.25; }
+  100% { opacity: 0}
 }
 
-.masonry-item {
-
-}

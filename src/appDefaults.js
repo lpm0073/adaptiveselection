@@ -12,7 +12,7 @@ export const MAX_ROWS = 75;
 // governs the veracity of multi-image content
 // on ItemRow data.
 export const IMAGE_CONTENT_2ITEMS = .20;
-export const IMAGE_CONTENT_3ITEMS = .15;
+export const IMAGE_CONTENT_3ITEMS = .10;
 
 // IDLE_TIMEOUT
 // ----------------------------------------------------------------
@@ -29,5 +29,5 @@ export const IDLE_TIMEOUT = 30000;
 // 2 - Adult/suggestive themed, including exposed breasts, buttocks
 // 3 - Fully nude
 // 4 - Exposed genitalia
-// 5 - Sexually explicit content
+// 5 - Sexually explicit / pornography
 export const DEFAULT_ADULT_CONTENT = 3;
