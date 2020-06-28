@@ -2,11 +2,11 @@
 // https://api.fotomashup.com/wp-json/wp/v2/media?_fields=id,categories,acf,media_details&per_page=100&categories=41
 export class ImagesApi {
 
-    MediaURL = null;
-    SplashURL = null;
-    CategoriesURL = null;
-    PageIdentifer = null;
-    CategoryExclusionIdentifier = null;
+    mediaURL = null;
+    splashURL = null;
+    categoriesURL = null;
+    pageIdentifer = null;
+    categoryExclusionIdentifier = null;
   
     level = 0;
     pageNumber = 1;
@@ -18,12 +18,19 @@ export class ImagesApi {
     gettingSplashData = false;
     gotSplashData = false;
   
-    constructor(mediaURL, categoriesURL, splashURL, pageIdentifer, categoryExclusionIdentifier, callBackMethod, level) {
-        this.MediaURL = mediaURL;
-        this.SplashURL = splashURL;
-        this.CategoriesURL = categoriesURL;
-        this.PageIdentifer = pageIdentifer;
-        this.CategoryExclusionIdentifier = categoryExclusionIdentifier;
+    constructor(mediaURL,                     // https://api.fotomashup.com/wp-json/wp/v2/media?_fields=id,categories,acf,media_details&per_page=100
+                categoriesURL,                // https://api.fotomashup.com/wp-json/wp/v2/categories?per_page=100&_fields=id,count,acf
+                splashURL,                    // https://api.fotomashup.com/wp-json/wp/v2/media?_fields=id,categories,acf,media_details&per_page=100&categories=41
+                pageIdentifer,                // &page=
+                categoryExclusionIdentifier,  // categories_exclude=
+                callBackMethod,               // a callable javascript method object
+                level                         // 0 - 5
+                ) {
+        this.mediaURL = mediaURL;
+        this.splashURL = splashURL;
+        this.categoriesURL = categoriesURL;
+        this.pageIdentifer = pageIdentifer;
+        this.categoryExclusionIdentifier = categoryExclusionIdentifier;
   
         this.level = level;
         this.callBackMethod = callBackMethod;
@@ -42,9 +49,9 @@ export class ImagesApi {
 
       if (this.categories !== null && !this.gettingSplashData && !this.gotSplashData) {
         this.gettingSplashData = true;
-        url = this.SplashURL;
+        url = this.splashURL;
       } else {
-        if (this.categories) url = this.MediaURL + this.PageIdentifer + this.pageNumber + "&" + wpGetExclusions(this.level, this.categories, this.CategoryExclusionIdentifier);
+        if (this.categories) url = this.mediaURL + this.pageIdentifer + this.pageNumber + "&" + wpGetExclusions(this.level, this.categories, this.categoryExclusionIdentifier);
         else return;
         if (this.pageNumber < 1) return;
         this.pageNumber = this.getNextPage(); 
@@ -102,7 +109,7 @@ export class ImagesApi {
 
   fetchCategories() {
 
-    return fetch(this.CategoriesURL)
+    return fetch(this.categoriesURL)
     .then(
         response => {
             if (response.ok) {
