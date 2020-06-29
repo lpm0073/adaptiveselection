@@ -293,6 +293,7 @@ const mapStateToProps = state => ({
         function groupHeight(group) {
             // return smallest height
             const height = group.sort((a, b) => a.height - b.height)[0].height;
+            console.log("groupHeight()", height, group);
             return height < targetHeight ? height : targetHeight;
         }
         function groupWidth(group) {
@@ -329,8 +330,9 @@ const mapStateToProps = state => ({
             return group;
         }
         function normalizeHeight(group) {
+            const height = groupHeight(group);
             for (i=0; i<group.length; i++) {
-                group[i].height = groupHeight(group);
+                group[i].height = height;
                 group[i].width = targetHeight / group[i].image_props.aspect_ratio;
             }
             return group;
@@ -347,7 +349,7 @@ const mapStateToProps = state => ({
                 const cols = 12/group.length + adj;
                 group[i].columns = cols;
                 totCols += group[i].columns;
-                console.log("setBootstrapAttributes() ", aspect_ratio, adj, cols);
+                //console.log("setBootstrapAttributes() ", aspect_ratio, adj, cols);
             }
 
             // adjust for over/under
@@ -363,7 +365,6 @@ const mapStateToProps = state => ({
         function analyzeContent(group) {
             // rowItems, portrait, landscape
             for (i=0; i<group.length; i++) {
-                group[i].bootstrapClass = group[i].orientation;
                 if (group.length === 1) group[i].bootstrapClass += " single-item "; 
                 if (portrait.length === 0) group[i].bootstrapClass += " all-landscapes "; 
                 else if (landscape.length === 0) group[i].bootstrapClass += " all-portraits "; 
@@ -371,14 +372,24 @@ const mapStateToProps = state => ({
                 else if (landscape.length === 2) group[i].bootstrapClass += " 2landscapes-1portrait "; 
                 else if (portrait.length === 2) group[i].bootstrapClass += " 2portraits-1landscape "; 
             }
-
-            console.log("analyzeContent()", group);
+            return group;
+        }
+        function initializeContent(group) {
+            // rowItems, portrait, landscape
+            for (i=0; i<group.length; i++) {
+                group[i].bootstrapClass = group[i].orientation;
+                group[i].width = group[i].image_props.width;
+                group[i].height = group[i].image_props.height;
+                group[i].aspect_ratio = group[i].image_props.aspect_ratio;
+            }
             return group;
         }
 
+        //---------- calculations begin here. -----------------------------------------------------
+        rowItems = initializeContent(rowItems);
         rowItems = analyzeContent(rowItems);
 
-        // easiest possible situation: only 1 item on the row
+        // single item on the row
         if (rowItems.length <= 1) {
             rowItems[0].height = groupHeight(rowItems);
             rowItems[0].width = rowItems[0].height / rowItems[0].image_props.aspect_ratio;
@@ -388,26 +399,27 @@ const mapStateToProps = state => ({
             return(rowItems);
         }
         else 
-        // only two items on the row
+        // two mixed items on the row
         if (portrait.length === landscape.length) {
             rowItems = proportionalWidth(rowItems);
             rowItems = normalizeHeight(rowItems);
             rowItems = setBootstrapAttributes(rowItems);
             return(rowItems);
         } else
-        // common orientations
+        // 2 or more common orientations
         if (portrait.length === 0 || landscape.length === 0) {
 
-            // deal w any special situations
-            // 1. all are portrait (require more height)
             if (landscape.length === 0) {
+                // all portraits
                 rowItems = proportionalWidth(rowItems);
-
+                rowItems = normalizeHeight(rowItems);
             } else {
-            // all landscapes
-            rowItems = normalizeHeight(rowItems);
-            rowItems = proportionalWidth(rowItems);
-        }
+                // all landscapes
+                rowItems = proportionalWidth(rowItems);
+                rowItems = normalizeHeight(rowItems);
+                console.log("all landscapes", rowItems);
+            }
+
             rowItems = setBootstrapAttributes(rowItems);
             return(rowItems);
 
@@ -416,6 +428,7 @@ const mapStateToProps = state => ({
         if (rowItems.length === 2) {
             console.log("calculateItemDimensions() internal error: rowItems.length === 2. We shouldn't be here.");
         } else
+        // 3 mixed items
         if (rowItems.length === 3) {
             if (landscape.length > 1) {
                 // a pair of rectangles
