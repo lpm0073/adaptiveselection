@@ -1,8 +1,11 @@
 
 
+.hidden {
+  display: none;
+  width: 0;
+}
 .article-container {
   width: 100%;
-
 }
 
 .article-box {
@@ -12,4 +15,15 @@
   -moz-box-shadow: 5px 5px 3px 3px rgba(0,0,0,0.5);
   box-shadow: 5px 5px 3px 3px rgba(0,0,0,0.5);
   background-color: #333;
+  overflow-y: scroll;
+
+}
+
+.heading, .sub-heading, .article {
+  width: 100%;
+  color: white;
+}
+
+.article {
+  line-height: normal;
 }
