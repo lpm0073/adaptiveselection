@@ -148,7 +148,7 @@ const mapStateToProps = state => ({
                 <React.Fragment>
                     <ArticleBox className={"col-sm-12 col-lg-" + colLeft} columns={colLeft} height={item.height} />
                     <ImageBox parent={self.state.componentKey} layout="layout_1" containerClasses={item.bootstrapClass} key={item.key} image = {item} />
-                    <ArticleBox className={"col-sm-12 col-lg-" + colRight} columns={colRight} />
+                    <ArticleBox className={"col-sm-12 col-lg-" + colRight} columns={colRight} height={item.height}  />
                 </React.Fragment>
             );        
         if (self.state.presentationRow[0].id % 3 === 1)
