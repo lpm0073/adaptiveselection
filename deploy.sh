@@ -30,8 +30,9 @@ aws s3 sync ./build/ s3://adaptiveselection \
 # remove the cache-control header created above with a "no-cache" header so that browsers never cache this page
 # ------------------------
 aws s3 cp s3://adaptiveselection/service-worker.js s3://adaptiveselection/service-worker.js --metadata-directive REPLACE --cache-control max-age=0,no-cache,no-store,must-revalidate --content-type application/javascript --acl public-read
-
 aws s3 cp s3://adaptiveselection/index.html s3://adaptiveselection/index.html --metadata-directive REPLACE --cache-control max-age=0,no-cache,no-store,must-revalidate --content-type text/html --acl public-read
+aws s3 cp s3://adaptiveselection/asset-manifest.json s3://adaptiveselection/asset-manifest.json --metadata-directive REPLACE --cache-control max-age=0,no-cache,no-store,must-revalidate --content-type text/html --acl public-read
+aws s3 cp s3://adaptiveselection/manifest.json s3://adaptiveselection/manifest.json --metadata-directive REPLACE --cache-control max-age=0,no-cache,no-store,must-revalidate --content-type text/html --acl public-read
 
 # invalidate the Cloudfront cache
 aws cloudfront create-invalidation \
