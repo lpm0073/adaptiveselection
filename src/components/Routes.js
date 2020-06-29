@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import { fetchCategories } from '../redux/ActionCreators';
 
 // Pages
-import Home from '../pages/home/Component';
+import Feed from '../pages/feed/Component';
 
 
 const mapStateToProps = state => ({
@@ -34,7 +34,7 @@ class Routes extends Component {
     return(
         <React.Fragment>
           <Switch>
-            <Route path="/" component={Home} />
+            <Route path="/" component={Feed} />
             <Redirect to="/" />
           </Switch>
         </React.Fragment>

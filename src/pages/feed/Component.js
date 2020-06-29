@@ -31,7 +31,7 @@ const mapDispatchToProps = (dispatch) => {
 
 
 
-class Home extends Component {
+class Feed extends Component {
 
   idleDelay = null;
   masterContent = [];
@@ -81,11 +81,13 @@ class Home extends Component {
     this.wpImages = new DemoImages(this.level, this.addMasterContent, this.state.channel);
     this.resetIdleTimeout();
 
-    // if we're in the general feed then grab cached content.
+    // if we're the general feed then grab cached content.
     if (this.state.channel === "") {
       for (var i = 0; i < localStorage.length; i++) {
         this.masterContent.push(JSON.parse(localStorage[localStorage.key(i)]));
       }
+      console.log("componentDidMount - loaded cached data", this.masterContent);
+      this.fetchRow(6);
     }
 
   }
@@ -95,7 +97,6 @@ class Home extends Component {
   }
 
   render() {
-    //console.log("Home.render()", this.props);
     const rows = this.props.itemRow.present.items.filter((item) => item.row.length > 0);
 
     if (rows.length === 0) return(
@@ -371,4 +372,4 @@ class Home extends Component {
 
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(Home);
+export default connect(mapStateToProps, mapDispatchToProps)(Feed);
