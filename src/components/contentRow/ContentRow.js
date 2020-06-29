@@ -284,24 +284,21 @@ const mapStateToProps = state => ({
     calculateItemDimensions(rowItems, portrait, landscape) {
         if (rowItems.length === 0) return;
 
+        var targetWidth = 0.75 * window.screen.width;
+        var targetHeight = .50 * window.screen.height;
         var portraitItems = rowItems.filter((item) => portrait.includes(item.id));
         var landscapeItems = rowItems.filter((item) => landscape.includes(item.id));
-        let landscape1, landscape2, portrait1, portrait2;
+        let landscape1, landscape2, portrait1, portrait2, i = 0, totWidth, totCols, columns;
 
         function groupHeight(group) {
-            const max = .50 * window.screen.height;
             var retval = 999999;
             for (var i=0; i<group.length; i++) {
-                retval = group[i].image_props.height < retval ? group[i].image_props.height : retval;
+                retval = group[i].height < retval ? group[i].height : retval;
             }
-            return retval < max ? retval : max;
+            return retval < targetHeight ? retval : targetHeight;
         }
         function groupWidth(group) {
-            var width = 0;
-            for (var i=0; i<group.length; i++) {
-                width += group[i].image_props.width;
-            }
-            return width;
+            return group.map((item) => {return item.width;}).reduce((a, b) => a + b);
         }
         function pairRectangles(rect1, rect2) {
             var height = groupHeight([rect1, rect2]);
@@ -320,47 +317,88 @@ const mapStateToProps = state => ({
                 }
             }
         }
+        function proportionalWidth(group) {
+            for (i=0; i<group.length; i++) {
+                group[i].width = rowItems[i].width * (rowItems[i].width / targetWidth);
+                group[i].height = rowItems[i].width * rowItems[i].image_props.aspect_ratio;
+            }
+            return group;
+        }
+        function normalizeHeight(group) {
+            for (i=0; i<group.length; i++) {
+                group[i].height = groupHeight(group);
+                group[i].width = targetHeight / group[i].image_props.aspect_ratio;
+            }
+            return group;
+        }
+        function setBootstrapAttributes(group) {
+
+            // calc Bootstrap 12ths per item
+            totWidth = groupWidth(group);
+            totCols = 0;
+            for (i=0; i<group.length; i++) {
+                group[i].columns = 1 + Math.floor(11 * (group[i].width / totWidth));
+                totCols += group[i].columns;
+            }
+            // adjust for over/under
+            columns = group.slice(1).map((item) => {return item.columns;}).reduce((a, b) => a + b);
+            group[0].columns = (12 - columns);
+
+            // generate bootstrap classes
+            for (i=0; i<group.length; i++) {
+                group[i].bootstrapClass += " col-sm-12 col-lg-" + group[i].columns;
+            }
+            return group;
+        }
+        function analyzeContent(group) {
+            // rowItems, portrait, landscape
+            for (i=0; i<group.length; i++) {
+                group[i].bootstrapClass = group[i].orientation;
+                if (group.length === 1) group[i].bootstrapClass += " single-item "; 
+                if (portrait.length === 0) group[i].bootstrapClass += " all-landscapes "; 
+                else if (landscape.length === 0) group[i].bootstrapClass += " all-portraits "; 
+                else if (landscape.length === portrait.length) group[i].bootstrapClass += " 1landscape-1portrait "; 
+                else if (landscape.length === 2) group[i].bootstrapClass += " 2landscapes-1portrait "; 
+                else if (portrait.length === 2) group[i].bootstrapClass += " 2portraits-1landscape "; 
+            }
+
+            console.log("analyzeContent()", group);
+            return group;
+        }
+
+        rowItems = analyzeContent(rowItems);
 
         // easiest possible situation: only 1 item on the row
         if (rowItems.length <= 1) {
-            const viewWidth = 0.75 * window.screen.width;
             rowItems[0].height = groupHeight(rowItems);
             rowItems[0].width = rowItems[0].height / rowItems[0].image_props.aspect_ratio;
-            rowItems[0].columns = 1 + Math.floor(11 * (rowItems[0].width / viewWidth));
+            rowItems[0].columns = 1 + Math.floor(11 * (rowItems[0].width / targetWidth));
             rowItems[0].columns = rowItems[0].columns >= 3 ? rowItems[0].columns : 3;
-            rowItems[0].bootstrapClass = "single-item col-sm-12 col-lg-" + rowItems[0].columns;
+            rowItems[0].bootstrapClass += "col-sm-12 col-lg-" + rowItems[0].columns;
             return(rowItems);
         }
         else 
-        // common orientations, or, only two items on the row
-        if (portrait.length === 0 || 
-            landscape.length === 0 ||
-            portrait.length === landscape.length) {
+        // only two items on the row
+        if (portrait.length === landscape.length) {
+            rowItems = proportionalWidth(rowItems);
+            rowItems = normalizeHeight(rowItems);
+            rowItems = setBootstrapAttributes(rowItems);
+            return(rowItems);
+        } else
+        // common orientations
+        if (portrait.length === 0 || landscape.length === 0) {
 
-            // normalize heights
-            const targetHeight = .50 * window.screen.height;
-            for (var i=0; i<rowItems.length; i++) {
-                rowItems[i].height = targetHeight;
-                rowItems[i].width = rowItems[i].height / rowItems[i].image_props.aspect_ratio;
-            }
+            // deal w any special situations
+            // 1. all are portrait (require more height)
+            if (landscape.length === 0) {
+                rowItems = proportionalWidth(rowItems);
 
-            // calc Bootstrap 12ths per item
-            var totWidth = rowItems.map((item) => {return item.width;}).reduce((a, b) => a + b);
-            var totCols = 0;
-            for (i=0; i<rowItems.length; i++) {
-                rowItems[i].columns = 1 + Math.floor(11 * (rowItems[i].width / totWidth));
-                totCols += rowItems[i].columns;
-            }
-            // adjust for over/under
-            var columns = rowItems.slice(1).map((item) => {return item.columns;}).reduce((a, b) => a + b);
-            rowItems[0].columns = (12 - columns);
-
-            // generate bootstrap classes
-            for (i=0; i<rowItems.length; i++) {
-                if (portrait.length === landscape.length) rowItems[i].bootstrapClass = "2-images ";
-                else rowItems[i].bootstrapClass = "common-orientations ";
-                rowItems[i].bootstrapClass += " col-sm-12 col-lg-" + rowItems[i].columns;
-            }
+            } else {
+            // all landscapes
+            rowItems = normalizeHeight(rowItems);
+            rowItems = proportionalWidth(rowItems);
+        }
+            rowItems = setBootstrapAttributes(rowItems);
             return(rowItems);
 
         } else 
@@ -387,10 +425,10 @@ const mapStateToProps = state => ({
                 // rectangles are stacked. both should be 12 columns wide
                 landscape1.columns = 12;
                 landscape2.columns = 12;
-                landscape1.bootstrapClass = "3-w-pair-of-landscapes col-12";
-                landscape2.bootstrapClass = "3-w-pair-of-landscapes col-12";
+                landscape1.bootstrapClass += "col-12";
+                landscape2.bootstrapClass += "col-12";
                 portrait1.columns = 6;
-                portrait1.bootstrapClass = "3-w-pair-of-landscapes col-sm-12 col-lg-5";
+                portrait1.bootstrapClass += "col-sm-12 col-lg-5";
 
                 if (
                     landscape1.height === 0 || landscape1.height === 'NaN' || landscape1.height === undefined ||
@@ -428,7 +466,7 @@ const mapStateToProps = state => ({
                 }
                 portraitRows[portraitRows.length - 1].columns += (12 - totCols);    // in case we're over/under
                 for (i=0; i<portraitRows.length; i++) {
-                    portraitRows[i].bootstrapClass = "3-w-pair-of-landscapes col-sm-12 col-lg-" + portraitRows[i].columns;
+                    portraitRows[i].bootstrapClass += "col-sm-12 col-lg-" + portraitRows[i].columns;
                 }
 
                 if (
@@ -440,7 +478,7 @@ const mapStateToProps = state => ({
                     portrait1.width === 0 || portrait1.width === 'NaN' || portrait1.width === undefined
                     )
                     console.log("internal error w pair of landscapes", portraitRows);
-                return(portraitRows);
+                    return(portraitRows);
 
             }
         }
