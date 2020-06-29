@@ -80,6 +80,14 @@ class Home extends Component {
   componentDidMount() {
     this.wpImages = new DemoImages(this.level, this.addMasterContent, this.state.channel);
     this.resetIdleTimeout();
+
+    // if we're in the general feed then grab cached content.
+    if (this.state.channel === "") {
+      for (var i = 0; i < localStorage.length; i++) {
+        this.masterContent.push(JSON.parse(localStorage[localStorage.key(i)]));
+      }
+    }
+
   }
 
   componentWillUnmount() {
@@ -134,6 +142,11 @@ class Home extends Component {
 
   addMasterContent(items) {
     this.masterContent = this.masterContent.concat(items);
+
+    items.map((item) => {
+      localStorage.setItem(item.id, JSON.stringify(item));
+      return item;
+    });
     if (this.props.itemCarousel.present.items.length === 0) this.fetchRow(6);
   }
 
