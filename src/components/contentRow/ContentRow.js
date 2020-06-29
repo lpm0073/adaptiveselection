@@ -291,14 +291,18 @@ const mapStateToProps = state => ({
         let landscape1, landscape2, portrait1, portrait2, i = 0, totWidth, totCols, columns;
 
         function groupHeight(group) {
-            var retval = 999999;
-            for (var i=0; i<group.length; i++) {
-                retval = group[i].height < retval ? group[i].height : retval;
-            }
-            return retval < targetHeight ? retval : targetHeight;
+            // return smallest height
+            const height = group.sort((a, b) => a.height - b.height)[0].height;
+            return height < targetHeight ? height : targetHeight;
         }
         function groupWidth(group) {
+            // return sum of widths
             return group.map((item) => {return item.width;}).reduce((a, b) => a + b);
+        }
+        function avgAspectRatio(group) {
+            // return sum of widths
+            if (group.length === 0) return 0;
+            return group.map((item) => {return item.image_props.aspect_ratio;}).reduce((a, b) => a + b) / group.length;
         }
         function pairRectangles(rect1, rect2) {
             var height = groupHeight([rect1, rect2]);
@@ -332,14 +336,20 @@ const mapStateToProps = state => ({
             return group;
         }
         function setBootstrapAttributes(group) {
+            if (group.length === 0) return group;
 
-            // calc Bootstrap 12ths per item
-            totWidth = groupWidth(group);
+            // =ROUNDDOWN((-(Aspect_Ratio-AVG_ASPECT_RATIO)/AVG_ASPECT_RATIO) / (1/12), 0)
             totCols = 0;
+            const avg_aspect_ratio = avgAspectRatio(group);
             for (i=0; i<group.length; i++) {
-                group[i].columns = 1 + Math.floor(11 * (group[i].width / totWidth));
+                const aspect_ratio = group[i].image_props.aspect_ratio;
+                const adj = Math.floor((group.length / 12) * (-(aspect_ratio-avg_aspect_ratio)/avg_aspect_ratio) / (1/12));
+                const cols = 12/group.length + adj;
+                group[i].columns = cols;
                 totCols += group[i].columns;
+                console.log("setBootstrapAttributes() ", aspect_ratio, adj, cols);
             }
+
             // adjust for over/under
             columns = group.slice(1).map((item) => {return item.columns;}).reduce((a, b) => a + b);
             group[0].columns = (12 - columns);

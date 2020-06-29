@@ -82,6 +82,7 @@ class Feed extends Component {
     this.resetIdleTimeout();
 
     // if we're the general feed then grab cached content.
+    //localStorage.clear();
     if (this.state.channel === "") {
       for (var i = 0; i < localStorage.length; i++) {
         this.masterContent.push(JSON.parse(localStorage[localStorage.key(i)]));
