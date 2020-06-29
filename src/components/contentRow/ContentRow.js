@@ -284,7 +284,7 @@ const mapStateToProps = state => ({
     calculateItemDimensions(rowItems, portrait, landscape) {
         if (rowItems.length === 0) return;
 
-        var targetWidth = 0.75 * window.screen.width;
+        var targetWidth = 0.67 * window.screen.width;
         var targetHeight = .50 * window.screen.height;
         var portraitItems = rowItems.filter((item) => portrait.includes(item.id));
         var landscapeItems = rowItems.filter((item) => landscape.includes(item.id));
@@ -293,7 +293,6 @@ const mapStateToProps = state => ({
         function groupHeight(group) {
             // return smallest height
             const height = group.sort((a, b) => a.height - b.height)[0].height;
-            console.log("groupHeight()", height, group);
             return height < targetHeight ? height : targetHeight;
         }
         function groupWidth(group) {
@@ -323,8 +322,9 @@ const mapStateToProps = state => ({
             }
         }
         function proportionalWidth(group) {
+            const totWidth = groupWidth(group);
             for (i=0; i<group.length; i++) {
-                group[i].width = rowItems[i].width * (rowItems[i].width / targetWidth);
+                group[i].width = targetWidth * (rowItems[i].width / totWidth);
                 group[i].height = rowItems[i].width * rowItems[i].image_props.aspect_ratio;
             }
             return group;
@@ -349,7 +349,6 @@ const mapStateToProps = state => ({
                 const cols = 12/group.length + adj;
                 group[i].columns = cols;
                 totCols += group[i].columns;
-                //console.log("setBootstrapAttributes() ", aspect_ratio, adj, cols);
             }
 
             // adjust for over/under
@@ -395,6 +394,7 @@ const mapStateToProps = state => ({
             rowItems[0].width = rowItems[0].height / rowItems[0].image_props.aspect_ratio;
             rowItems[0].columns = 1 + Math.floor(11 * (rowItems[0].width / targetWidth));
             rowItems[0].columns = rowItems[0].columns >= 3 ? rowItems[0].columns : 3;
+            rowItems[0].columns = rowItems[0].columns <= 12 ? rowItems[0].columns : 12;
             rowItems[0].bootstrapClass += "col-sm-12 col-lg-" + rowItems[0].columns;
             return(rowItems);
         }
@@ -417,7 +417,6 @@ const mapStateToProps = state => ({
                 // all landscapes
                 rowItems = proportionalWidth(rowItems);
                 rowItems = normalizeHeight(rowItems);
-                console.log("all landscapes", rowItems);
             }
 
             rowItems = setBootstrapAttributes(rowItems);
