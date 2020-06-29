@@ -8,6 +8,7 @@ import * as Actions from '../../redux/ActionCreators';
 // my stuff
 import './styles.css';
 import ImageBox from '../imageBox/ImageBox';
+import ArticleBox from '../articleBox/ArticleBox';
 
 const mapStateToProps = state => ({
     ...state
@@ -145,15 +146,15 @@ const mapStateToProps = state => ({
         if (self.state.presentationRow[0].id % 3 === 0)
             return(
                 <React.Fragment>
-                    <div className={"col-sm-12 col-lg-" + colLeft}></div>
+                    <ArticleBox className={"col-sm-12 col-lg-" + colLeft} columns={colLeft} height={item.height} />
                     <ImageBox parent={self.state.componentKey} layout="layout_1" containerClasses={item.bootstrapClass} key={item.key} image = {item} />
-                    <div className={"col-sm-12 col-lg-" + colRight}></div>
+                    <ArticleBox className={"col-sm-12 col-lg-" + colRight} columns={colRight} />
                 </React.Fragment>
             );        
         if (self.state.presentationRow[0].id % 3 === 1)
             return(
                 <React.Fragment>
-                    <div className={"col-sm-12 col-lg-" + colTotal}></div>
+                    <ArticleBox className={"col-sm-12 col-lg-" + colTotal} columns={colTotal} height={item.height} />
                     <ImageBox parent={self.state.componentKey} layout="layout_1" containerClasses={item.bootstrapClass} key={item.key} image = {item} />
                 </React.Fragment>
             );
@@ -161,7 +162,7 @@ const mapStateToProps = state => ({
             return(
                 <React.Fragment>
                     <ImageBox parent={self.state.componentKey} layout="layout_1" containerClasses={item.bootstrapClass} key={item.key} image = {item} />
-                    <div className={"col-sm-12 col-lg-" + colTotal}></div>
+                    <ArticleBox className={"col-sm-12 col-lg-" + colTotal} columns={colTotal} height={item.height} />
                 </React.Fragment>
             );        
     }
