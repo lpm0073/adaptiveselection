@@ -30,4 +30,4 @@ export const IDLE_TIMEOUT = 30000;
 // 3 - Fully nude
 // 4 - Exposed genitalia
 // 5 - Sexually explicit / pornography
-export const DEFAULT_ADULT_CONTENT = 1;
+export const DEFAULT_ADULT_CONTENT = 2;
