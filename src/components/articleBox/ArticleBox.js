@@ -22,11 +22,11 @@ const mapStateToProps = state => ({
           const style={
               height: this.props.height
           };
-          var cls = "m-0 p-0 " + this.props.className;
-          if (this.props.columns > 2) cls += " article-container"
+          var cls = "m-0 p-0 ";
+          if (this.props.columns > 2) cls += " article-box"
           return(
-            <div className={cls}>
-              <div className="m-0 p-0" style={style}></div>
+            <div className={"m-0 p-1 article-container " + this.props.className}>
+              <div className={cls} style={style}></div>
             </div>
         );
       }
