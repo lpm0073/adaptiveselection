@@ -78,7 +78,7 @@ class Feed extends Component {
   }
 
   componentDidMount() {
-    this.wpImages = new DemoImages(this.level, this.addMasterContent, this.state.channel);
+    this.wpImages = new DemoImages(this.state.level, this.addMasterContent, this.state.channel);
     this.resetIdleTimeout();
 
     // if we're the general feed then grab cached content.
@@ -152,6 +152,7 @@ class Feed extends Component {
   }
 
   handleChangeLevel() {
+    localStorage.clear();
     this.masterContent = [];
     this.props.actions.resetItemCarousel();
     this.wpImages = new DemoImages(this.level, this.addMasterContent, this.state.channel);
@@ -355,7 +356,6 @@ class Feed extends Component {
     const scrollHeight = this.page.scrollHeight;  // total height of the DOM
     const scrollTop = this.page.scrollTop;        // our current pixel position within the document
 
-    //console.log("requeue", scrollHeight, scrollTop, viewHeight, scrollHeight - scrollTop );
     if ((scrollHeight - scrollTop) < (viewHeight * 1.15)) {
       return true;
     }

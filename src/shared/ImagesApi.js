@@ -40,7 +40,6 @@ export class ImagesApi {
         this.callBackMethod = callBackMethod;
 
         if (channel !== "") {
-          console.log("constructor() - channel", channel, typeof channel);
           this.getChannelId();
         }
         else {
@@ -75,7 +74,6 @@ export class ImagesApi {
       .then(response => response.json())
       .then(obj => {
         this.channelId = Number(obj[0].id);
-        console.log("getChannelId", this.channelId);
 
         const url = "https://api.fotomashup.com/wp-json/wp/v2/media?channels=" + this.channelId + "&_fields=id,date,categories,channels,acf,caption,media_details,source_url";
         this.fetch(url);
