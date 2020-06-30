@@ -1,3 +1,6 @@
+// https://reactjsexample.com/react-side-nav-component/
+
+
 import React, { Component } from 'react';
 import { Navbar, Nav, NavbarToggler, Collapse, NavItem} from 'reactstrap';
 import { NavLink } from 'react-router-dom';
@@ -25,7 +28,7 @@ class Header extends Component {
     render() {
         return(
         <header key="app-header" >
-            <Navbar className="navbar-dark bg-dark" dark expand="md">
+            <Navbar className="navbar-dark bg-dark fixed-left" dark expand="md">
                 <NavbarToggler onClick={this.toggleNav} />
                 <Collapse isOpen={this.state.isNavOpen} navbar>
                     <Nav navbar>
