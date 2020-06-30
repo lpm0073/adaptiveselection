@@ -11,7 +11,7 @@ export const MAX_ROWS = 75;
 // IMAGE_CONTENT
 // governs the veracity of multi-image content
 // on ItemRow data.
-export const IMAGE_CONTENT_2ITEMS = .20;
+export const IMAGE_CONTENT_2ITEMS = .10;
 export const IMAGE_CONTENT_3ITEMS = .10;
 
 // IDLE_TIMEOUT

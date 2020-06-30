@@ -88,7 +88,7 @@ class Feed extends Component {
         this.masterContent.push(JSON.parse(localStorage[localStorage.key(i)]));
       }
       console.log("componentDidMount - loaded cached data", this.masterContent.length);
-      this.fetchRow(6);
+      this.fetchRow(3);
     }
 
   }
