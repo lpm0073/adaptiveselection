@@ -1,11 +1,47 @@
 import React, { useState } from 'react';
 import { Alert, Button } from 'reactstrap';
 
-const PrivacyDisclaimer = (props) => {
-  const [visible, setVisible] = useState(true);
+function setCookie(cname, cvalue, exdays) {
+  var d = new Date();
+  d.setTime(d.getTime() + (exdays*24*60*60*1000));
+  var expires = "expires="+ d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
 
+function getCookie(cname) {
+  var name = cname + "=";
+  var decodedCookie = decodeURIComponent(document.cookie);
+  var ca = decodedCookie.split(';');
+  for(var i = 0; i <ca.length; i++) {
+    var c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
+    }
+  }
+  return false;
+}
+
+const PrivacyDisclaimer = (props) => {
+  var shouldShow = true;
+
+  var seen = getCookie("privacyPolicy");
+  console.log("cookie", seen);
+  if (seen && seen !== "null") {
+    console.log("should not show")
+    shouldShow = false;
+  } else {
+      console.log("should show")
+      setCookie("privacyPolicy", null, 365);
+  }  
+
+  const [visible, setVisible] = useState(shouldShow);
   const onDismiss = () => setVisible(false);
   const hostname = window.location.hostname;
+
+
 
   return (
       

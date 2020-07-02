@@ -11,7 +11,7 @@ class Main extends Component {
   render() {
     return ( 
       <div className="container-fluid p-0">
-        <PrivacyDisclaimer buttonLabel="Shooby do" />
+        <PrivacyDisclaimer />
         <Sidebar />
         <Routes />
       </div>
