@@ -4,10 +4,37 @@
 const IMAGES_API_BACKEND_URL = 'https://api.fotomashup.com/wp-json/wp/v2/';
 const IMAGES_API_MEDIA_URL = IMAGES_API_BACKEND_URL + 'media?_fields=id,categories,acf,media_details&per_page=100';
 const IMAGES_API_CATEGORY_URL = IMAGES_API_BACKEND_URL + 'categories?per_page=100&_fields=id,count,acf';
+const IMAGE_API_PUBLISHERS_URL = IMAGES_API_BACKEND_URL + "categories?per_page=100&_fields=id,name,acf&parent=0";
 
 const IMAGES_API_PAGE_IDENTIFIER = "&page=";
 const IMAGES_API_CATEGORY_EXCLUSION_IDENTIFIER = "categories_exclude=";
 
+export function getPublishers(dispatcher) {
+
+  return fetch(IMAGE_API_PUBLISHERS_URL)
+  .then(
+      response => {
+          if (response.ok) {
+              return response;
+          } else {
+              var error = new Error('Error ' + response.status + ': ' + response.statusText);
+              error.response = response;
+              throw error;
+          }
+      },
+      error => {
+          var errmess = new Error(error.message);
+          throw errmess;
+      })
+  .then(response => response.json())
+  .then(publishers => {
+    dispatcher(publishers);
+  })
+  .catch(error => {
+    console.log("getPublishers() - could not get publishers");
+  });
+
+}
 export class ImagesApi {
 
     type = null;
@@ -83,7 +110,7 @@ export class ImagesApi {
 
       })
       .catch(error => {
-        console.log("getChannelId() - something went wrong :(");
+        console.log("getChannelId() - could not get channel: " + channel);
       });
     }
 

@@ -17,8 +17,7 @@ import './styles.css';
 import Loading from '../../components/Loading';
 import * as Defaults from '../../appDefaults';
 import ContentRow from '../../components/contentRow/ContentRow'
-import { wpGetImage, imagePreFetcher, wpGetExclusionArray } from '../../shared/ImagesApi';
-import { SplashContent, Girls, Wallpapers } from '../../shared/BuiltInPlugins';
+import { getPublishers, ImagesApi, wpGetImage, imagePreFetcher, wpGetExclusionArray } from '../../shared/ImagesApi';
 
 const mapStateToProps = state => ({
     ...state
@@ -44,6 +43,7 @@ class Feed extends Component {
     // content management
     this.handleChangeLevel = this.handleChangeLevel.bind(this);
     this.addMasterContent = this.addMasterContent.bind(this);
+    this.registerSubscriptions = this.registerSubscriptions.bind(this);
 
     // real-time analytics
     this.processAnalytics = this.processAnalytics.bind(this);
@@ -82,27 +82,7 @@ class Feed extends Component {
     this.resetIdleTimeout();
     if (this.state.channel !== "") return;
 
-    for (var i=0; i<this.state.subscriptions.length; i++) {
-      // register content subscriptions
-      switch (this.state.subscriptions[i]) {
-        case "Splash":
-          this.imageSubscriptions.push(new SplashContent(this.state.level, this.addMasterContent));
-          break;
-        case "Girls":
-          this.imageSubscriptions.push(new Girls(this.state.level, this.addMasterContent));
-          break;
-        case "Wallpapers":
-          this.imageSubscriptions.push(new Wallpapers(this.state.level, this.addMasterContent));
-          break;
-          default:
-          break;
-      }
-    }
-
-    for (i = 0; i < localStorage.length; i++) {
-      this.masterContent.push(JSON.parse(localStorage[localStorage.key(i)]));
-    }
-    this.fetchRow(3);
+    getPublishers(this.registerSubscriptions);
 
   }
 
@@ -129,6 +109,26 @@ class Feed extends Component {
         </div>
     );
   }
+
+  // Callback for ImagesApi.getPublishers()
+  registerSubscriptions(publishers) {
+
+    console.log("registerSubscriptions()", publishers);
+
+    for (var i=0; i<publishers.length; i++) {
+      const required = publishers[i].acf.hasOwnProperty("required") ? publishers[i].acf.required : false;
+      const publication = publishers[i].name;
+      const categoryId = publishers[i].id;
+      const filtered = publishers[i].acf.hasOwnProperty("filtered") ? publishers[i].acf.filtered : false;
+      if (this.state.subscriptions.includes(publication) || required) {
+          console.log(publication, categoryId);
+          const obj = new ImagesApi(publication, categoryId, null, this.addMasterContent, this.state.level, filtered);
+          this.imageSubscriptions.push(obj);
+          }
+    }
+    this.fetchRow(3);
+  }
+
 
   doIdle() {
     console.log("doIdle() short-circuited");
@@ -169,7 +169,6 @@ class Feed extends Component {
     localStorage.clear();
     this.masterContent = [];
     this.props.actions.resetItemCarousel();
-    this.imageSubscriptions = new Girls(this.level, this.addMasterContent, this.state.channel);
   }  
   
   addRow(row) {
