@@ -18,7 +18,7 @@ import Loading from '../../components/Loading';
 import * as Defaults from '../../appDefaults';
 import ContentRow from '../../components/contentRow/ContentRow'
 import { wpGetImage, imagePreFetcher, wpGetExclusionArray } from '../../shared/ImagesApi';
-import { Girls, Wallpapers } from '../../shared/BuiltInPlugins';
+import { SplashContent, Girls, Wallpapers } from '../../shared/BuiltInPlugins';
 
 const mapStateToProps = state => ({
     ...state
@@ -86,12 +86,13 @@ class Feed extends Component {
       // register content subscriptions
       switch (this.state.subscriptions[i]) {
         case "Splash":
+          this.imageSubscriptions.push(new SplashContent(this.state.level, this.addMasterContent));
           break;
         case "Girls":
-          this.imageSubscriptions.push(new Girls(this.state.level, this.addMasterContent, this.state.channel));
+          this.imageSubscriptions.push(new Girls(this.state.level, this.addMasterContent));
           break;
         case "Wallpapers":
-          this.imageSubscriptions.push(new Wallpapers(this.state.level, this.addMasterContent, this.state.channel));
+          this.imageSubscriptions.push(new Wallpapers(this.state.level, this.addMasterContent));
           break;
           default:
           break;

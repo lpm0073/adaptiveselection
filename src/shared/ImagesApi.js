@@ -1,15 +1,20 @@
 
 // https://api.fotomashup.com/wp-json/wp/v2/media?_fields=id,categories,acf,media_details&per_page=100&categories=41
+
+const IMAGES_API_BACKEND_URL = 'https://api.fotomashup.com/wp-json/wp/v2/';
+const IMAGES_API_MEDIA_URL = IMAGES_API_BACKEND_URL + 'media?_fields=id,categories,acf,media_details&per_page=100';
+const IMAGES_API_CATEGORY_URL = IMAGES_API_BACKEND_URL + 'categories?per_page=100&_fields=id,count,acf';
+
+const IMAGES_API_PAGE_IDENTIFIER = "&page=";
+const IMAGES_API_CATEGORY_EXCLUSION_IDENTIFIER = "categories_exclude=";
+
 export class ImagesApi {
 
     type = null;
     mediaURL = null;
-    splashURL = null;
-    categoriesURL = null;
-    pageIdentifer = null;
-    categoryExclusionIdentifier = null;
     channel = null;
     channelId = null;
+    filteredContent = false;
   
     level = 0;
     pageNumber = 1;
@@ -22,36 +27,29 @@ export class ImagesApi {
     gotSplashData = false;
   
     constructor(type,
-                mediaURL,                     // https://api.fotomashup.com/wp-json/wp/v2/media?_fields=id,categories,acf,media_details&per_page=100
-                categoriesURL,                // https://api.fotomashup.com/wp-json/wp/v2/categories?per_page=100&_fields=id,count,acf
-                splashURL,                    // https://api.fotomashup.com/wp-json/wp/v2/media?_fields=id,categories,acf,media_details&per_page=100&categories=41
-                pageIdentifer,                // &page=
-                categoryExclusionIdentifier,  // categories_exclude=
+                category_id,
+                channel = null,                       // name of an api channel. Ex: body-painting
                 callBackMethod,               // a callable javascript method object
                 level,                        // 0 - 5
-                channel                       // name of an api channel. Ex: body-painting
+                filteredContent
                 ) {
+
+
         this.type = type;
-        this.mediaURL = mediaURL;
-        this.splashURL = splashURL;
-        this.categoriesURL = categoriesURL;
-        this.pageIdentifer = pageIdentifer;
-        this.categoryExclusionIdentifier = categoryExclusionIdentifier;
+        this.mediaURL = IMAGES_API_MEDIA_URL + '&categories=' + category_id;
         this.channel = channel;
+        this.filteredContent = filteredContent;
   
         this.level = level;
         this.callBackMethod = callBackMethod;
 
-        if (channel !== "") {
+        if (channel) {
           this.getChannelId();
         }
         else {
           this.fetch(); // query the splash page data
-          this.fetchCategories(); // fetch & process categories, then recall fetch()
+          if (this.filteredContent) this.fetchCategories(); // fetch & process categories, then recall fetch()
         }
-
-        
-
     }
   
     getNextPage() {
@@ -60,7 +58,8 @@ export class ImagesApi {
   
     getChannelId(channel) {
       // query to retrieve the channel ID for the slug that was passed.
-      var url = "https://api.fotomashup.com/wp-json/wp/v2/channels?slug=" + channel + "&_fields=id,count,description,link,name,slug";
+      var url = IMAGES_API_BACKEND_URL + "channels?slug=" + channel + "&_fields=id,count,description,link,name,slug";
+      console.log("getChannelId", url);
 
       fetch(url)
       .then(response => {
@@ -79,29 +78,26 @@ export class ImagesApi {
       .then(obj => {
         this.channelId = Number(obj[0].id);
 
-        const url = "https://api.fotomashup.com/wp-json/wp/v2/media?channels=" + this.channelId + "&_fields=id,date,categories,channels,acf,caption,media_details,source_url";
+        const url = IMAGES_API_BACKEND_URL + "media?channels=" + this.channelId + "&_fields=id,date,categories,channels,acf,caption,media_details,source_url";
         this.fetch(url);
 
       })
       .catch(error => {
         console.log("getChannelId() - something went wrong :(");
       });
-
-
     }
-    fetch(url = null) {
 
-      if (url === null) {
-        if (this.categories !== null && !this.gettingSplashData && !this.gotSplashData) {
-          this.gettingSplashData = true;
-          url = this.splashURL;
-        } else {
-          if (this.categories) url = this.mediaURL + this.pageIdentifer + this.pageNumber + "&" + wpGetExclusions(this.level, this.categories, this.categoryExclusionIdentifier);
-          else return;
-          if (this.pageNumber < 1) return;
-          this.pageNumber = this.getNextPage(); 
-        }
-      }
+    fetch() {
+      var url = this.mediaURL + IMAGES_API_PAGE_IDENTIFIER + this.pageNumber;
+      // if this subscription requires content filtering then we first need to verify that
+      // the categories object has been created, and then afterwards we need to 
+      // add a category exclusion list based on the user's Content Filter setting.
+      if (this.filteredContent) {
+        if (this.categories) url += "&" + wpGetExclusions(this.level, this.categories);
+        else return;
+      }  
+      if (this.pageNumber < 1) return;
+      this.pageNumber = this.getNextPage(); 
 
       fetch(url)
       .then(response => {
@@ -132,7 +128,7 @@ export class ImagesApi {
   
         // attribute pre-initializations
         new_images = new_images.map((image) => {
-          image.type = "ImagesApi";
+          image.subscription_type = this.type;
           image.viewing_sequence = 0;
           image.rank = 1;   
           return image;
@@ -154,7 +150,7 @@ export class ImagesApi {
 
   fetchCategories() {
 
-    return fetch(this.categoriesURL)
+    return fetch(IMAGES_API_CATEGORY_URL)
     .then(
         response => {
             if (response.ok) {
@@ -395,13 +391,13 @@ export const wpGetExclusionArray = (level, categories) => {
     return [];
 }
 
-export const wpGetExclusions = (level, categories, categoryExclusionIdentifier) => {
+export const wpGetExclusions = (level, categories) => {
     // https://api.fotomashup.com/wp-json/wp/v2/media?categories=5,2&_fields=id,categories,acf,media_details&categories_exclude=3,10
     
     const exclusions = array_to_csv(level, categories);
 
     if (exclusions.length > 0) {
-        return categoryExclusionIdentifier + exclusions;
+        return IMAGES_API_CATEGORY_EXCLUSION_IDENTIFIER + exclusions;
     }
 
     return "";
