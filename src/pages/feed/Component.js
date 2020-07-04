@@ -14,11 +14,11 @@ import * as Signals from '../../redux/userSignals';
 
 // my stuff
 import './styles.css';
+import Loading from '../../components/Loading';
 import * as Defaults from '../../appDefaults';
 import ContentRow from '../../components/contentRow/ContentRow'
 import { wpGetImage, imagePreFetcher, wpGetExclusionArray } from '../../shared/ImagesApi';
-import { DemoImages } from '../../shared/BuiltInPlugins';
-import Loading from '../../components/Loading';
+import { Girls, Wallpapers } from '../../shared/BuiltInPlugins';
 
 const mapStateToProps = state => ({
     ...state
@@ -35,7 +35,7 @@ class Feed extends Component {
 
   idleDelay = null;
   masterContent = [];
-  wpImages = null;
+  imageSubscriptions = [];
   page;
   fetching = false;
 
@@ -72,24 +72,36 @@ class Feed extends Component {
     this.state = {
       level: Defaults.DEFAULT_ADULT_CONTENT,
       nextSerialNumber: 0,
-      channel: props.location.pathname.replace("/", "")
+      channel: props.location.pathname.replace("/", ""),
+      subscriptions: ["Splash", "Girls", "Wallpapers"]
     }
 
   }
 
   componentDidMount() {
-    this.wpImages = new DemoImages(this.state.level, this.addMasterContent, this.state.channel);
     this.resetIdleTimeout();
+    if (this.state.channel !== "") return;
 
-    // if we're the general feed then grab cached content.
-    //localStorage.clear();
-    if (this.state.channel === "") {
-      for (var i = 0; i < localStorage.length; i++) {
-        this.masterContent.push(JSON.parse(localStorage[localStorage.key(i)]));
+    for (var i=0; i<this.state.subscriptions.length; i++) {
+      // register content subscriptions
+      switch (this.state.subscriptions[i]) {
+        case "Splash":
+          break;
+        case "Girls":
+          this.imageSubscriptions.push(new Girls(this.state.level, this.addMasterContent, this.state.channel));
+          break;
+        case "Wallpapers":
+          this.imageSubscriptions.push(new Wallpapers(this.state.level, this.addMasterContent, this.state.channel));
+          break;
+          default:
+          break;
       }
-      console.log("componentDidMount - loaded cached data", this.masterContent.length);
-      this.fetchRow(3);
     }
+
+    for (i = 0; i < localStorage.length; i++) {
+      this.masterContent.push(JSON.parse(localStorage[localStorage.key(i)]));
+    }
+    this.fetchRow(3);
 
   }
 
@@ -156,7 +168,7 @@ class Feed extends Component {
     localStorage.clear();
     this.masterContent = [];
     this.props.actions.resetItemCarousel();
-    this.wpImages = new DemoImages(this.level, this.addMasterContent, this.state.channel);
+    this.imageSubscriptions = new Girls(this.level, this.addMasterContent, this.state.channel);
   }  
   
   addRow(row) {
@@ -272,18 +284,18 @@ class Feed extends Component {
 
   processAnalytics() {
 
-    if (this.wpImages.categories) {
-      for (var i=0; i<this.wpImages.categories.categories.length; i++) {
-        var category = this.wpImages.categories.categories[i];
-        this.wpImages.categories.categories[i].factor_score = this.weightCategory(category);
+    if (this.imageSubscriptions.categories) {
+      for (var i=0; i<this.imageSubscriptions.categories.categories.length; i++) {
+        var category = this.imageSubscriptions.categories.categories[i];
+        this.imageSubscriptions.categories.categories[i].factor_score = this.weightCategory(category);
       }  
     }
   }
 
   getCategoryScore(id) {
-    if (this.wpImages.categories) {
-      for (var i=0; i<this.wpImages.categories.categories.length; i++) {
-        if (this.wpImages.categories.categories[i].id === id) return this.wpImages.categories.categories[i].factor_score
+    if (this.imageSubscriptions.categories) {
+      for (var i=0; i<this.imageSubscriptions.categories.categories.length; i++) {
+        if (this.imageSubscriptions.categories.categories[i].id === id) return this.imageSubscriptions.categories.categories[i].factor_score
       }
     }
     return 1;

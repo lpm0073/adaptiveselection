@@ -2,6 +2,7 @@
 // https://api.fotomashup.com/wp-json/wp/v2/media?_fields=id,categories,acf,media_details&per_page=100&categories=41
 export class ImagesApi {
 
+    type = null;
     mediaURL = null;
     splashURL = null;
     categoriesURL = null;
@@ -20,7 +21,8 @@ export class ImagesApi {
     gettingSplashData = false;
     gotSplashData = false;
   
-    constructor(mediaURL,                     // https://api.fotomashup.com/wp-json/wp/v2/media?_fields=id,categories,acf,media_details&per_page=100
+    constructor(type,
+                mediaURL,                     // https://api.fotomashup.com/wp-json/wp/v2/media?_fields=id,categories,acf,media_details&per_page=100
                 categoriesURL,                // https://api.fotomashup.com/wp-json/wp/v2/categories?per_page=100&_fields=id,count,acf
                 splashURL,                    // https://api.fotomashup.com/wp-json/wp/v2/media?_fields=id,categories,acf,media_details&per_page=100&categories=41
                 pageIdentifer,                // &page=
@@ -29,6 +31,7 @@ export class ImagesApi {
                 level,                        // 0 - 5
                 channel                       // name of an api channel. Ex: body-painting
                 ) {
+        this.type = type;
         this.mediaURL = mediaURL;
         this.splashURL = splashURL;
         this.categoriesURL = categoriesURL;
@@ -56,7 +59,8 @@ export class ImagesApi {
     }
   
     getChannelId(channel) {
-      var url = "https://api.fotomashup.com/wp-json/wp/v2/channels?slug=body-painting&_fields=id,count,description,link,name,slug";
+      // query to retrieve the channel ID for the slug that was passed.
+      var url = "https://api.fotomashup.com/wp-json/wp/v2/channels?slug=" + channel + "&_fields=id,count,description,link,name,slug";
 
       fetch(url)
       .then(response => {
