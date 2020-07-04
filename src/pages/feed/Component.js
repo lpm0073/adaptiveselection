@@ -19,6 +19,9 @@ import * as Defaults from '../../appDefaults';
 import ContentRow from '../../components/contentRow/ContentRow'
 import { getPublishers, ImagesApi, wpGetImage, imagePreFetcher, wpGetExclusionArray } from '../../shared/ImagesApi';
 
+const SUBSCRIPTIONS = ["Splash", "Wallpapers"];
+const LEVEL = 3;
+
 const mapStateToProps = state => ({
     ...state
 });
@@ -40,6 +43,11 @@ class Feed extends Component {
 
   constructor(props) {
     super(props);
+
+    // FIX NOTE: DELETE ME!!!
+    localStorage.clear();
+
+
     // content management
     this.handleChangeLevel = this.handleChangeLevel.bind(this);
     this.addMasterContent = this.addMasterContent.bind(this);
@@ -70,10 +78,10 @@ class Feed extends Component {
     this.handleMasonryLayoutComplete = this.handleMasonryLayoutComplete.bind(this);
 
     this.state = {
-      level: Defaults.DEFAULT_ADULT_CONTENT,
+      level: LEVEL,
       nextSerialNumber: 0,
       channel: props.location.pathname.replace("/", ""),
-      subscriptions: ["Splash", "Girls", "Wallpapers"]
+      subscriptions: SUBSCRIPTIONS
     }
 
   }
@@ -113,15 +121,12 @@ class Feed extends Component {
   // Callback for ImagesApi.getPublishers()
   registerSubscriptions(publishers) {
 
-    console.log("registerSubscriptions()", publishers);
-
     for (var i=0; i<publishers.length; i++) {
       const required = publishers[i].acf.hasOwnProperty("required") ? publishers[i].acf.required : false;
       const publication = publishers[i].name;
       const categoryId = publishers[i].id;
       const filtered = publishers[i].acf.hasOwnProperty("filtered") ? publishers[i].acf.filtered : false;
       if (this.state.subscriptions.includes(publication) || required) {
-          console.log(publication, categoryId);
           const obj = new ImagesApi(publication, categoryId, null, this.addMasterContent, this.state.level, filtered);
           this.imageSubscriptions.push(obj);
           }
