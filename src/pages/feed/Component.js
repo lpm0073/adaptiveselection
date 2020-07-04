@@ -197,8 +197,10 @@ class Feed extends Component {
       var row = [];
       for (var k=0; k<j; k++) {
         const item = this.getNextItem();
-        this.props.actions.addItemCarousel(item);
-        row.push(item.id);
+        if (item) {
+          this.props.actions.addItemCarousel(item);
+          row.push(item.id);
+          }
       }
       this.addRow({
         id: Math.floor(Math.random() * 1000000000).toString(), 

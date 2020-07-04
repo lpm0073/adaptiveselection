@@ -53,8 +53,7 @@ const PrivacyDisclaimer = (props) => {
             </div>            
             <div className="col-4">
               <div className="p-2 text-right">
-                <span className="p-2"><Button outline color="primary" size="sm" active>Awesome! Save My Data</Button></span>
-                <span className="p-2"><Button outline color="secondary" size="sm" active>No Way, I Hate Cookies</Button></span>
+                <span className="p-2"><Button outline color="primary" size="sm" active>ACCEPT COOKIES</Button></span>
               </div>
             </div>
           </div>

@@ -1,5 +1,13 @@
-
 // app defaults
+
+/*
+  API note to self: 
+  in order to get Wordpress api to include all children of a parent category
+  i had to hack /var/www/html/fotomashup.com/wp-includes/rest-api/endpoints/class-wp-rest-posts-controller.php
+  setting       'include_children' => true
+  in two location in this file.
+
+ */
 
 // MAX_ROWS
 // ----------------------------------------------------------------
@@ -30,4 +38,4 @@ export const IDLE_TIMEOUT = 30000;
 // 3 - Fully nude
 // 4 - Exposed genitalia
 // 5 - Sexually explicit / pornography
-export const DEFAULT_ADULT_CONTENT = 4;
+export const DEFAULT_ADULT_CONTENT = 0;
