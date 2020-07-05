@@ -42,6 +42,7 @@ class Sidebar extends Component {
                         <NavIcon><i className="fa fa-fw fa-book" style={iconStyle} /></NavIcon>
                         <NavText>Plugins</NavText>                        
                         {this.props.publishers.items.map((publication) => {
+                            if (publication.required) return( <React.Fragment></React.Fragment> );
                             return(
                                 <NavItem eventKey={"publications/" + String(publication.publisher)}>
                                     <NavText>

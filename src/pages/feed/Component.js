@@ -19,7 +19,7 @@ import * as Defaults from '../../appDefaults';
 import ContentRow from '../../components/contentRow/ContentRow'
 import { ImagesApi, wpGetImage, imagePreFetcher, wpGetExclusionArray } from '../../shared/ImagesApi';
 
-const SUBSCRIPTIONS = ["Splash", "Wallpapers"];
+const SUBSCRIPTIONS = ["Wallpapers"];
 const LEVEL = 3;
 
 const mapStateToProps = state => ({
