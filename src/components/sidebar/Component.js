@@ -40,7 +40,7 @@ class Sidebar extends Component {
                     </NavItem>
                     <NavItem eventKey="publications">
                         <NavIcon><i className="fa fa-fw fa-book" style={iconStyle} /></NavIcon>
-                        <NavText>Publications</NavText>                        
+                        <NavText>Plugins</NavText>                        
                         {this.props.publishers.items.map((publication) => {
                             return(
                                 <NavItem eventKey={"publications/" + String(publication.publisher)}>

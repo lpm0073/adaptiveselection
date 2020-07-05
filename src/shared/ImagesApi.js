@@ -9,34 +9,6 @@ export const IMAGE_API_PUBLISHERS_URL = IMAGES_API_BACKEND_URL + "categories?per
 const IMAGES_API_PAGE_IDENTIFIER = "&page=";
 const IMAGES_API_CATEGORY_EXCLUSION_IDENTIFIER = "categories_exclude=";
 
-/*
-export function getPublishers(dispatcher) {
-
-  return fetch(IMAGE_API_PUBLISHERS_URL)
-  .then(
-      response => {
-          if (response.ok) {
-              return response;
-          } else {
-              var error = new Error('Error ' + response.status + ': ' + response.statusText);
-              error.response = response;
-              throw error;
-          }
-      },
-      error => {
-          var errmess = new Error(error.message);
-          throw errmess;
-      })
-  .then(response => response.json())
-  .then(publishers => {
-    dispatcher(publishers);
-  })
-  .catch(error => {
-    console.log("getPublishers() - could not get publishers");
-  });
-
-}
-*/
 export class ImagesApi {
 
     type = null;
