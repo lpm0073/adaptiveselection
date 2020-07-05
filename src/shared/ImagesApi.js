@@ -9,6 +9,7 @@ export const IMAGE_API_PUBLISHERS_URL = IMAGES_API_BACKEND_URL + "categories?per
 const IMAGES_API_PAGE_IDENTIFIER = "&page=";
 const IMAGES_API_CATEGORY_EXCLUSION_IDENTIFIER = "categories_exclude=";
 
+/*
 export function getPublishers(dispatcher) {
 
   return fetch(IMAGE_API_PUBLISHERS_URL)
@@ -35,6 +36,7 @@ export function getPublishers(dispatcher) {
   });
 
 }
+*/
 export class ImagesApi {
 
     type = null;

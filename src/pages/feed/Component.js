@@ -76,9 +76,9 @@ class Feed extends Component {
 
     this.state = {
       level: LEVEL,
+      subscriptions: SUBSCRIPTIONS,
       nextSerialNumber: 0,
       channel: props.location.pathname.replace("/", ""),
-      subscriptions: SUBSCRIPTIONS,
       imageSubscriptions: [],
     }
 
@@ -87,7 +87,7 @@ class Feed extends Component {
   componentDidMount() {
     this.resetIdleTimeout();
   }
-  componentWillReceiveProps() {
+  componentDidUpdate() {
     if (this.state.channel !== "") return;
     if (!this.areSubscriptionsRegistered) this.registerSubscriptions();
   }
@@ -116,7 +116,6 @@ class Feed extends Component {
     );
   }
 
-  // Callback for ImagesApi.getPublishers()
   registerSubscriptions() {
     if (this.areSubscriptionsRegistered) return;
     if (this.props.publishers.items.length === 0) return;
@@ -124,14 +123,16 @@ class Feed extends Component {
 
     const publishers = this.props.publishers.items;
     const imageSubscriptions = [];
-    console.log("registerSubscriptions()", publishers);
 
     for (var i=0; i<publishers.length; i++) {
-      if (this.state.subscriptions.includes(publishers[i].publication) || publishers[i].required) {
-          const obj = new ImagesApi(publishers[i].publication, publishers[i].categoryId, null, this.addMasterContent, this.state.level, publishers[i].filtered);
+      if (this.state.subscriptions.includes(publishers[i].publisher) || publishers[i].required) {
+          const obj = new ImagesApi(publishers[i].publisher, publishers[i].id, null, this.addMasterContent, this.state.level, publishers[i].filtered);
           imageSubscriptions.push(obj);
           }
     }
+    this.setState({
+      imageSubscriptions: imageSubscriptions
+    });
     this.fetchRow(3);
   }
 

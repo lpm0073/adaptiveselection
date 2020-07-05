@@ -11,17 +11,13 @@ export const Publishers = (state = {
             // transform the json object from the REST get into something
             // easier to work with.
             for (var i=0; i<publishers.length; i++) {
-                const categoryId = publishers[i].id;
-                const publisher = publishers[i].name;
-                const required = publishers[i].acf.hasOwnProperty("required") ? publishers[i].acf.required : false;
-                const filtered = publishers[i].acf.hasOwnProperty("filtered") ? publishers[i].acf.filtered : false;
                 const publication = {
-                    required: required,
-                    publisher: publisher,
-                    id: categoryId,
-                    filtered: filtered
+                    required: publishers[i].acf.hasOwnProperty("required") ? publishers[i].acf.required : false,
+                    publisher: publishers[i].name,
+                    id: publishers[i].id,
+                    filtered: publishers[i].acf.hasOwnProperty("filtered") ? publishers[i].acf.filtered : false
                 }
-                if (publication.id !== 1 && !publication.required) items.push(publication);
+                if (publication.id !== 1) items.push(publication);
             }
             return {...state, isLoading: false, errMess: null, items: items};
 
