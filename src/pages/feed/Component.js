@@ -17,7 +17,7 @@ import './styles.css';
 import Loading from '../../components/Loading';
 import * as Defaults from '../../appDefaults';
 import ContentRow from '../../components/contentRow/ContentRow'
-import { getPublishers, ImagesApi, wpGetImage, imagePreFetcher, wpGetExclusionArray } from '../../shared/ImagesApi';
+import { ImagesApi, wpGetImage, imagePreFetcher, wpGetExclusionArray } from '../../shared/ImagesApi';
 
 const SUBSCRIPTIONS = ["Splash", "Wallpapers"];
 const LEVEL = 3;
@@ -30,16 +30,13 @@ const mapDispatchToProps = (dispatch) => {
     actions: bindActionCreators(Actions, dispatch)
   });
 };
-
-
-
 class Feed extends Component {
 
   idleDelay = null;
   masterContent = [];
-  imageSubscriptions = [];
   page;
   fetching = false;
+  areSubscriptionsRegistered = false;
 
   constructor(props) {
     super(props);
@@ -81,17 +78,18 @@ class Feed extends Component {
       level: LEVEL,
       nextSerialNumber: 0,
       channel: props.location.pathname.replace("/", ""),
-      subscriptions: SUBSCRIPTIONS
+      subscriptions: SUBSCRIPTIONS,
+      imageSubscriptions: [],
     }
 
   }
 
   componentDidMount() {
     this.resetIdleTimeout();
+  }
+  componentWillReceiveProps() {
     if (this.state.channel !== "") return;
-
-    getPublishers(this.registerSubscriptions);
-
+    if (!this.areSubscriptionsRegistered) this.registerSubscriptions();
   }
 
   componentWillUnmount() {
@@ -119,21 +117,23 @@ class Feed extends Component {
   }
 
   // Callback for ImagesApi.getPublishers()
-  registerSubscriptions(publishers) {
+  registerSubscriptions() {
+    if (this.areSubscriptionsRegistered) return;
+    if (this.props.publishers.items.length === 0) return;
+    this.areSubscriptionsRegistered = true;
+
+    const publishers = this.props.publishers.items;
+    const imageSubscriptions = [];
+    console.log("registerSubscriptions()", publishers);
 
     for (var i=0; i<publishers.length; i++) {
-      const required = publishers[i].acf.hasOwnProperty("required") ? publishers[i].acf.required : false;
-      const publication = publishers[i].name;
-      const categoryId = publishers[i].id;
-      const filtered = publishers[i].acf.hasOwnProperty("filtered") ? publishers[i].acf.filtered : false;
-      if (this.state.subscriptions.includes(publication) || required) {
-          const obj = new ImagesApi(publication, categoryId, null, this.addMasterContent, this.state.level, filtered);
-          this.imageSubscriptions.push(obj);
+      if (this.state.subscriptions.includes(publishers[i].publication) || publishers[i].required) {
+          const obj = new ImagesApi(publishers[i].publication, publishers[i].categoryId, null, this.addMasterContent, this.state.level, publishers[i].filtered);
+          imageSubscriptions.push(obj);
           }
     }
     this.fetchRow(3);
   }
-
 
   doIdle() {
     console.log("doIdle() short-circuited");

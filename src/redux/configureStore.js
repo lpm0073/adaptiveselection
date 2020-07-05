@@ -4,6 +4,7 @@ import { createStore, combineReducers, applyMiddleware } from 'redux';
 import undoable from 'redux-undo';
 
 import { Categories } from './categories';
+import { Publishers } from './publishers';
 import { ItemCarousel } from './itemCarousel';
 import { UserSignal} from './userSignal';
 import { ItemRow } from './ItemRow';
@@ -18,6 +19,7 @@ export const ConfigureStore = () => {
         
         combineReducers({
             categories: Categories,
+            publishers: Publishers,
             itemRow: undoable(ItemRow, {
                 undoType: 'UNDO_ITEMROW',
                 redoType: 'REDO_ITEMROW'

@@ -1,8 +1,11 @@
 import * as ActionTypes from './ActionTypes';
+import { IMAGE_API_PUBLISHERS_URL } from '../shared/ImagesApi';
 
 const BackendURL = 'https://api.fotomashup.com/wp-json/wp/v2/';
 const CategoriesURL = BackendURL + 'categories?per_page=100&_fields=id,count,acf';
 
+
+/* ------------------------------------------------------------ */
 export const addUserSignal = (signal, image) => {
     return {
         type: ActionTypes.ADD_USER_SIGNAL,
@@ -305,3 +308,46 @@ export const addCategories = (Categories) => ({
     type: ActionTypes.ADD_CATEGORIES,
     payload: Categories
 });
+
+
+/* ------------------------------------------------------------ */
+
+export const PublishersLoading = () => ({
+    type: ActionTypes.PUBLISHERS_LOADING
+});
+
+export const PublishersFailed = (errmess) => ({
+    type: ActionTypes.PUBLISHERS_FAILED,
+    payload: errmess
+});
+
+export const addPublishers = (Publishers) => ({
+    type: ActionTypes.ADD_PUBLISHERS,
+    payload: Publishers
+});
+
+
+export const fetchPublishers = () => (dispatch) => {
+    dispatch(PublishersLoading(true));
+
+    return fetch(IMAGE_API_PUBLISHERS_URL)
+    .then(
+        response => {
+            if (response.ok) {
+                return response;
+            } else {
+                var error = new Error('Error ' + response.status + ': ' + response.statusText);
+                error.response = response;
+                throw error;
+            }
+        },
+        error => {
+            var errmess = new Error(error.message);
+            throw errmess;
+        })
+    .then(response => response.json())
+    .then(publishers => {
+        dispatch(addPublishers(publishers));
+    })
+    .catch(error => dispatch(PublishersFailed(error.message)));
+}

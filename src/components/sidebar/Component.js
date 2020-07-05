@@ -3,32 +3,28 @@
 import React, { Component} from 'react';
 import SideNav, { Toggle, Nav, NavItem, NavIcon, NavText } from '@trendmicro/react-sidenav';
 
+// redux stuff
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import * as Actions from '../../redux/ActionCreators';
+
 // Be sure to include styles at some point, probably during your bootstrapping
 import '@trendmicro/react-sidenav/dist/react-sidenav.css';
 import './styles.css';
 
-import { getPublishers } from '../../shared/ImagesApi';
-
+const mapStateToProps = state => ({
+    ...state
+});
+const mapDispatchToProps = (dispatch) => {
+  return({
+    actions: bindActionCreators(Actions, dispatch)
+  });
+};
 
 class Sidebar extends Component {
 
-    constructor(props) {
-        super(props);
-
-        this.postPublishers = this.postPublishers.bind(this);
-
-        this.state = {
-            publishers: []
-        };
-    }
-
-    componentDidMount() {
-        getPublishers(this.postPublishers);
-    }
-
     render() {
         const iconStyle = { fontSize: '1.75em' };
-
         return(
             <SideNav
                 onSelect={(selected) => {
@@ -45,7 +41,7 @@ class Sidebar extends Component {
                     <NavItem eventKey="publications">
                         <NavIcon><i className="fa fa-fw fa-book" style={iconStyle} /></NavIcon>
                         <NavText>Publications</NavText>                        
-                        {this.state.publishers.map((publication) => {
+                        {this.props.publishers.items.map((publication) => {
                             return(
                                 <NavItem eventKey={"publications/" + String(publication.publisher)}>
                                     <NavText>
@@ -59,32 +55,7 @@ class Sidebar extends Component {
             </SideNav>            
         );
     }
-
-    postPublishers(publishers) {
-
-        var obj = [];
-
-        for (var i=0; i<publishers.length; i++) {
-          const required = publishers[i].acf.hasOwnProperty("required") ? publishers[i].acf.required : false;
-          const publisher = publishers[i].name;
-          const categoryId = publishers[i].id;
-          const filtered = publishers[i].acf.hasOwnProperty("filtered") ? publishers[i].acf.filtered : false;
-          
-          const publication = {
-              required: required,
-              publisher: publisher,
-              id: categoryId,
-              filtered: filtered
-          }
-          if (publication.id !== 1 && !publication.required) obj.push(publication);
-        }
-
-        this.setState({
-            publishers: obj
-        });
-
-    }
         
 }
 
-export default Sidebar;
+export default connect(mapStateToProps, mapDispatchToProps)(Sidebar);

@@ -4,7 +4,7 @@
 const IMAGES_API_BACKEND_URL = 'https://api.fotomashup.com/wp-json/wp/v2/';
 const IMAGES_API_MEDIA_URL = IMAGES_API_BACKEND_URL + 'media?_fields=id,categories,acf,media_details&per_page=100';
 const IMAGES_API_CATEGORY_URL = IMAGES_API_BACKEND_URL + 'categories?per_page=100&_fields=id,count,acf';
-const IMAGE_API_PUBLISHERS_URL = IMAGES_API_BACKEND_URL + "categories?per_page=100&_fields=id,name,acf&parent=0";
+export const IMAGE_API_PUBLISHERS_URL = IMAGES_API_BACKEND_URL + "categories?per_page=100&_fields=id,name,acf&parent=0";
 
 const IMAGES_API_PAGE_IDENTIFIER = "&page=";
 const IMAGES_API_CATEGORY_EXCLUSION_IDENTIFIER = "categories_exclude=";
