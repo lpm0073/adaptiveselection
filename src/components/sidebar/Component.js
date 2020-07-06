@@ -33,24 +33,46 @@ class Sidebar extends Component {
                 }}
             >
                 <SideNav.Toggle />
-                <SideNav.Nav defaultSelected="home">
+                <SideNav.Nav defaultSelected="plugins">
                     <NavItem eventKey="home">
                         <NavIcon><i className="fa fa-fw fa-home" style={iconStyle} /></NavIcon>
                         <NavText>Home</NavText>
                     </NavItem>
-                    <NavItem eventKey="publications">
-                        <NavIcon><i className="fa fa-fw fa-book" style={iconStyle} /></NavIcon>
+                    <NavItem eventKey="plugins">
+                        <NavIcon><i className="fa fa-fw fa-plug" style={iconStyle} /></NavIcon>
                         <NavText>Plugins</NavText>                        
                         {this.props.publishers.items.map((publication) => {
                             if (publication.required) return( <React.Fragment></React.Fragment> );
                             return(
-                                <NavItem eventKey={"publications/" + String(publication.publisher)}>
+                                <NavItem eventKey={"plugins/" + String(publication.publisher)}>
                                     <NavText>
                                         {publication.publisher}
                                     </NavText>
                                 </NavItem>
                             );
                         })}
+                    </NavItem>
+                    <NavItem eventKey="enhancers">
+                        <NavIcon><i className="fa fa-fw fa-magic" style={iconStyle} /></NavIcon>
+                        <NavText>Enhancers</NavText>
+                    </NavItem>
+                    <NavItem eventKey="developers">
+                        <NavIcon><i className="fa fa-fw fa-code" style={iconStyle} /></NavIcon>
+                        <NavText>Developer Center</NavText>
+                    </NavItem>
+                    <NavItem eventKey="account">
+                        <NavIcon><i className="fa fa-fw fa-user" style={iconStyle} /></NavIcon>
+                        <NavText>Account</NavText>
+                            <NavItem eventKey="account/login">
+                                <NavText>Login</NavText>
+                            </NavItem>
+                            <NavItem eventKey="account/logout">
+                                <NavText>Logout</NavText>
+                            </NavItem>
+                            <NavItem eventKey="settings">
+                                <NavText>Settings</NavText>
+                            </NavItem>
+
                     </NavItem>
                 </SideNav.Nav>
             </SideNav>            
