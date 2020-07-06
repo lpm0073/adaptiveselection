@@ -47,7 +47,7 @@ class Sidebar extends Component {
                     }}
                 >
                     <SideNav.Toggle />
-                    <SideNav.Nav defaultSelected="plugins">
+                    <SideNav.Nav defaultSelected="home">
                         <NavItem eventKey="home">
                             <NavIcon><i className="fa fa-fw fa-home" style={iconStyle} /></NavIcon>
                             <NavText>Home</NavText>

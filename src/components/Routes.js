@@ -5,9 +5,13 @@ import { withRouter, Switch, Route, Redirect } from 'react-router-dom';
 import { connect } from 'react-redux';
 import { fetchCategories, fetchPublishers } from '../redux/ActionCreators';
 
+// my stuff
+import Sidebar from './sidebar/Component';
+
 // Pages
 import Feed from '../pages/feed/Component';
-import Sidebar from './sidebar/Component';
+import EnhancersPage from '../pages/enhancers/Component';
+import AccountPage from '../pages/account/Component';
 
 
 const mapStateToProps = state => ({
@@ -33,7 +37,10 @@ class Routes extends Component {
         <React.Fragment>
           <Sidebar history={this.props.history} location={this.props.location} />
           <Switch>
-            <Route path="/" component={Feed} />
+            <Route exact path="/" component={Feed} />
+            <Route exact path="/home" component={Feed} />
+            <Route exact path="/enhancers" component={EnhancersPage} />
+            <Route exact path="/account" component={AccountPage} />
             <Redirect to="/" />
           </Switch>
         </React.Fragment>
