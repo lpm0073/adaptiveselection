@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { Switch, Route, Redirect } from 'react-router-dom';
-import { withRouter } from 'react-router-dom';
+import { withRouter, Switch, Route, Redirect } from 'react-router-dom';
 
 // Redux
 import { connect } from 'react-redux';
@@ -8,6 +7,7 @@ import { fetchCategories, fetchPublishers } from '../redux/ActionCreators';
 
 // Pages
 import Feed from '../pages/feed/Component';
+import Sidebar from './sidebar/Component';
 
 
 const mapStateToProps = state => ({
@@ -27,14 +27,11 @@ class Routes extends Component {
     this.props.fetchPublishers();
   }
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return true;
-}
 
   render() {
-
     return(
         <React.Fragment>
+          <Sidebar history={this.props.history} location={this.props.location} />
           <Switch>
             <Route path="/" component={Feed} />
             <Redirect to="/" />

@@ -22,14 +22,16 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 class Sidebar extends Component {
-
     render() {
+
         const iconStyle = { fontSize: '1.75em' };
         return(
             <SideNav
                 onSelect={(selected) => {
-                    console.log("onSelect() - ", selected);
-                    // Add your code here
+                    const to = '/' + selected;
+                       if (this.props.location.pathname !== to) {
+                        this.props.history.push(to);
+                    }                    
                 }}
             >
                 <SideNav.Toggle />
